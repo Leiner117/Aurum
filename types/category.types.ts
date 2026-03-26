@@ -1,3 +1,5 @@
+export type CategoryType = "expense" | "income";
+
 export interface Category {
   id: string;
   user_id: string;
@@ -5,6 +7,7 @@ export interface Category {
   icon: string;
   color: string;
   is_default: boolean;
+  type: CategoryType;
   created_at: string;
 }
 
@@ -12,6 +15,7 @@ export interface CreateCategoryInput {
   name: string;
   icon: string;
   color: string;
+  type: CategoryType;
 }
 
 export interface UpdateCategoryInput extends Partial<CreateCategoryInput> {

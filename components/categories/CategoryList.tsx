@@ -61,6 +61,10 @@ export function CategoryList({
               {cat.name}
             </span>
 
+            {/* Type badge */}
+            <Badge variant={cat.type === "income" ? "success" : "default"}>
+              {cat.type === "income" ? "Income" : "Expense"}
+            </Badge>
             {/* Default badge */}
             {cat.is_default && <Badge variant="default">Default</Badge>}
 

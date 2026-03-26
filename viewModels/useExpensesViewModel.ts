@@ -47,6 +47,7 @@ export function useExpensesViewModel(): ExpensesViewModelReturn {
         .from(SUPABASE_TABLES.EXPENSES)
         .select("*, category:categories(id, name, icon, color)", { count: "exact" });
 
+      if (filters.type) query = query.eq("type", filters.type);
       if (filters.categoryId) query = query.eq("category_id", filters.categoryId);
       if (filters.startDate) query = query.gte("date", filters.startDate);
       if (filters.endDate) query = query.lte("date", filters.endDate);

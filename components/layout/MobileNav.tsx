@@ -60,7 +60,7 @@ export function MobileNav() {
             <div className="flex items-center justify-between px-5 py-5 border-b border-[var(--color-border)]">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-[var(--color-primary)]" />
-                <span className="font-semibold text-[var(--color-foreground)]">Finance App</span>
+                <span className="font-semibold text-[var(--color-foreground)]">Aurum</span>
               </div>
               <button
                 onClick={() => setIsOpen(false)}

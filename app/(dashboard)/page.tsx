@@ -225,6 +225,7 @@ export default function DashboardPage() {
       >
         <ExpenseForm
           categories={categories}
+          type="expense"
           defaultCurrency={defaultCurrency}
           isLoading={quickAddLoading}
           onSubmit={handleQuickAdd}

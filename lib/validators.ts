@@ -28,6 +28,7 @@ export const categorySchema = z.object({
   color: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color"),
+  type: z.enum(["expense", "income"]),
 });
 
 // ── Expenses ──────────────────────────────────────────────
@@ -44,6 +45,7 @@ export const expenseSchema = z.object({
   category_id: z.string().uuid("Invalid category").nullable(),
   date: z.string().min(1, "Date is required"),
   notes: z.string().max(500, "Notes must be 500 characters or less").optional(),
+  type: z.enum(["expense", "income"]),
 });
 
 // ── Budgets ───────────────────────────────────────────────
@@ -73,6 +75,7 @@ export const recurringExpenseSchema = z.object({
   category_id: z.string().uuid("Invalid category").nullable(),
   frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
   next_date: z.string().min(1, "Next date is required"),
+  type: z.enum(["expense", "income"]),
 });
 
 // ── Inferred types ────────────────────────────────────────

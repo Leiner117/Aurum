@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { SUPPORTED_CURRENCIES } from "@/constants/currency.constants";
+import { cn } from "@/lib/utils";
 import type { RecurringExpenseWithCategory } from "@/types/recurring.types";
 import type { Category } from "@/types/category.types";
 
@@ -40,6 +41,8 @@ export function RecurringForm({
     handleSubmit,
     control,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<RecurringExpenseInput>({
     resolver: zodResolver(recurringExpenseSchema),
@@ -50,6 +53,7 @@ export function RecurringForm({
       category_id: recurring?.category_id ?? null,
       frequency: recurring?.frequency ?? "monthly",
       next_date: recurring?.next_date ?? "",
+      type: recurring?.type ?? "expense",
     },
   });
 
@@ -62,6 +66,7 @@ export function RecurringForm({
         category_id: recurring.category_id,
         frequency: recurring.frequency,
         next_date: recurring.next_date,
+        type: recurring.type,
       });
     }
   }, [recurring, reset]);
@@ -69,9 +74,11 @@ export function RecurringForm({
   const handleFormSubmit: SubmitHandler<RecurringExpenseInput> = (data) =>
     onSubmit(data);
 
+  const activeType = watch("type");
+  const filteredCategories = categories.filter((c) => c.type === activeType);
   const categoryOptions = [
     { label: "No category", value: "" },
-    ...categories.map((c) => ({ label: c.name, value: c.id })),
+    ...filteredCategories.map((c) => ({ label: c.name, value: c.id })),
   ];
 
   const currencyOptions = SUPPORTED_CURRENCIES.map((c) => ({
@@ -81,9 +88,34 @@ export function RecurringForm({
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+      {/* Type toggle */}
+      <div className="space-y-1.5">
+        <p className="text-sm font-medium text-[var(--color-foreground)]">Type</p>
+        <div className="flex gap-2">
+          {(["expense", "income"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setValue("type", t, { shouldValidate: true })}
+              className={cn(
+                "flex-1 rounded-lg border px-3 py-2 text-sm font-medium capitalize transition-colors",
+                activeType === t
+                  ? t === "expense"
+                    ? "border-[var(--color-danger)] bg-red-50 text-[var(--color-danger)] dark:bg-red-900/20"
+                    : "border-[var(--color-success)] bg-green-50 text-[var(--color-success)] dark:bg-green-900/20"
+                  : "border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:bg-[var(--color-surface-hover)]"
+              )}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+        <input type="hidden" {...register("type")} />
+      </div>
+
       <Input
         label="Description"
-        placeholder="e.g. Netflix, Rent, Gym"
+        placeholder="e.g. Netflix, Rent, Salary"
         error={errors.description?.message}
         {...register("description")}
       />

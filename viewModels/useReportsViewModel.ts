@@ -69,6 +69,7 @@ export function useReportsViewModel(): ReportsViewModelReturn {
       const { data: expenses, error: dbError } = await supabase
         .from(SUPABASE_TABLES.EXPENSES)
         .select("amount, currency, date, category_id, categories(name, color)")
+        .eq("type", "expense")
         .gte("date", rangeStart)
         .lte("date", rangeEnd);
 

@@ -44,6 +44,7 @@ export interface Database {
           icon: string;
           color: string;
           is_default: boolean;
+          type: "expense" | "income";
           created_at: string;
         };
         Insert: {
@@ -53,12 +54,14 @@ export interface Database {
           icon?: string;
           color?: string;
           is_default?: boolean;
+          type?: "expense" | "income";
           created_at?: string;
         };
         Update: {
           name?: string;
           icon?: string;
           color?: string;
+          type?: "expense" | "income";
         };
         Relationships: [];
       };
@@ -72,6 +75,7 @@ export interface Database {
           description: string;
           date: string;
           notes: string | null;
+          type: "expense" | "income";
           is_recurring: boolean;
           recurring_expense_id: string | null;
           created_at: string;
@@ -86,6 +90,7 @@ export interface Database {
           description: string;
           date: string;
           notes?: string | null;
+          type?: "expense" | "income";
           is_recurring?: boolean;
           recurring_expense_id?: string | null;
           created_at?: string;
@@ -98,6 +103,7 @@ export interface Database {
           description?: string;
           date?: string;
           notes?: string | null;
+          type?: "expense" | "income";
           updated_at?: string;
         };
         Relationships: [];
@@ -146,6 +152,7 @@ export interface Database {
           frequency: "daily" | "weekly" | "monthly" | "yearly";
           next_date: string;
           is_active: boolean;
+          type: "expense" | "income";
           created_at: string;
           updated_at: string;
         };
@@ -159,6 +166,7 @@ export interface Database {
           frequency: "daily" | "weekly" | "monthly" | "yearly";
           next_date: string;
           is_active?: boolean;
+          type?: "expense" | "income";
           created_at?: string;
           updated_at?: string;
         };
@@ -170,6 +178,7 @@ export interface Database {
           frequency?: "daily" | "weekly" | "monthly" | "yearly";
           next_date?: string;
           is_active?: boolean;
+          type?: "expense" | "income";
           updated_at?: string;
         };
         Relationships: [];

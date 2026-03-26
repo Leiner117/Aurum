@@ -8,12 +8,13 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { SUPPORTED_CURRENCIES } from "@/constants/currency.constants";
-import type { ExpenseWithCategory } from "@/types/expense.types";
+import type { ExpenseWithCategory, TransactionType } from "@/types/expense.types";
 import type { Category } from "@/types/category.types";
 
 interface ExpenseFormProps {
   expense?: ExpenseWithCategory;
   categories: Category[];
+  type?: TransactionType;
   defaultCurrency?: string;
   isLoading: boolean;
   onSubmit: (data: ExpenseInput) => void;
@@ -25,11 +26,14 @@ const today = new Date().toISOString().split("T")[0];
 export function ExpenseForm({
   expense,
   categories,
+  type = "expense",
   defaultCurrency = "USD",
   isLoading,
   onSubmit,
   onCancel,
 }: ExpenseFormProps) {
+  const activeType = expense?.type ?? type;
+
   const {
     register,
     handleSubmit,
@@ -45,6 +49,7 @@ export function ExpenseForm({
       category_id: expense?.category_id ?? null,
       date: expense?.date ?? today,
       notes: expense?.notes ?? "",
+      type: activeType,
     },
   });
 
@@ -57,13 +62,16 @@ export function ExpenseForm({
         category_id: expense.category_id,
         date: expense.date,
         notes: expense.notes ?? "",
+        type: expense.type,
       });
     }
   }, [expense, reset]);
 
+  // Only show categories that match the active type
+  const filteredCategories = categories.filter((c) => c.type === activeType);
   const categoryOptions = [
     { label: "No category", value: "" },
-    ...categories.map((c) => ({ label: c.name, value: c.id })),
+    ...filteredCategories.map((c) => ({ label: c.name, value: c.id })),
   ];
 
   const currencyOptions = SUPPORTED_CURRENCIES.map((c) => ({
@@ -72,14 +80,19 @@ export function ExpenseForm({
   }));
 
   const handleFormSubmit: SubmitHandler<ExpenseInput> = (data) => {
-    onSubmit({ ...data, category_id: data.category_id || null });
+    onSubmit({ ...data, category_id: data.category_id || null, type: activeType });
   };
+
+  const isIncome = activeType === "income";
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+      {/* Hidden type field */}
+      <input type="hidden" {...register("type")} value={activeType} />
+
       <Input
         label="Description"
-        placeholder="e.g. Grocery shopping"
+        placeholder={isIncome ? "e.g. Monthly salary" : "e.g. Grocery shopping"}
         error={errors.description?.message}
         {...register("description")}
       />
@@ -124,19 +137,25 @@ export function ExpenseForm({
         />
       </div>
 
-      <Input
-        label="Notes (optional)"
-        placeholder="Any additional details..."
-        error={errors.notes?.message}
-        {...register("notes")}
-      />
+      {!isIncome && (
+        <Input
+          label="Notes (optional)"
+          placeholder="Any additional details..."
+          error={errors.notes?.message}
+          {...register("notes")}
+        />
+      )}
 
       <div className="flex justify-end gap-2 pt-2">
         <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>
           Cancel
         </Button>
         <Button type="submit" isLoading={isLoading}>
-          {expense ? "Save changes" : "Add expense"}
+          {expense
+            ? "Save changes"
+            : isIncome
+            ? "Add income"
+            : "Add expense"}
         </Button>
       </div>
     </form>

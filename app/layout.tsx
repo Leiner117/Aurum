@@ -4,8 +4,8 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import { ToastProvider } from "@/providers/ToastProvider";
 
 export const metadata: Metadata = {
-  title: "Finance App",
-  description: "Personal expense management app",
+  title: "Aurum",
+  description: "Personal finance management app",
 };
 
 export default function RootLayout({

@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(npx create-next-app@latest finance-app --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --no-eslint)",
-      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --no-eslint --yes)"
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --no-eslint --yes)",
+      "Bash(npm install:*)",
+      "Bash(cat app/\\\\\\(dashboard\\\\\\)/expenses/page.tsx)",
+      "Bash(npx tsc:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(true git:*)"
     ]
   }
 }

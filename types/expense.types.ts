@@ -1,3 +1,5 @@
+export type TransactionType = "expense" | "income";
+
 export interface Expense {
   id: string;
   user_id: string;
@@ -7,6 +9,7 @@ export interface Expense {
   description: string;
   date: string;
   notes: string | null;
+  type: TransactionType;
   is_recurring: boolean;
   recurring_expense_id: string | null;
   created_at: string;
@@ -29,6 +32,7 @@ export interface CreateExpenseInput {
   description: string;
   date: string;
   notes?: string;
+  type: TransactionType;
 }
 
 export interface UpdateExpenseInput extends Partial<CreateExpenseInput> {
@@ -43,4 +47,5 @@ export interface ExpenseFilters {
   maxAmount?: number;
   search?: string;
   sortBy?: string;
+  type?: TransactionType;
 }
