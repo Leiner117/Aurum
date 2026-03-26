@@ -47,7 +47,7 @@ const initialState: ReportsState = {
   totalLastMonth: 0,
   totalExpenses: 0,
   monthsBack: 6,
-  isLoading: false,
+  isLoading: true,
   error: null,
 };
 
