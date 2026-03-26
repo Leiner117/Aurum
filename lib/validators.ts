@@ -46,8 +46,22 @@ export const expenseSchema = z.object({
   notes: z.string().max(500, "Notes must be 500 characters or less").optional(),
 });
 
+// ── Budgets ───────────────────────────────────────────────
+export const budgetSchema = z.object({
+  category_id: z.string().uuid("Select a category"),
+  amount: z
+    .number()
+    .positive("Amount must be greater than 0")
+    .multipleOf(0.01, "Max 2 decimal places"),
+  currency: z.string().length(3, "Must be a valid currency code"),
+  month: z.number().int().min(1).max(12),
+  year: z.number().int().min(2000),
+  alert_threshold: z.number().int().min(1).max(100).optional(),
+});
+
 // ── Inferred types ────────────────────────────────────────
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type CategoryInput = z.infer<typeof categorySchema>;
 export type ExpenseInput = z.infer<typeof expenseSchema>;
+export type BudgetInput = z.infer<typeof budgetSchema>;
