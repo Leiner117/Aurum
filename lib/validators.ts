@@ -59,9 +59,26 @@ export const budgetSchema = z.object({
   alert_threshold: z.number().int().min(1).max(100).optional(),
 });
 
+// ── Recurring Expenses ────────────────────────────────────
+export const recurringExpenseSchema = z.object({
+  description: z
+    .string()
+    .min(1, "Description is required")
+    .max(100, "Description must be 100 characters or less"),
+  amount: z
+    .number()
+    .positive("Amount must be greater than 0")
+    .multipleOf(0.01, "Max 2 decimal places"),
+  currency: z.string().length(3, "Must be a valid currency code"),
+  category_id: z.string().uuid("Invalid category").nullable(),
+  frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
+  next_date: z.string().min(1, "Next date is required"),
+});
+
 // ── Inferred types ────────────────────────────────────────
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type CategoryInput = z.infer<typeof categorySchema>;
 export type ExpenseInput = z.infer<typeof expenseSchema>;
 export type BudgetInput = z.infer<typeof budgetSchema>;
+export type RecurringExpenseInput = z.infer<typeof recurringExpenseSchema>;
