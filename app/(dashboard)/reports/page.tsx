@@ -45,11 +45,12 @@ const ReportsPage = () => {
         title="Reports"
         description="Visualize your spending patterns."
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <PeriodSelector value={monthsBack} onChange={setMonthsBack} />
             <Button variant="secondary" size="sm" onClick={handleExport}>
               <Download className="h-4 w-4" />
-              Export CSV
+              <span className="hidden sm:inline">Export CSV</span>
+              <span className="sm:hidden">CSV</span>
             </Button>
           </div>
         }

@@ -29,7 +29,7 @@ export const AccountCard = ({ account, onEdit, onDelete }: AccountCardProps) => 
   const isNegative = account.balance < 0;
 
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
+    <div className="flex items-center gap-3 px-4 py-3">
       {/* Icon */}
       <div
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white"
@@ -45,7 +45,7 @@ export const AccountCard = ({ account, onEdit, onDelete }: AccountCardProps) => 
       </div>
 
       {/* Balance — fixed width, right-aligned */}
-      <div className="w-36 shrink-0 text-right">
+      <div className="w-24 shrink-0 text-right sm:w-36">
         <p
           className={cn(
             "text-sm font-semibold tabular-nums",

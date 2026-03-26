@@ -25,7 +25,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: ROUTES.DASHBOARD, icon: <LayoutDashboard className="h-4 w-4" /> },
   { label: "Accounts", href: ROUTES.ACCOUNTS, icon: <Landmark className="h-4 w-4" /> },
-  { label: "Expenses", href: ROUTES.EXPENSES, icon: <Receipt className="h-4 w-4" /> },
+  { label: "Transactions", href: ROUTES.EXPENSES, icon: <Receipt className="h-4 w-4" /> },
   { label: "Categories", href: ROUTES.CATEGORIES, icon: <Tag className="h-4 w-4" /> },
   { label: "Budgets", href: ROUTES.BUDGETS, icon: <Target className="h-4 w-4" /> },
   { label: "Reports", href: ROUTES.REPORTS, icon: <BarChart3 className="h-4 w-4" /> },

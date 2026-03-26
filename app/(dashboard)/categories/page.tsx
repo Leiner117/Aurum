@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { SkeletonRow } from "@/components/ui/Skeleton";
+import { Spinner } from "@/components/ui/Spinner";
 import { CategoryList } from "@/components/categories/CategoryList";
 import { CategoryForm } from "@/components/categories/CategoryForm";
 import { useCategoriesViewModel } from "@/viewModels/useCategoriesViewModel";
@@ -50,8 +50,8 @@ const CategoriesPage = () => {
       <Card>
         <CardBody className="p-0">
           {isLoading ? (
-            <div className="px-5 py-2">
-              {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
+            <div className="flex justify-center py-10">
+              <Spinner />
             </div>
           ) : categories.length === 0 ? (
             <EmptyState

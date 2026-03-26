@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Receipt, TrendingUp } from "lucide-react";
+import { Plus, Receipt, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { DataTable, type Column } from "@/components/ui/DataTable";
+import { Spinner } from "@/components/ui/Spinner";
 import { ExpenseFiltersBar } from "@/components/expenses/ExpenseFilters";
 import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { ExpenseRowActions } from "@/components/expenses/ExpenseRowActions";
@@ -106,7 +107,7 @@ export default function ExpensesPage() {
                 color={row.category.color}
               />
             </div>
-            <span className="text-sm">{row.category.name}</span>
+            <span className="hidden sm:inline text-sm">{row.category.name}</span>
           </div>
         ) : (
           <span className="text-[var(--color-muted-foreground)]">—</span>
@@ -115,6 +116,7 @@ export default function ExpensesPage() {
     {
       key: "date",
       header: "Date",
+      className: "hidden sm:table-cell",
       cell: (row) => (
         <span className="text-sm text-[var(--color-muted-foreground)]">
           {formatDate(row.date)}
@@ -214,26 +216,18 @@ export default function ExpensesPage() {
         onChange={(f) => setFilters({ ...f, type: activeType })}
       />
 
-      <DataTable
-        columns={columns}
-        data={expenses}
-        keyExtractor={(row) => row.id}
-        isLoading={isLoading}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalCount={totalCount}
-        pageSize={EXPENSES_PAGE_SIZE}
-        onPageChange={setPage}
-        emptyState={
+      {/* Mobile card list */}
+      <div className="sm:hidden">
+        {isLoading ? (
+          <div className="flex justify-center py-8"><Spinner /></div>
+        ) : expenses.length === 0 ? (
           <EmptyState
             icon={isIncome ? <TrendingUp className="h-6 w-6" /> : <Receipt className="h-6 w-6" />}
             title={isIncome ? "No income found" : "No expenses found"}
             description={
               Object.keys(filters).filter((k) => k !== "type").length
                 ? "Try adjusting your filters."
-                : isIncome
-                ? "Add your first income entry to get started."
-                : "Add your first expense to get started."
+                : isIncome ? "Add your first income entry." : "Add your first expense."
             }
             actionLabel={
               !Object.keys(filters).filter((k) => k !== "type").length
@@ -246,8 +240,135 @@ export default function ExpensesPage() {
                 : undefined
             }
           />
-        }
-      />
+        ) : (
+          <div className="space-y-2">
+            {expenses.map((exp) => (
+              <div
+                key={exp.id}
+                className="flex items-start gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3"
+              >
+                {/* Category icon */}
+                <div
+                  className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+                  style={{ backgroundColor: (exp.category?.color ?? "#64748b") + "22" }}
+                >
+                  <CategoryIcon
+                    name={exp.category?.icon ?? "ellipsis"}
+                    className="h-4 w-4"
+                    color={exp.category?.color ?? "#64748b"}
+                  />
+                </div>
+
+                {/* Info */}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-[var(--color-foreground)]">
+                    {exp.description}
+                  </p>
+                  <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
+                    {exp.category?.name ?? "Uncategorized"} · {formatDate(exp.date)}
+                  </p>
+                  {exp.is_recurring && (
+                    <Badge variant="info" className="mt-1 text-xs">Recurring</Badge>
+                  )}
+                </div>
+
+                {/* Amount + actions */}
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  <span
+                    className={cn(
+                      "text-sm font-semibold tabular-nums",
+                      exp.type === "income"
+                        ? "text-[var(--color-success)]"
+                        : "text-[var(--color-foreground)]"
+                    )}
+                  >
+                    {exp.type === "income" ? "+" : ""}
+                    {formatCurrency(exp.amount, exp.currency)}
+                  </span>
+                  <ExpenseRowActions
+                    expense={exp}
+                    categories={categories}
+                    accounts={accounts}
+                    onUpdate={async (data: UpdateExpenseInput) => {
+                      const ok = await updateExpense(data);
+                      if (ok) showToast("Updated", "success");
+                      else showToast("Failed to update", "error");
+                      return ok;
+                    }}
+                    onDelete={async (id: string) => {
+                      const ok = await deleteExpense(id);
+                      if (ok) showToast("Deleted", "success");
+                      else showToast("Failed to delete", "error");
+                      return ok;
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+
+            {/* Mobile pagination */}
+            {totalCount > 0 && (
+              <div className="flex items-center justify-between px-1 pt-1 text-sm text-[var(--color-muted-foreground)]">
+                <span>
+                  {(currentPage - 1) * EXPENSES_PAGE_SIZE + 1}–
+                  {Math.min(currentPage * EXPENSES_PAGE_SIZE, totalCount)} of {totalCount}
+                </span>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0"
+                    onClick={() => setPage(currentPage - 1)} disabled={currentPage <= 1}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="px-1 font-medium text-[var(--color-foreground)]">
+                    {currentPage} / {totalPages}
+                  </span>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0"
+                    onClick={() => setPage(currentPage + 1)} disabled={currentPage >= totalPages}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden sm:block">
+        <DataTable
+          columns={columns}
+          data={expenses}
+          keyExtractor={(row) => row.id}
+          isLoading={isLoading}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          pageSize={EXPENSES_PAGE_SIZE}
+          onPageChange={setPage}
+          emptyState={
+            <EmptyState
+              icon={isIncome ? <TrendingUp className="h-6 w-6" /> : <Receipt className="h-6 w-6" />}
+              title={isIncome ? "No income found" : "No expenses found"}
+              description={
+                Object.keys(filters).filter((k) => k !== "type").length
+                  ? "Try adjusting your filters."
+                  : isIncome
+                  ? "Add your first income entry to get started."
+                  : "Add your first expense to get started."
+              }
+              actionLabel={
+                !Object.keys(filters).filter((k) => k !== "type").length
+                  ? isIncome ? "Add income" : "Add expense"
+                  : undefined
+              }
+              onAction={
+                !Object.keys(filters).filter((k) => k !== "type").length
+                  ? () => setIsCreateOpen(true)
+                  : undefined
+              }
+            />
+          }
+        />
+      </div>
 
       <Modal
         isOpen={isCreateOpen}

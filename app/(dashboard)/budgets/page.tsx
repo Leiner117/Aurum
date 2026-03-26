@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { SkeletonCard } from "@/components/ui/Skeleton";
+import { PageSpinner } from "@/components/ui/Spinner";
 import { BudgetCard } from "@/components/budgets/BudgetCard";
 import { BudgetForm } from "@/components/budgets/BudgetForm";
 import { MonthSelector } from "@/components/budgets/MonthSelector";
@@ -76,9 +76,7 @@ const BudgetsPage = () => {
 
       {/* Budget cards grid */}
       {isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
-        </div>
+        <PageSpinner />
       ) : summaries.length === 0 ? (
         <EmptyState
           icon={<Target className="h-6 w-6" />}

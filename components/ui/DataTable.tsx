@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "./Button";
-import { Skeleton } from "./Skeleton";
+import { Spinner } from "./Spinner";
 
 export interface Column<T> {
   key: string;
@@ -61,15 +61,11 @@ export const DataTable = <T,>({
           </thead>
           <tbody className="bg-[var(--color-surface)]">
             {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-[var(--color-border)] last:border-0">
-                  {columns.map((col) => (
-                    <td key={col.key} className="px-4 py-3">
-                      <Skeleton className="h-4 w-full" />
-                    </td>
-                  ))}
-                </tr>
-              ))
+              <tr>
+                <td colSpan={columns.length} className="py-12 text-center">
+                  <Spinner className="mx-auto" />
+                </td>
+              </tr>
             ) : data.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className="py-0">
