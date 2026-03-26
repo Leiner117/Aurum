@@ -10,11 +10,11 @@ import {
   BarChart3,
   RefreshCw,
   Settings,
-  TrendingUp,
   Landmark,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 interface NavItem {
   label: string;
@@ -39,9 +39,9 @@ export const Sidebar = () => {
   return (
     <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-[var(--color-border)] bg-[var(--color-surface)] min-h-screen">
       {/* Logo */}
-      <div className="flex h-14 items-center gap-2 px-5 border-b border-[var(--color-border)]">
-        <TrendingUp className="h-5 w-5 text-[var(--color-primary)]" />
-        <span className="font-semibold text-[var(--color-foreground)]">Aurum</span>
+      <div className="flex h-14 items-center gap-2.5 px-4 border-b border-[var(--color-border)]">
+        <Image src="/logo.png" alt="Aurum" width={28} height={28} className="shrink-0" />
+        <span className="font-semibold tracking-wide text-[var(--color-foreground)]">Aurum</span>
       </div>
 
       {/* Nav */}
@@ -59,7 +59,7 @@ export const Sidebar = () => {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-[var(--color-primary)] text-white"
+                  ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
                   : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-foreground)]"
               )}
             >
@@ -71,4 +71,4 @@ export const Sidebar = () => {
       </nav>
     </aside>
   );
-}
+};

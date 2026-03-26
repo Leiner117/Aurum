@@ -7,6 +7,10 @@ import { ReduxProvider } from "@/providers/ReduxProvider";
 export const metadata: Metadata = {
   title: "Aurum",
   description: "Personal finance management app",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

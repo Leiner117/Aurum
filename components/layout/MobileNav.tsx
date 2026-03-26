@@ -10,7 +10,6 @@ import {
   BarChart3,
   RefreshCw,
   Settings,
-  TrendingUp,
   Menu,
   X,
   Landmark,
@@ -18,6 +17,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: ROUTES.DASHBOARD, icon: <LayoutDashboard className="h-4 w-4" /> },
@@ -34,7 +34,6 @@ export const MobileNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  // Close on route change
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
@@ -59,10 +58,10 @@ export const MobileNav = () => {
 
           {/* Drawer */}
           <div className="absolute left-0 top-0 bottom-0 w-64 bg-[var(--color-surface)] flex flex-col shadow-xl">
-            <div className="flex items-center justify-between px-5 py-5 border-b border-[var(--color-border)]">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-[var(--color-primary)]" />
-                <span className="font-semibold text-[var(--color-foreground)]">Aurum</span>
+            <div className="flex h-14 items-center justify-between px-4 border-b border-[var(--color-border)]">
+              <div className="flex items-center gap-2.5">
+                <Image src="/logo.png" alt="Aurum" width={28} height={28} className="shrink-0" />
+                <span className="font-semibold tracking-wide text-[var(--color-foreground)]">Aurum</span>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
@@ -86,7 +85,7 @@ export const MobileNav = () => {
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                       isActive
-                        ? "bg-[var(--color-primary)] text-white"
+                        ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
                         : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-foreground)]"
                     )}
                   >
@@ -101,4 +100,4 @@ export const MobileNav = () => {
       )}
     </>
   );
-}
+};
