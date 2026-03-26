@@ -1,6 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createMiddlewareClient } from "@/lib/supabase/middleware";
-import { PUBLIC_ROUTES, ROUTES } from "@/constants/routes.constants";
+import { ROUTES } from "@/constants/routes.constants";
+
+const PUBLIC_PATHS = [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.AUTH_CALLBACK];
+
+function isPublicPath(pathname: string): boolean {
+  return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(path + "/"));
+}
 
 export async function middleware(request: NextRequest) {
   const { supabase, response } = await createMiddlewareClient(request);
@@ -11,20 +17,19 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
-  const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname === route);
 
-  // Redirect unauthenticated users to login
-  if (!user && !isPublicRoute) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = ROUTES.LOGIN;
-    return NextResponse.redirect(redirectUrl);
+  // Redirect unauthenticated users to login (except public paths)
+  if (!user && !isPublicPath(pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = ROUTES.LOGIN;
+    return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from auth pages
-  if (user && isPublicRoute && pathname !== ROUTES.AUTH_CALLBACK) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = ROUTES.DASHBOARD;
-    return NextResponse.redirect(redirectUrl);
+  // Redirect authenticated users away from login/register
+  if (user && (pathname === ROUTES.LOGIN || pathname === ROUTES.REGISTER)) {
+    const url = request.nextUrl.clone();
+    url.pathname = ROUTES.DASHBOARD;
+    return NextResponse.redirect(url);
   }
 
   return response;

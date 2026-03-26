@@ -44,3 +44,6 @@
 - Supabase v2.100+: Database type needs `Relationships: []` in each table + `Views`, `Enums`, `CompositeTypes` fields
 - Supabase join type inference: when doing `.select("*, relation(fields)")`, the returned type doesn't match automatically. Use `as unknown as YourType[]` cast
 - react-hook-form + zodResolver: type the `SubmitHandler<T>` explicitly when TS can't infer the handler correctly
+- Route groups like `(auth)` and `(dashboard)` do NOT add path segments — `app/(auth)/callback/route.ts` responds to `/callback`, not `/auth/callback`
+- Never have both `app/page.tsx` and `app/(group)/page.tsx` for the same `/` route — causes infinite redirect loop
+- Supabase middleware: check exact paths for login/register redirects separately from the callback route to avoid redirect loops

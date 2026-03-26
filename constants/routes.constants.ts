@@ -2,7 +2,7 @@ export const ROUTES = {
   // Auth
   LOGIN: "/login",
   REGISTER: "/register",
-  AUTH_CALLBACK: "/auth/callback",
+  AUTH_CALLBACK: "/callback",
 
   // Dashboard
   DASHBOARD: "/",
