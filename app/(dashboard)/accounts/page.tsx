@@ -89,7 +89,7 @@ export default function AccountsPage() {
       )}
 
       <Card>
-        <CardBody className={accounts.length > 0 ? "p-4" : "p-0"}>
+        <CardBody className="p-0">
           {isLoading ? (
             <div className="flex justify-center py-10">
               <Spinner />

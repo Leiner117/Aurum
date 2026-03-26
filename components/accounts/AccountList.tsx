@@ -26,7 +26,7 @@ export const AccountList = ({ accounts, onEdit, onDelete }: AccountListProps) =>
   }
 
   return (
-    <div className="space-y-3">
+    <div className="divide-y divide-[var(--color-border)]">
       {accounts.map((account) => (
         <AccountCard key={account.id} account={account} onEdit={onEdit} onDelete={onDelete} />
       ))}

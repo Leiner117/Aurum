@@ -28,6 +28,7 @@ import { ROUTES } from "@/constants/routes.constants";
 import { format } from "date-fns";
 import { useState } from "react";
 import type { ExpenseInput } from "@/lib/validators";
+import type { TransactionType } from "@/types/expense.types";
 
 const STATUS_BADGE: Record<string, "success" | "warning" | "danger"> = {
   ok: "success",
@@ -38,6 +39,7 @@ const STATUS_BADGE: Record<string, "success" | "warning" | "danger"> = {
 const DashboardPage = () => {
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [quickAddLoading, setQuickAddLoading] = useState(false);
+  const [quickAddType, setQuickAddType] = useState<TransactionType>("expense");
   const { showToast } = useToast();
 
   const { defaultCurrency } = useCurrencyViewModel();
@@ -56,13 +58,13 @@ const DashboardPage = () => {
 
   const handleQuickAdd = async (data: ExpenseInput) => {
     setQuickAddLoading(true);
-    const ok = await createExpense(data);
+    const ok = await createExpense({ ...data, type: quickAddType });
     setQuickAddLoading(false);
     if (ok) {
       setIsQuickAddOpen(false);
-      showToast("Expense added", "success");
+      showToast(quickAddType === "income" ? "Income added" : "Expense added", "success");
     } else {
-      showToast("Failed to add expense", "error");
+      showToast("Failed to add transaction", "error");
     }
   };
 
@@ -222,13 +224,29 @@ const DashboardPage = () => {
       <Modal
         isOpen={isQuickAddOpen}
         onClose={() => setIsQuickAddOpen(false)}
-        title="Quick Add Expense"
+        title="Quick Add"
         size="lg"
       >
+        {/* Expense / Income toggle */}
+        <div className="mb-4 flex gap-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-muted)] p-1">
+          {(["expense", "income"] as TransactionType[]).map((t) => (
+            <button
+              key={t}
+              onClick={() => setQuickAddType(t)}
+              className={`flex-1 rounded-md py-1.5 text-sm font-medium capitalize transition-colors ${
+                quickAddType === t
+                  ? "bg-[var(--color-surface)] text-[var(--color-foreground)] shadow-sm"
+                  : "text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
+              }`}
+            >
+              {t === "expense" ? "Expense" : "Income"}
+            </button>
+          ))}
+        </div>
         <ExpenseForm
           categories={categories}
           accounts={accounts}
-          type="expense"
+          type={quickAddType}
           defaultCurrency={defaultCurrency}
           isLoading={quickAddLoading}
           onSubmit={handleQuickAdd}
