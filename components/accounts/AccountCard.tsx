@@ -44,35 +44,35 @@ export const AccountCard = ({ account, onEdit, onDelete }: AccountCardProps) => 
         <p className="text-xs text-[var(--color-muted-foreground)]">{ACCOUNT_TYPE_LABELS[account.type]}</p>
       </div>
 
-      {/* Balance — fixed width, right-aligned */}
-      <div className="w-24 shrink-0 text-right sm:w-36">
-        <p
-          className={cn(
-            "text-sm font-semibold tabular-nums",
-            isNegative ? "text-[var(--color-danger)]" : "text-[var(--color-foreground)]"
-          )}
-        >
-          {formatCurrency(account.balance, account.currency)}
-        </p>
-        <p className="text-xs text-[var(--color-muted-foreground)]">{account.currency}</p>
-      </div>
-
-      {/* Actions */}
-      <div className="flex shrink-0 items-center gap-1">
-        <button
-          onClick={() => onEdit(account)}
-          className="rounded-lg p-1.5 text-[var(--color-muted-foreground)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-foreground)] transition-colors"
-          aria-label="Edit account"
-        >
-          <Pencil className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => onDelete(account.id)}
-          className="rounded-lg p-1.5 text-[var(--color-muted-foreground)] hover:bg-red-500/10 hover:text-[var(--color-danger)] transition-colors"
-          aria-label="Delete account"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
+      {/* Balance + actions: stacked on mobile, inline on sm+ */}
+      <div className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3">
+        <div className="text-right">
+          <p
+            className={cn(
+              "text-sm font-semibold tabular-nums",
+              isNegative ? "text-[var(--color-danger)]" : "text-[var(--color-foreground)]"
+            )}
+          >
+            {formatCurrency(account.balance, account.currency)}
+          </p>
+          <p className="text-xs text-[var(--color-muted-foreground)]">{account.currency}</p>
+        </div>
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => onEdit(account)}
+            className="rounded-lg p-1.5 text-[var(--color-muted-foreground)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-foreground)] transition-colors"
+            aria-label="Edit account"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onDelete(account.id)}
+            className="rounded-lg p-1.5 text-[var(--color-muted-foreground)] hover:bg-red-500/10 hover:text-[var(--color-danger)] transition-colors"
+            aria-label="Delete account"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
