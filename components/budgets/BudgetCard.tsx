@@ -154,4 +154,4 @@ export const BudgetCard = ({ summary, categories, onUpdate, onDelete }: BudgetCa
       </Modal>
     </>
   );
-}
+};

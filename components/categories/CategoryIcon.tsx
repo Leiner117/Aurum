@@ -29,7 +29,7 @@ interface CategoryIconProps {
   color?: string;
 }
 
-export function CategoryIcon({ name, className, color }: CategoryIconProps) {
+export const CategoryIcon = ({ name, className, color }: CategoryIconProps) => {
   const Icon = ICON_MAP[name] ?? Ellipsis;
   return <Icon className={className} style={color ? { color } : undefined} />;
-}
+};

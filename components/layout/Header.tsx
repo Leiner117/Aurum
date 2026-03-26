@@ -5,17 +5,17 @@ import { Sun, Moon, Monitor, Bell } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { MobileNav } from "./MobileNav";
 
-export function Header() {
+export const Header = () => {
   const { theme, setTheme } = useTheme();
 
-  function cycleTheme() {
+  const cycleTheme = () => {
     const cycle: Record<string, "light" | "dark" | "system"> = {
       light: "dark",
       dark: "system",
       system: "light",
     };
     setTheme(cycle[theme]);
-  }
+  };
 
   const ThemeIcon =
     theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
@@ -50,4 +50,4 @@ export function Header() {
       </div>
     </header>
   );
-}
+};

@@ -15,7 +15,7 @@ interface CardBodyProps {
   className?: string;
 }
 
-export function Card({ children, className }: CardProps) {
+export const Card = ({ children, className }: CardProps) => {
   return (
     <div
       className={cn(
@@ -27,9 +27,9 @@ export function Card({ children, className }: CardProps) {
       {children}
     </div>
   );
-}
+};
 
-export function CardHeader({ children, className }: CardHeaderProps) {
+export const CardHeader = ({ children, className }: CardHeaderProps) => {
   return (
     <div
       className={cn(
@@ -41,12 +41,12 @@ export function CardHeader({ children, className }: CardHeaderProps) {
       {children}
     </div>
   );
-}
+};
 
-export function CardBody({ children, className }: CardBodyProps) {
+export const CardBody = ({ children, className }: CardBodyProps) => {
   return (
     <div className={cn("px-5 py-4", className)}>
       {children}
     </div>
   );
-}
+};

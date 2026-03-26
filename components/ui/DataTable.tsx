@@ -23,7 +23,7 @@ interface DataTableProps<T> {
   emptyState?: React.ReactNode;
 }
 
-export function DataTable<T>({
+export const DataTable = <T,>({
   columns,
   data,
   keyExtractor,
@@ -34,7 +34,7 @@ export function DataTable<T>({
   pageSize,
   onPageChange,
   emptyState,
-}: DataTableProps<T>) {
+}: DataTableProps<T>) => {
   const start = (currentPage - 1) * pageSize + 1;
   const end = Math.min(currentPage * pageSize, totalCount);
 
@@ -129,4 +129,4 @@ export function DataTable<T>({
       )}
     </div>
   );
-}
+};

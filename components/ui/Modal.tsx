@@ -18,18 +18,18 @@ const sizeClasses = {
   lg: "max-w-lg",
 };
 
-export function Modal({
+export const Modal = ({
   isOpen,
   onClose,
   title,
   children,
   size = "md",
-}: ModalProps) {
+}: ModalProps) => {
   useEffect(() => {
     if (!isOpen) return;
-    function handleKey(e: KeyboardEvent) {
+    const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-    }
+    };
     document.addEventListener("keydown", handleKey);
     document.body.style.overflow = "hidden";
     return () => {
@@ -75,4 +75,4 @@ export function Modal({
       </div>
     </div>
   );
-}
+};

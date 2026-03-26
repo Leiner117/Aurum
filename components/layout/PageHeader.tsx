@@ -7,12 +7,12 @@ interface PageHeaderProps {
   className?: string;
 }
 
-export function PageHeader({
+export const PageHeader = ({
   title,
   description,
   actions,
   className,
-}: PageHeaderProps) {
+}: PageHeaderProps) => {
   return (
     <div
       className={cn(
@@ -33,4 +33,4 @@ export function PageHeader({
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>
   );
-}
+};

@@ -15,7 +15,7 @@ interface ExpenseFiltersProps {
   onChange: (filters: ExpenseFilters) => void;
 }
 
-export function ExpenseFiltersBar({ filters, categories, onChange }: ExpenseFiltersProps) {
+export const ExpenseFiltersBar = ({ filters, categories, onChange }: ExpenseFiltersProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const categoryOptions = [
@@ -28,9 +28,9 @@ export function ExpenseFiltersBar({ filters, categories, onChange }: ExpenseFilt
     value: o.value,
   }));
 
-  function handleReset() {
+  const handleReset = () => {
     onChange({});
-  }
+  };
 
   const hasActiveFilters =
     filters.search ||
@@ -109,4 +109,4 @@ export function ExpenseFiltersBar({ filters, categories, onChange }: ExpenseFilt
       )}
     </div>
   );
-}
+};

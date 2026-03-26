@@ -10,14 +10,14 @@ interface EmptyStateProps {
   className?: string;
 }
 
-export function EmptyState({
+export const EmptyState = ({
   icon,
   title,
   description,
   actionLabel,
   onAction,
   className,
-}: EmptyStateProps) {
+}: EmptyStateProps) => {
   return (
     <div
       className={cn(
@@ -45,4 +45,4 @@ export function EmptyState({
       )}
     </div>
   );
-}
+};

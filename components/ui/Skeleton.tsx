@@ -4,7 +4,7 @@ interface SkeletonProps {
   className?: string;
 }
 
-export function Skeleton({ className }: SkeletonProps) {
+export const Skeleton = ({ className }: SkeletonProps) => {
   return (
     <div
       className={cn(
@@ -13,9 +13,9 @@ export function Skeleton({ className }: SkeletonProps) {
       )}
     />
   );
-}
+};
 
-export function SkeletonCard() {
+export const SkeletonCard = () => {
   return (
     <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 space-y-3">
       <Skeleton className="h-4 w-1/3" />
@@ -23,9 +23,9 @@ export function SkeletonCard() {
       <Skeleton className="h-3 w-full" />
     </div>
   );
-}
+};
 
-export function SkeletonRow() {
+export const SkeletonRow = () => {
   return (
     <div className="flex items-center gap-4 py-3">
       <Skeleton className="h-9 w-9 rounded-full" />
@@ -36,4 +36,4 @@ export function SkeletonRow() {
       <Skeleton className="h-4 w-16" />
     </div>
   );
-}
+};

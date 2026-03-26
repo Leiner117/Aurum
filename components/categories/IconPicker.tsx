@@ -10,7 +10,7 @@ interface IconPickerProps {
   onChange: (icon: string) => void;
 }
 
-export function IconPicker({ value, color, onChange }: IconPickerProps) {
+export const IconPicker = ({ value, color, onChange }: IconPickerProps) => {
   return (
     <div className="flex flex-wrap gap-2">
       {CATEGORY_ICONS.map((icon) => (
@@ -38,4 +38,4 @@ export function IconPicker({ value, color, onChange }: IconPickerProps) {
       ))}
     </div>
   );
-}
+};

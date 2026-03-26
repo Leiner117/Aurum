@@ -8,9 +8,9 @@ interface ExchangeRates {
 
 let cachedRates: ExchangeRates | null = null;
 
-export async function fetchExchangeRates(
+export const fetchExchangeRates = async (
   baseCurrency: string
-): Promise<Record<string, number>> {
+): Promise<Record<string, number>> => {
   const now = Date.now();
   const cacheMs = EXCHANGE_RATE_CACHE_HOURS * 60 * 60 * 1000;
 
@@ -36,15 +36,15 @@ export async function fetchExchangeRates(
   };
 
   return cachedRates.rates;
-}
+};
 
-export function convertAmount(
+export const convertAmount = (
   amount: number,
   fromCurrency: string,
   toCurrency: string,
   rates: Record<string, number>
-): number {
+): number => {
   if (fromCurrency === toCurrency) return amount;
   const rate = rates[toCurrency] / rates[fromCurrency];
   return amount * rate;
-}
+};

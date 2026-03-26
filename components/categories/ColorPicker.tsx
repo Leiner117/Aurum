@@ -9,7 +9,7 @@ interface ColorPickerProps {
   onChange: (color: string) => void;
 }
 
-export function ColorPicker({ value, onChange }: ColorPickerProps) {
+export const ColorPicker = ({ value, onChange }: ColorPickerProps) => {
   return (
     <div className="flex flex-wrap gap-2">
       {CATEGORY_COLORS.map((color) => (
@@ -31,4 +31,4 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
       ))}
     </div>
   );
-}
+};

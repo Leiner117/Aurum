@@ -19,7 +19,7 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 
 const TOAST_DURATION_MS = 4000;
 
-export function ToastProvider({ children }: { children: React.ReactNode }) {
+export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   const showToast = useCallback(
@@ -33,9 +33,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  function removeToast(id: string) {
+  const removeToast = (id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
-  }
+  };
 
   return (
     <ToastContext.Provider value={{ showToast }}>
@@ -52,7 +52,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       </div>
     </ToastContext.Provider>
   );
-}
+};
 
 export function useToast(): ToastContextValue {
   const ctx = useContext(ToastContext);

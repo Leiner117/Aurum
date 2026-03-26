@@ -33,7 +33,7 @@ const variantConfig: Record<
   },
 };
 
-export function Toast({ message, variant, onClose }: ToastProps) {
+export const Toast = ({ message, variant, onClose }: ToastProps) => {
   const { icon, className } = variantConfig[variant];
 
   return (
@@ -57,4 +57,4 @@ export function Toast({ message, variant, onClose }: ToastProps) {
       </button>
     </div>
   );
-}
+};

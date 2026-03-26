@@ -44,4 +44,4 @@ export const BudgetProgress = ({ summary, className }: BudgetProgressProps) => {
       </div>
     </div>
   );
-}
+};

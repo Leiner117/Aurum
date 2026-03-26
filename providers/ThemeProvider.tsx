@@ -14,7 +14,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const STORAGE_KEY = "finance-app-theme";
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setThemeState] = useState<Theme>("system");
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
 
@@ -27,11 +27,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const root = document.documentElement;
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
 
-    function applyTheme(t: Theme) {
+    const applyTheme = (t: Theme) => {
       const resolved = t === "system" ? (prefersDark.matches ? "dark" : "light") : t;
       setResolvedTheme(resolved);
       root.classList.toggle("dark", resolved === "dark");
-    }
+    };
 
     applyTheme(theme);
 
@@ -41,17 +41,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [theme]);
 
-  function setTheme(newTheme: Theme) {
+  const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
     localStorage.setItem(STORAGE_KEY, newTheme);
-  }
+  };
 
   return (
     <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );
-}
+};
 
 export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);

@@ -14,7 +14,7 @@ import { useCategoriesViewModel } from "@/viewModels/useCategoriesViewModel";
 import { useToast } from "@/providers/ToastProvider";
 import type { CategoryInput } from "@/lib/validators";
 
-export default function CategoriesPage() {
+const CategoriesPage = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const { showToast } = useToast();
@@ -22,7 +22,7 @@ export default function CategoriesPage() {
   const { categories, isLoading, createCategory, updateCategory, deleteCategory } =
     useCategoriesViewModel();
 
-  async function handleCreate(data: CategoryInput) {
+  const handleCreate = async (data: CategoryInput) => {
     setCreateLoading(true);
     const ok = await createCategory(data);
     setCreateLoading(false);
@@ -32,7 +32,7 @@ export default function CategoriesPage() {
     } else {
       showToast("Failed to create category", "error");
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -98,4 +98,6 @@ export default function CategoriesPage() {
       </Modal>
     </div>
   );
-}
+};
+
+export default CategoriesPage;
