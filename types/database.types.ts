@@ -70,6 +70,7 @@ export interface Database {
           id: string;
           user_id: string;
           category_id: string | null;
+          account_id: string | null;
           amount: number;
           currency: string;
           description: string;
@@ -85,6 +86,7 @@ export interface Database {
           id?: string;
           user_id: string;
           category_id?: string | null;
+          account_id?: string | null;
           amount: number;
           currency?: string;
           description: string;
@@ -98,6 +100,7 @@ export interface Database {
         };
         Update: {
           category_id?: string | null;
+          account_id?: string | null;
           amount?: number;
           currency?: string;
           description?: string;
@@ -118,6 +121,7 @@ export interface Database {
           month: number;
           year: number;
           alert_threshold: number;
+          is_recurring: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -130,6 +134,7 @@ export interface Database {
           month: number;
           year: number;
           alert_threshold?: number;
+          is_recurring?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -137,6 +142,7 @@ export interface Database {
           amount?: number;
           currency?: string;
           alert_threshold?: number;
+          is_recurring?: boolean;
           updated_at?: string;
         };
         Relationships: [];
@@ -146,6 +152,7 @@ export interface Database {
           id: string;
           user_id: string;
           category_id: string | null;
+          account_id: string | null;
           amount: number;
           currency: string;
           description: string;
@@ -160,6 +167,7 @@ export interface Database {
           id?: string;
           user_id: string;
           category_id?: string | null;
+          account_id?: string | null;
           amount: number;
           currency?: string;
           description: string;
@@ -172,6 +180,7 @@ export interface Database {
         };
         Update: {
           category_id?: string | null;
+          account_id?: string | null;
           amount?: number;
           currency?: string;
           description?: string;
@@ -179,6 +188,45 @@ export interface Database {
           next_date?: string;
           is_active?: boolean;
           type?: "expense" | "income";
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      accounts: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          type: "checking" | "savings" | "cash" | "credit";
+          balance: number;
+          currency: string;
+          color: string;
+          icon: string;
+          is_default: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          type: "checking" | "savings" | "cash" | "credit";
+          balance?: number;
+          currency?: string;
+          color?: string;
+          icon?: string;
+          is_default?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          name?: string;
+          type?: "checking" | "savings" | "cash" | "credit";
+          balance?: number;
+          currency?: string;
+          color?: string;
+          icon?: string;
+          is_default?: boolean;
           updated_at?: string;
         };
         Relationships: [];
@@ -226,9 +274,14 @@ export interface Database {
           remaining: number;
           percentage: number;
           status: "ok" | "warning" | "exceeded";
+          is_recurring: boolean;
         }[];
       };
       seed_default_categories: {
+        Args: { p_user_id: string };
+        Returns: undefined;
+      };
+      seed_default_accounts: {
         Args: { p_user_id: string };
         Returns: undefined;
       };

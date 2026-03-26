@@ -14,6 +14,7 @@ import { ExpenseRowActions } from "@/components/expenses/ExpenseRowActions";
 import { CategoryIcon } from "@/components/categories/CategoryIcon";
 import { useExpensesViewModel } from "@/viewModels/useExpensesViewModel";
 import { useCategoriesViewModel } from "@/viewModels/useCategoriesViewModel";
+import { useAccountsViewModel } from "@/viewModels/useAccountsViewModel";
 import { useToast } from "@/providers/ToastProvider";
 import { formatCurrency } from "@/lib/currency/format";
 import { formatDate } from "@/lib/utils";
@@ -48,19 +49,19 @@ export default function ExpensesPage() {
   } = useExpensesViewModel();
 
   const { categories } = useCategoriesViewModel();
+  const { accounts } = useAccountsViewModel();
 
-  // Keep filters in sync with active tab type
-  function handleTabChange(tab: TransactionType) {
+  const handleTabChange = (tab: TransactionType) => {
     setActiveType(tab);
     setFilters({ ...filters, type: tab });
-  }
+  };
 
   // Initialize type filter on mount
   useState(() => {
     setFilters({ type: "expense" });
   });
 
-  async function handleCreate(data: ExpenseInput) {
+  const handleCreate = async (data: ExpenseInput) => {
     setCreateLoading(true);
     const ok = await createExpense({ ...data, type: activeType });
     setCreateLoading(false);
@@ -70,7 +71,7 @@ export default function ExpensesPage() {
     } else {
       showToast(activeType === "income" ? "Failed to add income" : "Failed to add expense", "error");
     }
-  }
+  };
 
   const isIncome = activeType === "income";
 
@@ -153,6 +154,7 @@ export default function ExpensesPage() {
         <ExpenseRowActions
           expense={row}
           categories={categories}
+          accounts={accounts}
           onUpdate={async (data: UpdateExpenseInput) => {
             const ok = await updateExpense(data);
             if (ok) showToast("Updated", "success");
@@ -255,6 +257,7 @@ export default function ExpensesPage() {
       >
         <ExpenseForm
           categories={categories}
+          accounts={accounts}
           type={activeType}
           isLoading={createLoading}
           onSubmit={handleCreate}

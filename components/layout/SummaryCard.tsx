@@ -9,14 +9,14 @@ interface SummaryCardProps {
   className?: string;
 }
 
-export function SummaryCard({
+export const SummaryCard = ({
   title,
   value,
   subtitle,
   icon,
   trend,
   className,
-}: SummaryCardProps) {
+}: SummaryCardProps) => {
   const trendColor =
     trend === "up"
       ? "text-[var(--color-danger)]"
@@ -49,4 +49,4 @@ export function SummaryCard({
       </div>
     </div>
   );
-}
+};

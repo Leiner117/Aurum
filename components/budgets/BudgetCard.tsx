@@ -33,24 +33,24 @@ interface BudgetCardProps {
   onDelete: (id: string) => Promise<boolean>;
 }
 
-export function BudgetCard({ summary, categories, onUpdate, onDelete }: BudgetCardProps) {
+export const BudgetCard = ({ summary, categories, onUpdate, onDelete }: BudgetCardProps) => {
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [isActionLoading, setIsActionLoading] = useState(false);
 
-  async function handleUpdate(data: BudgetInput) {
+  const handleUpdate = async (data: BudgetInput) => {
     setIsActionLoading(true);
     const ok = await onUpdate({ id: summary.id, ...data });
     setIsActionLoading(false);
     if (ok) setShowEdit(false);
-  }
+  };
 
-  async function handleDelete() {
+  const handleDelete = async () => {
     setIsActionLoading(true);
     const ok = await onDelete(summary.id);
     setIsActionLoading(false);
     if (ok) setShowDelete(false);
-  }
+  };
 
   return (
     <>

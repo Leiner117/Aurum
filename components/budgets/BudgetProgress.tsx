@@ -13,7 +13,7 @@ const STATUS_TRACK: Record<string, string> = {
   exceeded: "bg-red-500",
 };
 
-export function BudgetProgress({ summary, className }: BudgetProgressProps) {
+export const BudgetProgress = ({ summary, className }: BudgetProgressProps) => {
   const pct = Math.min(summary.percentage, 100);
 
   return (

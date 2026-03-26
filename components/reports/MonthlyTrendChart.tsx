@@ -12,7 +12,7 @@ interface MonthlyTrendChartProps {
   currency: string;
 }
 
-export function MonthlyTrendChart({ data, currency }: MonthlyTrendChartProps) {
+export const MonthlyTrendChart = ({ data, currency }: MonthlyTrendChartProps) => {
   if (!data.length) {
     return (
       <p className="py-8 text-center text-sm text-[var(--color-muted-foreground)]">
@@ -56,4 +56,4 @@ export function MonthlyTrendChart({ data, currency }: MonthlyTrendChartProps) {
       </BarChart>
     </ResponsiveContainer>
   );
-}
+};

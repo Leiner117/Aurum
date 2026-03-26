@@ -13,6 +13,7 @@ import {
   TrendingUp,
   Menu,
   X,
+  Landmark,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,6 +21,7 @@ import { useState, useEffect } from "react";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: ROUTES.DASHBOARD, icon: <LayoutDashboard className="h-4 w-4" /> },
+  { label: "Accounts", href: ROUTES.ACCOUNTS, icon: <Landmark className="h-4 w-4" /> },
   { label: "Expenses", href: ROUTES.EXPENSES, icon: <Receipt className="h-4 w-4" /> },
   { label: "Categories", href: ROUTES.CATEGORIES, icon: <Tag className="h-4 w-4" /> },
   { label: "Budgets", href: ROUTES.BUDGETS, icon: <Target className="h-4 w-4" /> },
@@ -28,7 +30,7 @@ const NAV_ITEMS = [
   { label: "Settings", href: ROUTES.SETTINGS, icon: <Settings className="h-4 w-4" /> },
 ];
 
-export function MobileNav() {
+export const MobileNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 

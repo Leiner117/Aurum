@@ -38,7 +38,7 @@ interface BudgetFormProps {
   onCancel: () => void;
 }
 
-export function BudgetForm({
+export const BudgetForm = ({
   budget,
   categories,
   defaultMonth = new Date().getMonth() + 1,
@@ -47,7 +47,7 @@ export function BudgetForm({
   isLoading,
   onSubmit,
   onCancel,
-}: BudgetFormProps) {
+}: BudgetFormProps) => {
   const {
     register,
     handleSubmit,
@@ -63,6 +63,7 @@ export function BudgetForm({
       month: budget?.month ?? defaultMonth,
       year: budget?.year ?? defaultYear,
       alert_threshold: budget?.alert_threshold ?? BUDGET_ALERT_THRESHOLD_DEFAULT,
+      is_recurring: budget?.is_recurring ?? false,
     },
   });
 
@@ -75,6 +76,7 @@ export function BudgetForm({
         month: budget.month,
         year: budget.year,
         alert_threshold: budget.alert_threshold,
+        is_recurring: budget.is_recurring ?? false,
       });
     }
   }, [budget, reset]);
@@ -173,6 +175,35 @@ export function BudgetForm({
         )}
       />
 
+      {/* Recurring toggle */}
+      <div className="flex items-center justify-between rounded-lg border border-[var(--color-border)] px-4 py-3">
+        <div>
+          <p className="text-sm font-medium text-[var(--color-foreground)]">Recurring budget</p>
+          <p className="text-xs text-[var(--color-muted-foreground)]">Auto-renew this budget every month</p>
+        </div>
+        <Controller
+          name="is_recurring"
+          control={control}
+          render={({ field }) => (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={field.value}
+              onClick={() => field.onChange(!field.value)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 ${
+                field.value ? "bg-[var(--color-primary)]" : "bg-[var(--color-border)]"
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform ${
+                  field.value ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+          )}
+        />
+      </div>
+
       <div className="flex justify-end gap-2 pt-2">
         <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>
           Cancel
@@ -183,4 +214,4 @@ export function BudgetForm({
       </div>
     </form>
   );
-}
+};

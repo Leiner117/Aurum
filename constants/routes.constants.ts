@@ -6,6 +6,7 @@ export const ROUTES = {
 
   // Dashboard
   DASHBOARD: "/",
+  ACCOUNTS: "/accounts",
   EXPENSES: "/expenses",
   CATEGORIES: "/categories",
   BUDGETS: "/budgets",

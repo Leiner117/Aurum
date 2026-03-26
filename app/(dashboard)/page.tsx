@@ -20,6 +20,7 @@ import { useBudgetsViewModel } from "@/viewModels/useBudgetsViewModel";
 import { useExpensesViewModel } from "@/viewModels/useExpensesViewModel";
 import { useCategoriesViewModel } from "@/viewModels/useCategoriesViewModel";
 import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
+import { useAccountsViewModel } from "@/viewModels/useAccountsViewModel";
 import { useToast } from "@/providers/ToastProvider";
 import { formatCurrency } from "@/lib/currency/format";
 import { formatDate } from "@/lib/utils";
@@ -34,7 +35,7 @@ const STATUS_BADGE: Record<string, "success" | "warning" | "danger"> = {
   exceeded: "danger",
 };
 
-export default function DashboardPage() {
+const DashboardPage = () => {
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [quickAddLoading, setQuickAddLoading] = useState(false);
   const { showToast } = useToast();
@@ -45,6 +46,7 @@ export default function DashboardPage() {
   const { summaries } = useBudgetsViewModel();
   const { expenses, isLoading: expensesLoading, createExpense } = useExpensesViewModel();
   const { categories } = useCategoriesViewModel();
+  const { accounts } = useAccountsViewModel();
 
   const recentExpenses = expenses.slice(0, 5);
   const diff = totalThisMonth - totalLastMonth;
@@ -52,7 +54,7 @@ export default function DashboardPage() {
   const trend = diff > 0 ? "up" : diff < 0 ? "down" : "neutral";
   const exceededBudgets = summaries.filter((s) => s.status !== "ok").length;
 
-  async function handleQuickAdd(data: ExpenseInput) {
+  const handleQuickAdd = async (data: ExpenseInput) => {
     setQuickAddLoading(true);
     const ok = await createExpense(data);
     setQuickAddLoading(false);
@@ -62,7 +64,7 @@ export default function DashboardPage() {
     } else {
       showToast("Failed to add expense", "error");
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -225,6 +227,7 @@ export default function DashboardPage() {
       >
         <ExpenseForm
           categories={categories}
+          accounts={accounts}
           type="expense"
           defaultCurrency={defaultCurrency}
           isLoading={quickAddLoading}
@@ -234,4 +237,6 @@ export default function DashboardPage() {
       </Modal>
     </div>
   );
-}
+};
+
+export default DashboardPage;

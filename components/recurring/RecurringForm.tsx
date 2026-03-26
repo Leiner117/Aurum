@@ -11,6 +11,7 @@ import { SUPPORTED_CURRENCIES } from "@/constants/currency.constants";
 import { cn } from "@/lib/utils";
 import type { RecurringExpenseWithCategory } from "@/types/recurring.types";
 import type { Category } from "@/types/category.types";
+import type { Account } from "@/types/account.types";
 
 const FREQUENCY_OPTIONS = [
   { label: "Daily", value: "daily" },
@@ -22,20 +23,22 @@ const FREQUENCY_OPTIONS = [
 interface RecurringFormProps {
   recurring?: RecurringExpenseWithCategory;
   categories: Category[];
+  accounts?: Account[];
   defaultCurrency?: string;
   isLoading: boolean;
   onSubmit: (data: RecurringExpenseInput) => void;
   onCancel: () => void;
 }
 
-export function RecurringForm({
+export const RecurringForm = ({
   recurring,
   categories,
+  accounts = [],
   defaultCurrency = "USD",
   isLoading,
   onSubmit,
   onCancel,
-}: RecurringFormProps) {
+}: RecurringFormProps) => {
   const {
     register,
     handleSubmit,
@@ -51,6 +54,7 @@ export function RecurringForm({
       amount: recurring?.amount ?? undefined,
       currency: recurring?.currency ?? defaultCurrency,
       category_id: recurring?.category_id ?? null,
+      account_id: recurring?.account_id ?? null,
       frequency: recurring?.frequency ?? "monthly",
       next_date: recurring?.next_date ?? "",
       type: recurring?.type ?? "expense",
@@ -64,6 +68,7 @@ export function RecurringForm({
         amount: recurring.amount,
         currency: recurring.currency,
         category_id: recurring.category_id,
+        account_id: recurring.account_id ?? null,
         frequency: recurring.frequency,
         next_date: recurring.next_date,
         type: recurring.type,
@@ -71,8 +76,7 @@ export function RecurringForm({
     }
   }, [recurring, reset]);
 
-  const handleFormSubmit: SubmitHandler<RecurringExpenseInput> = (data) =>
-    onSubmit(data);
+  const handleFormSubmit: SubmitHandler<RecurringExpenseInput> = (data) => onSubmit(data);
 
   const activeType = watch("type");
   const filteredCategories = categories.filter((c) => c.type === activeType);
@@ -85,6 +89,11 @@ export function RecurringForm({
     label: `${c.code} — ${c.name}`,
     value: c.code,
   }));
+
+  const accountOptions = [
+    { label: "No account", value: "" },
+    ...accounts.map((a) => ({ label: `${a.name} (${a.currency})`, value: a.id })),
+  ];
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
@@ -160,6 +169,15 @@ export function RecurringForm({
         />
       </div>
 
+      {accounts.length > 0 && (
+        <Select
+          label="Account (optional)"
+          options={accountOptions}
+          error={errors.account_id?.message}
+          {...register("account_id")}
+        />
+      )}
+
       <Input
         label="Next date"
         type="date"
@@ -177,4 +195,4 @@ export function RecurringForm({
       </div>
     </form>
   );
-}
+};

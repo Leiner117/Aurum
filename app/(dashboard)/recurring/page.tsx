@@ -14,6 +14,7 @@ import { RecurringForm } from "@/components/recurring/RecurringForm";
 import { useRecurringViewModel } from "@/viewModels/useRecurringViewModel";
 import { useCategoriesViewModel } from "@/viewModels/useCategoriesViewModel";
 import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
+import { useAccountsViewModel } from "@/viewModels/useAccountsViewModel";
 import { useToast } from "@/providers/ToastProvider";
 import type { RecurringExpenseInput } from "@/lib/validators";
 import type { RecurringExpenseWithCategory } from "@/types/recurring.types";
@@ -37,13 +38,11 @@ export default function RecurringPage() {
 
   const { categories } = useCategoriesViewModel();
   const { defaultCurrency } = useCurrencyViewModel();
+  const { accounts } = useAccountsViewModel();
 
-  async function handleCreate(data: RecurringExpenseInput) {
+  const handleCreate = async (data: RecurringExpenseInput) => {
     setActionLoading(true);
-    const ok = await createRecurring({
-      ...data,
-      category_id: data.category_id || null,
-    });
+    const ok = await createRecurring({ ...data, category_id: data.category_id || null });
     setActionLoading(false);
     if (ok) {
       setIsCreateOpen(false);
@@ -51,16 +50,12 @@ export default function RecurringPage() {
     } else {
       showToast("Failed to add recurring expense", "error");
     }
-  }
+  };
 
-  async function handleEdit(data: RecurringExpenseInput) {
+  const handleEdit = async (data: RecurringExpenseInput) => {
     if (!editTarget) return;
     setActionLoading(true);
-    const ok = await updateRecurring({
-      id: editTarget.id,
-      ...data,
-      category_id: data.category_id || null,
-    });
+    const ok = await updateRecurring({ id: editTarget.id, ...data, category_id: data.category_id || null });
     setActionLoading(false);
     if (ok) {
       setEditTarget(null);
@@ -68,19 +63,19 @@ export default function RecurringPage() {
     } else {
       showToast("Failed to update recurring expense", "error");
     }
-  }
+  };
 
-  async function handleDelete(id: string) {
+  const handleDelete = async (id: string) => {
     const ok = await deleteRecurring(id);
     if (ok) showToast("Recurring expense deleted", "success");
     else showToast("Failed to delete recurring expense", "error");
-  }
+  };
 
-  async function handleToggleActive(id: string, isActive: boolean) {
+  const handleToggleActive = async (id: string, isActive: boolean) => {
     const ok = await toggleActive(id, isActive);
     if (ok) showToast(isActive ? "Activated" : "Paused", "success");
     else showToast("Failed to update status", "error");
-  }
+  };
 
   const activeCount = recurring.filter((r) => r.is_active).length;
 
@@ -160,6 +155,7 @@ export default function RecurringPage() {
       >
         <RecurringForm
           categories={categories}
+          accounts={accounts}
           defaultCurrency={defaultCurrency}
           isLoading={actionLoading}
           onSubmit={handleCreate}
@@ -178,6 +174,7 @@ export default function RecurringPage() {
           <RecurringForm
             recurring={editTarget}
             categories={categories}
+            accounts={accounts}
             defaultCurrency={defaultCurrency}
             isLoading={actionLoading}
             onSubmit={handleEdit}

@@ -43,6 +43,7 @@ export const expenseSchema = z.object({
     .multipleOf(0.01, "Max 2 decimal places"),
   currency: z.string().length(3, "Must be a valid currency code"),
   category_id: z.string().uuid("Invalid category").nullable(),
+  account_id: z.string().uuid("Invalid account").nullable().optional(),
   date: z.string().min(1, "Date is required"),
   notes: z.string().max(500, "Notes must be 500 characters or less").optional(),
   type: z.enum(["expense", "income"]),
@@ -59,6 +60,7 @@ export const budgetSchema = z.object({
   month: z.number().int().min(1).max(12),
   year: z.number().int().min(2000),
   alert_threshold: z.number().int().min(1).max(100).optional(),
+  is_recurring: z.boolean(),
 });
 
 // ── Recurring Expenses ────────────────────────────────────
@@ -73,9 +75,20 @@ export const recurringExpenseSchema = z.object({
     .multipleOf(0.01, "Max 2 decimal places"),
   currency: z.string().length(3, "Must be a valid currency code"),
   category_id: z.string().uuid("Invalid category").nullable(),
+  account_id: z.string().uuid("Invalid account").nullable().optional(),
   frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
   next_date: z.string().min(1, "Next date is required"),
   type: z.enum(["expense", "income"]),
+});
+
+// ── Accounts ─────────────────────────────────────────────
+export const accountSchema = z.object({
+  name: z.string().min(1, "Name is required").max(50, "Max 50 characters"),
+  type: z.enum(["checking", "savings", "cash", "credit"]),
+  balance: z.number().multipleOf(0.01, "Max 2 decimal places"),
+  currency: z.string().length(3, "Must be a valid currency code"),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color"),
+  icon: z.string().min(1, "Icon is required"),
 });
 
 // ── Inferred types ────────────────────────────────────────
@@ -85,3 +98,4 @@ export type CategoryInput = z.infer<typeof categorySchema>;
 export type ExpenseInput = z.infer<typeof expenseSchema>;
 export type BudgetInput = z.infer<typeof budgetSchema>;
 export type RecurringExpenseInput = z.infer<typeof recurringExpenseSchema>;
+export type AccountInput = z.infer<typeof accountSchema>;

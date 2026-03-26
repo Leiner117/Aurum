@@ -14,7 +14,7 @@ interface PeriodSelectorProps {
   onChange: (months: number) => void;
 }
 
-export function PeriodSelector({ value, onChange }: PeriodSelectorProps) {
+export const PeriodSelector = ({ value, onChange }: PeriodSelectorProps) => {
   return (
     <div className="flex rounded-lg border border-[var(--color-border)] bg-[var(--color-muted)] p-0.5">
       {REPORT_PERIODS.filter((p) => p.value !== "custom" && p.value !== "year").map((period) => {
@@ -37,4 +37,4 @@ export function PeriodSelector({ value, onChange }: PeriodSelectorProps) {
       })}
     </div>
   );
-}
+};

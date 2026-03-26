@@ -16,7 +16,7 @@ import { useCategoriesViewModel } from "@/viewModels/useCategoriesViewModel";
 import { useToast } from "@/providers/ToastProvider";
 import type { BudgetInput } from "@/lib/validators";
 
-export default function BudgetsPage() {
+const BudgetsPage = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const { showToast } = useToast();
@@ -37,7 +37,7 @@ export default function BudgetsPage() {
   // Triggers warning/exceeded toasts when summaries load
   useBudgetAlertsViewModel(summaries);
 
-  async function handleCreate(data: BudgetInput) {
+  const handleCreate = async (data: BudgetInput) => {
     setCreateLoading(true);
     const ok = await createBudget(data);
     setCreateLoading(false);
@@ -47,7 +47,7 @@ export default function BudgetsPage() {
     } else {
       showToast("Failed to create budget", "error");
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -128,4 +128,6 @@ export default function BudgetsPage() {
       </Modal>
     </div>
   );
-}
+};
+
+export default BudgetsPage;

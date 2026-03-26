@@ -22,13 +22,13 @@ interface CategoryFormProps {
   onCancel: () => void;
 }
 
-export function CategoryForm({
+export const CategoryForm = ({
   category,
   defaultType = "expense",
   isLoading,
   onSubmit,
   onCancel,
-}: CategoryFormProps) {
+}: CategoryFormProps) => {
   const {
     register,
     handleSubmit,
@@ -129,4 +129,4 @@ export function CategoryForm({
       </div>
     </form>
   );
-}
+};

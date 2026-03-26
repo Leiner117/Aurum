@@ -22,12 +22,12 @@ const FREQUENCY_LABEL: Record<string, string> = {
   yearly: "Yearly",
 };
 
-export function RecurringList({
+export const RecurringList = ({
   items,
   onEdit,
   onDelete,
   onToggleActive,
-}: RecurringListProps) {
+}: RecurringListProps) => {
   return (
     <ul className="divide-y divide-[var(--color-border)]">
       {items.map((item) => (
@@ -120,4 +120,4 @@ export function RecurringList({
       ))}
     </ul>
   );
-}
+};

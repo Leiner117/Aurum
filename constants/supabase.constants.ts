@@ -5,6 +5,7 @@ export const SUPABASE_TABLES = {
   BUDGETS: "budgets",
   RECURRING_EXPENSES: "recurring_expenses",
   EXCHANGE_RATES: "exchange_rates",
+  ACCOUNTS: "accounts",
 } as const;
 
 export const SUPABASE_FUNCTIONS = {

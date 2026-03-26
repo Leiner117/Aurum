@@ -8,7 +8,7 @@ interface ChartCardProps {
   action?: React.ReactNode;
 }
 
-export function ChartCard({ title, isLoading, children, action }: ChartCardProps) {
+export const ChartCard = ({ title, isLoading, children, action }: ChartCardProps) => {
   return (
     <Card>
       <CardHeader>
@@ -26,4 +26,4 @@ export function ChartCard({ title, isLoading, children, action }: ChartCardProps
       </CardBody>
     </Card>
   );
-}
+};

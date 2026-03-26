@@ -17,31 +17,31 @@ interface CategoryListProps {
   onDelete: (id: string) => Promise<boolean>;
 }
 
-export function CategoryList({
+export const CategoryList = ({
   categories,
   isLoading,
   onUpdate,
   onDelete,
-}: CategoryListProps) {
+}: CategoryListProps) => {
   const [editTarget, setEditTarget] = useState<Category | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  async function handleUpdate(data: CategoryInput) {
+  const handleUpdate = async (data: CategoryInput) => {
     if (!editTarget) return;
     setActionLoading(true);
     const ok = await onUpdate({ id: editTarget.id, ...data });
     setActionLoading(false);
     if (ok) setEditTarget(null);
-  }
+  };
 
-  async function handleDelete() {
+  const handleDelete = async () => {
     if (!deleteTarget) return;
     setActionLoading(true);
     const ok = await onDelete(deleteTarget.id);
     setActionLoading(false);
     if (ok) setDeleteTarget(null);
-  }
+  };
 
   return (
     <>
@@ -133,4 +133,4 @@ export function CategoryList({
       </Modal>
     </>
   );
-}
+};

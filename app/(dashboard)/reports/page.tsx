@@ -15,7 +15,7 @@ import { exportExpensesToCsv } from "@/lib/export";
 import { formatCurrency } from "@/lib/currency/format";
 import { format } from "date-fns";
 
-export default function ReportsPage() {
+const ReportsPage = () => {
   const {
     categorySpending,
     monthlyTrend,
@@ -34,10 +34,10 @@ export default function ReportsPage() {
   const diff = totalThisMonth - totalLastMonth;
   const diffSign = diff >= 0 ? "+" : "";
 
-  function handleExport() {
+  const handleExport = () => {
     const filename = `expenses-${format(new Date(), "yyyy-MM")}.csv`;
     exportExpensesToCsv(expenses, filename);
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -119,4 +119,6 @@ export default function ReportsPage() {
       </div>
     </div>
   );
-}
+};
+
+export default ReportsPage;

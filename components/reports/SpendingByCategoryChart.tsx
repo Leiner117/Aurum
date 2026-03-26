@@ -11,7 +11,7 @@ interface SpendingByCategoryChartProps {
   currency: string;
 }
 
-export function SpendingByCategoryChart({ data, currency }: SpendingByCategoryChartProps) {
+export const SpendingByCategoryChart = ({ data, currency }: SpendingByCategoryChartProps) => {
   if (!data.length) {
     return (
       <p className="py-8 text-center text-sm text-[var(--color-muted-foreground)]">
@@ -54,4 +54,4 @@ export function SpendingByCategoryChart({ data, currency }: SpendingByCategoryCh
       </PieChart>
     </ResponsiveContainer>
   );
-}
+};

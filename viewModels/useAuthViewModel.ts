@@ -15,20 +15,17 @@ export interface AuthViewModelReturn {
   clearError: () => void;
 }
 
-export function useAuthViewModel(): AuthViewModelReturn {
+export const useAuthViewModel = (): AuthViewModelReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
-  async function login({ email, password }: LoginInput): Promise<void> {
+  const login = async ({ email, password }: LoginInput): Promise<void> => {
     try {
       setIsLoading(true);
       setError(null);
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) throw authError;
       router.push(ROUTES.DASHBOARD);
       router.refresh();
@@ -37,13 +34,9 @@ export function useAuthViewModel(): AuthViewModelReturn {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
-  async function register({
-    email,
-    password,
-    fullName,
-  }: RegisterInput): Promise<void> {
+  const register = async ({ email, password, fullName }: RegisterInput): Promise<void> => {
     try {
       setIsLoading(true);
       setError(null);
@@ -60,9 +53,9 @@ export function useAuthViewModel(): AuthViewModelReturn {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
-  async function logout(): Promise<void> {
+  const logout = async (): Promise<void> => {
     try {
       setIsLoading(true);
       await supabase.auth.signOut();
@@ -73,11 +66,9 @@ export function useAuthViewModel(): AuthViewModelReturn {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
-  function clearError() {
-    setError(null);
-  }
+  const clearError = () => setError(null);
 
   return { isLoading, error, login, register, logout, clearError };
-}
+};

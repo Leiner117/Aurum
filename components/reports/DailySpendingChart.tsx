@@ -12,7 +12,7 @@ interface DailySpendingChartProps {
   currency: string;
 }
 
-export function DailySpendingChart({ data, currency }: DailySpendingChartProps) {
+export const DailySpendingChart = ({ data, currency }: DailySpendingChartProps) => {
   if (!data.length) {
     return (
       <p className="py-8 text-center text-sm text-[var(--color-muted-foreground)]">
@@ -63,4 +63,4 @@ export function DailySpendingChart({ data, currency }: DailySpendingChartProps) 
       </LineChart>
     </ResponsiveContainer>
   );
-}
+};

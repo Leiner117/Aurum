@@ -22,17 +22,17 @@ const currencyOptions = SUPPORTED_CURRENCIES.map((c) => ({
   value: c.code,
 }));
 
-export default function SettingsPage() {
+const SettingsPage = () => {
   const { defaultCurrency, setDefaultCurrency } = useCurrencyViewModel();
   const { theme, setTheme } = useTheme();
   const { logout, isLoading } = useAuthViewModel();
   const { showToast } = useToast();
 
-  async function handleCurrencyChange(currency: string) {
+  const handleCurrencyChange = async (currency: string) => {
     const ok = await setDefaultCurrency(currency);
     if (ok) showToast(`Default currency set to ${currency}`, "success");
     else showToast("Failed to update currency", "error");
-  }
+  };
 
   return (
     <div className="space-y-6 max-w-lg">
@@ -103,4 +103,6 @@ export default function SettingsPage() {
       </Card>
     </div>
   );
-}
+};
+
+export default SettingsPage;

@@ -11,6 +11,7 @@ import {
   RefreshCw,
   Settings,
   TrendingUp,
+  Landmark,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,6 +24,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: ROUTES.DASHBOARD, icon: <LayoutDashboard className="h-4 w-4" /> },
+  { label: "Accounts", href: ROUTES.ACCOUNTS, icon: <Landmark className="h-4 w-4" /> },
   { label: "Expenses", href: ROUTES.EXPENSES, icon: <Receipt className="h-4 w-4" /> },
   { label: "Categories", href: ROUTES.CATEGORIES, icon: <Tag className="h-4 w-4" /> },
   { label: "Budgets", href: ROUTES.BUDGETS, icon: <Target className="h-4 w-4" /> },
@@ -31,7 +33,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Settings", href: ROUTES.SETTINGS, icon: <Settings className="h-4 w-4" /> },
 ];
 
-export function Sidebar() {
+export const Sidebar = () => {
   const pathname = usePathname();
 
   return (

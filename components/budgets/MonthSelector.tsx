@@ -14,16 +14,16 @@ interface MonthSelectorProps {
   onChange: (month: number, year: number) => void;
 }
 
-export function MonthSelector({ month, year, onChange }: MonthSelectorProps) {
-  function prev() {
+export const MonthSelector = ({ month, year, onChange }: MonthSelectorProps) => {
+  const prev = () => {
     if (month === 1) onChange(12, year - 1);
     else onChange(month - 1, year);
-  }
+  };
 
-  function next() {
+  const next = () => {
     if (month === 12) onChange(1, year + 1);
     else onChange(month + 1, year);
-  }
+  };
 
   return (
     <div className="flex items-center gap-2">
@@ -38,4 +38,4 @@ export function MonthSelector({ month, year, onChange }: MonthSelectorProps) {
       </Button>
     </div>
   );
-}
+};

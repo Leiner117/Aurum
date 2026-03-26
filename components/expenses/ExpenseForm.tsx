@@ -10,10 +10,12 @@ import { Button } from "@/components/ui/Button";
 import { SUPPORTED_CURRENCIES } from "@/constants/currency.constants";
 import type { ExpenseWithCategory, TransactionType } from "@/types/expense.types";
 import type { Category } from "@/types/category.types";
+import type { Account } from "@/types/account.types";
 
 interface ExpenseFormProps {
   expense?: ExpenseWithCategory;
   categories: Category[];
+  accounts?: Account[];
   type?: TransactionType;
   defaultCurrency?: string;
   isLoading: boolean;
@@ -23,15 +25,16 @@ interface ExpenseFormProps {
 
 const today = new Date().toISOString().split("T")[0];
 
-export function ExpenseForm({
+export const ExpenseForm = ({
   expense,
   categories,
+  accounts = [],
   type = "expense",
   defaultCurrency = "USD",
   isLoading,
   onSubmit,
   onCancel,
-}: ExpenseFormProps) {
+}: ExpenseFormProps) => {
   const activeType = expense?.type ?? type;
 
   const {
@@ -47,6 +50,7 @@ export function ExpenseForm({
       amount: expense?.amount ?? undefined,
       currency: expense?.currency ?? defaultCurrency,
       category_id: expense?.category_id ?? null,
+      account_id: expense?.account_id ?? null,
       date: expense?.date ?? today,
       notes: expense?.notes ?? "",
       type: activeType,
@@ -60,6 +64,7 @@ export function ExpenseForm({
         amount: expense.amount,
         currency: expense.currency,
         category_id: expense.category_id,
+        account_id: expense.account_id ?? null,
         date: expense.date,
         notes: expense.notes ?? "",
         type: expense.type,
@@ -67,7 +72,6 @@ export function ExpenseForm({
     }
   }, [expense, reset]);
 
-  // Only show categories that match the active type
   const filteredCategories = categories.filter((c) => c.type === activeType);
   const categoryOptions = [
     { label: "No category", value: "" },
@@ -79,15 +83,24 @@ export function ExpenseForm({
     value: c.code,
   }));
 
+  const accountOptions = [
+    { label: "No account", value: "" },
+    ...accounts.map((a) => ({ label: `${a.name} (${a.currency})`, value: a.id })),
+  ];
+
   const handleFormSubmit: SubmitHandler<ExpenseInput> = (data) => {
-    onSubmit({ ...data, category_id: data.category_id || null, type: activeType });
+    onSubmit({
+      ...data,
+      category_id: data.category_id || null,
+      account_id: data.account_id || null,
+      type: activeType,
+    });
   };
 
   const isIncome = activeType === "income";
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-      {/* Hidden type field */}
       <input type="hidden" {...register("type")} value={activeType} />
 
       <Input
@@ -137,6 +150,15 @@ export function ExpenseForm({
         />
       </div>
 
+      {accounts.length > 0 && (
+        <Select
+          label="Account (optional)"
+          options={accountOptions}
+          error={errors.account_id?.message}
+          {...register("account_id")}
+        />
+      )}
+
       {!isIncome && (
         <Input
           label="Notes (optional)"
@@ -151,13 +173,9 @@ export function ExpenseForm({
           Cancel
         </Button>
         <Button type="submit" isLoading={isLoading}>
-          {expense
-            ? "Save changes"
-            : isIncome
-            ? "Add income"
-            : "Add expense"}
+          {expense ? "Save changes" : isIncome ? "Add income" : "Add expense"}
         </Button>
       </div>
     </form>
   );
-}
+};

@@ -4,9 +4,8 @@ import { useEffect, useRef } from "react";
 import { useToast } from "@/providers/ToastProvider";
 import type { BudgetSummary } from "@/types/budget.types";
 
-export function useBudgetAlertsViewModel(summaries: BudgetSummary[]) {
+export const useBudgetAlertsViewModel = (summaries: BudgetSummary[]) => {
   const { showToast } = useToast();
-  // Track which IDs have already been alerted this session
   const alertedIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -28,4 +27,4 @@ export function useBudgetAlertsViewModel(summaries: BudgetSummary[]) {
       }
     });
   }, [summaries, showToast]);
-}
+};

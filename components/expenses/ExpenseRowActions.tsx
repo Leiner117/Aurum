@@ -1,44 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2, MoreHorizontal } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { ExpenseForm } from "./ExpenseForm";
 import type { ExpenseWithCategory, UpdateExpenseInput } from "@/types/expense.types";
 import type { Category } from "@/types/category.types";
+import type { Account } from "@/types/account.types";
 import type { ExpenseInput } from "@/lib/validators";
 
 interface ExpenseRowActionsProps {
   expense: ExpenseWithCategory;
   categories: Category[];
+  accounts?: Account[];
   onUpdate: (data: UpdateExpenseInput) => Promise<boolean>;
   onDelete: (id: string) => Promise<boolean>;
 }
 
-export function ExpenseRowActions({
+export const ExpenseRowActions = ({
   expense,
   categories,
+  accounts = [],
   onUpdate,
   onDelete,
-}: ExpenseRowActionsProps) {
+}: ExpenseRowActionsProps) => {
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [isActionLoading, setIsActionLoading] = useState(false);
 
-  async function handleUpdate(data: ExpenseInput) {
+  const handleUpdate = async (data: ExpenseInput) => {
     setIsActionLoading(true);
     const ok = await onUpdate({ id: expense.id, ...data });
     setIsActionLoading(false);
     if (ok) setShowEdit(false);
-  }
+  };
 
-  async function handleDelete() {
+  const handleDelete = async () => {
     setIsActionLoading(true);
     const ok = await onDelete(expense.id);
     setIsActionLoading(false);
     if (ok) setShowDelete(false);
-  }
+  };
 
   return (
     <>
@@ -68,6 +71,7 @@ export function ExpenseRowActions({
         <ExpenseForm
           expense={expense}
           categories={categories}
+          accounts={accounts}
           isLoading={isActionLoading}
           onSubmit={handleUpdate}
           onCancel={() => setShowEdit(false)}
@@ -91,4 +95,4 @@ export function ExpenseRowActions({
       </Modal>
     </>
   );
-}
+};
