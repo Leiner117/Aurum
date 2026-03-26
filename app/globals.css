@@ -5,11 +5,11 @@
 
 @theme inline {
   /* Brand colors */
-  --color-primary: #10b981;
-  --color-primary-hover: #059669;
-  --color-primary-foreground: #ffffff;
+  --color-primary: #f59e0b;
+  --color-primary-hover: #d97706;
+  --color-primary-foreground: #0a0a0a;
 
-  /* Semantic colors — light mode */
+  /* Semantic colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
@@ -27,24 +27,24 @@
 
 /* Light mode tokens */
 :root {
-  --background: #f0faf6;
-  --foreground: #0d1f1a;
+  --background: #fafaf9;
+  --foreground: #0a0a0a;
   --surface: #ffffff;
-  --surface-hover: #e6f5ef;
-  --border: #c9e8dc;
-  --muted: #e6f5ef;
-  --muted-foreground: #4d8070;
+  --surface-hover: #f4f4f3;
+  --border: #e5e5e3;
+  --muted: #f4f4f3;
+  --muted-foreground: #737370;
 }
 
 /* Dark mode tokens */
 .dark {
-  --background: #0d1f1a;
-  --foreground: #e6f5ef;
-  --surface: #132a22;
-  --surface-hover: #1e3d30;
-  --border: #1e3d30;
-  --muted: #132a22;
-  --muted-foreground: #6bbfa0;
+  --background: #0a0a0a;
+  --foreground: #fafaf9;
+  --surface: #141414;
+  --surface-hover: #1f1f1f;
+  --border: #2a2a2a;
+  --muted: #141414;
+  --muted-foreground: #a0a0a0;
 }
 
 body {

@@ -6,9 +6,9 @@ export const ACCOUNT_TYPES = [
 ] as const;
 
 export const ACCOUNT_COLORS = [
-  "#10b981", "#3b82f6", "#8b5cf6", "#f59e0b",
+  "#f59e0b", "#22c55e", "#3b82f6", "#8b5cf6",
   "#ef4444", "#ec4899", "#06b6d4", "#64748b",
 ] as const;
 
 export const ACCOUNT_ICON_DEFAULT = "wallet";
-export const ACCOUNT_COLOR_DEFAULT = "#10b981";
+export const ACCOUNT_COLOR_DEFAULT = "#f59e0b";
