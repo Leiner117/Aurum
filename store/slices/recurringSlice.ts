@@ -18,7 +18,7 @@ interface RecurringState {
 
 const initialState: RecurringState = {
   items: [],
-  isLoading: false,
+  isLoading: true,
   isProcessing: false,
   error: null,
   generatedCount: 0,

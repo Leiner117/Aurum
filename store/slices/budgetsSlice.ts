@@ -21,8 +21,8 @@ const initialState: BudgetsState = {
   summaries: [],
   selectedMonth: now.getMonth() + 1,
   selectedYear: now.getFullYear(),
-  isLoading: false,
-  isSummaryLoading: false,
+  isLoading: true,
+  isSummaryLoading: true,
   error: null,
 };
 

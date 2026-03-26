@@ -46,9 +46,9 @@ export default function RecurringPage() {
     setActionLoading(false);
     if (ok) {
       setIsCreateOpen(false);
-      showToast("Recurring expense added", "success");
+      showToast("Recurring transaction added", "success");
     } else {
-      showToast("Failed to add recurring expense", "error");
+      showToast("Failed to add recurring transaction", "error");
     }
   };
 
@@ -59,16 +59,16 @@ export default function RecurringPage() {
     setActionLoading(false);
     if (ok) {
       setEditTarget(null);
-      showToast("Recurring expense updated", "success");
+      showToast("Recurring transaction updated", "success");
     } else {
-      showToast("Failed to update recurring expense", "error");
+      showToast("Failed to update recurring transaction", "error");
     }
   };
 
   const handleDelete = async (id: string) => {
     const ok = await deleteRecurring(id);
-    if (ok) showToast("Recurring expense deleted", "success");
-    else showToast("Failed to delete recurring expense", "error");
+    if (ok) showToast("Recurring transaction deleted", "success");
+    else showToast("Failed to delete recurring transaction", "error");
   };
 
   const handleToggleActive = async (id: string, isActive: boolean) => {
@@ -82,8 +82,8 @@ export default function RecurringPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Recurring Expenses"
-        description="Manage scheduled expenses that are auto-generated."
+        title="Recurring transactions"
+        description="Manage scheduled transactions that are auto-generated."
         actions={
           <Button size="sm" onClick={() => setIsCreateOpen(true)}>
             <Plus className="h-4 w-4" />
@@ -97,7 +97,7 @@ export default function RecurringPage() {
         <div className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm">
           <Sparkles className="h-4 w-4 shrink-0 text-[var(--color-primary)]" />
           <span>
-            <strong>{generatedCount}</strong> expense
+            <strong>{generatedCount}</strong> transaction
             {generatedCount !== 1 ? "s were" : " was"} auto-generated from your recurring
             schedule.
           </span>
@@ -129,8 +129,8 @@ export default function RecurringPage() {
         ) : recurring.length === 0 ? (
           <EmptyState
             icon={<RefreshCw className="h-6 w-6" />}
-            title="No recurring expenses"
-            description="Add a recurring expense and it will be auto-generated on schedule."
+            title="No recurring transactions"
+            description="Add a recurring transaction and it will be auto-generated on schedule."
             actionLabel="New recurring"
             onAction={() => setIsCreateOpen(true)}
           />
@@ -148,7 +148,7 @@ export default function RecurringPage() {
       <Modal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        title="New recurring expense"
+        title="New recurring transaction"
         size="sm"
       >
         <RecurringForm

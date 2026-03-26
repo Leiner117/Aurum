@@ -9,7 +9,7 @@ interface AccountsState {
   error: string | null;
 }
 
-const initialState: AccountsState = { items: [], isLoading: false, error: null };
+const initialState: AccountsState = { items: [], isLoading: true, error: null };
 
 export const fetchAccountsThunk = createAsyncThunk(
   "accounts/fetch",

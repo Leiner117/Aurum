@@ -9,7 +9,7 @@ interface CategoriesState {
   error: string | null;
 }
 
-const initialState: CategoriesState = { items: [], isLoading: false, error: null };
+const initialState: CategoriesState = { items: [], isLoading: true, error: null };
 
 export const fetchCategoriesThunk = createAsyncThunk(
   "categories/fetch",

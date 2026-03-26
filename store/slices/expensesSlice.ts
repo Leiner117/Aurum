@@ -22,7 +22,7 @@ const initialState: ExpensesState = {
   items: [],
   totalCount: 0,
   currentPage: 1,
-  isLoading: false,
+  isLoading: true,
   error: null,
   filters: {},
 };

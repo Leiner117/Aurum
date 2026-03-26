@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   title: "Aurum",
   description: "Personal finance management app",
   icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
+    icon: "/icon-192.png",
+    apple: "/apple-icon.png",
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
