@@ -40,3 +40,7 @@
 - Next.js 16 uses `@tailwindcss/postcss` plugin (not `tailwindcss` directly in postcss)
 - Tailwind v4 has no `tailwind.config.js` — all config done via CSS `@theme` and `@custom-variant`
 - `create-next-app` with `--no-src-dir` places `app/`, `components/`, etc. at root level
+- Zod v4: `z.number({ invalid_type_error: "..." })` is removed — use `z.number()` with no options; use `z.coerce.number()` only when input comes as string (but breaks react-hook-form types)
+- Supabase v2.100+: Database type needs `Relationships: []` in each table + `Views`, `Enums`, `CompositeTypes` fields
+- Supabase join type inference: when doing `.select("*, relation(fields)")`, the returned type doesn't match automatically. Use `as unknown as YourType[]` cast
+- react-hook-form + zodResolver: type the `SubmitHandler<T>` explicitly when TS can't infer the handler correctly
