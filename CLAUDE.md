@@ -47,3 +47,6 @@
 - Route groups like `(auth)` and `(dashboard)` do NOT add path segments — `app/(auth)/callback/route.ts` responds to `/callback`, not `/auth/callback`
 - Never have both `app/page.tsx` and `app/(group)/page.tsx` for the same `/` route — causes infinite redirect loop
 - Supabase middleware: check exact paths for login/register redirects separately from the callback route to avoid redirect loops
+- Recharts v3 Tooltip `formatter`: value is `ValueType | undefined`, not `number` — use `Number(value ?? 0)` to cast safely
+- Recharts requires `"use client"` — all chart components must be client components
+- For DB-computed shapes (RPC results), define a dedicated type matching the exact column names returned instead of extending table row types
