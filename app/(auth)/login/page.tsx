@@ -6,7 +6,7 @@ import { loginSchema, type LoginInput } from "@/lib/validators";
 import { useAuthViewModel } from "@/viewModels/useAuthViewModel";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { TrendingUp } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { ROUTES } from "@/constants/routes.constants";
 
@@ -25,16 +25,14 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center px-4 bg-[var(--color-background)]">
       <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="mb-8 flex flex-col items-center gap-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-primary)]">
-            <TrendingUp className="h-6 w-6 text-white" />
+        <div className="mb-8 flex flex-col items-center gap-3">
+          <Image src="/logo.png" alt="Aurum" width={64} height={64} />
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-[var(--color-foreground)]">Aurum</h1>
+            <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+              Sign in to your account
+            </p>
           </div>
-          <h1 className="text-xl font-semibold text-[var(--color-foreground)]">
-            Sign in to Finance App
-          </h1>
-          <p className="text-sm text-[var(--color-muted-foreground)]">
-            Track your expenses, manage your budget
-          </p>
         </div>
 
         {/* Form */}
@@ -55,9 +53,7 @@ export default function LoginPage() {
           />
 
           {error && (
-            <p className="text-sm text-[var(--color-danger)] text-center">
-              {error}
-            </p>
+            <p className="text-sm text-[var(--color-danger)] text-center">{error}</p>
           )}
 
           <Button type="submit" className="w-full" isLoading={isLoading}>

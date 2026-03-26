@@ -48,7 +48,7 @@ const DashboardPage = () => {
   const { categories } = useCategoriesViewModel();
   const { accounts } = useAccountsViewModel();
 
-  const recentExpenses = expenses.slice(0, 5);
+  const recentExpenses = expenses.filter((e) => e.type === "expense").slice(0, 5);
   const diff = totalThisMonth - totalLastMonth;
   const diffSign = diff >= 0 ? "+" : "";
   const trend = diff > 0 ? "up" : diff < 0 ? "down" : "neutral";
@@ -109,17 +109,17 @@ const DashboardPage = () => {
       </div>
 
       {/* Charts + recent */}
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3 items-stretch">
         {/* Spending by category */}
-        <div className="lg:col-span-1">
-          <ChartCard title="Spending by Category" isLoading={reportsLoading}>
+        <div className="lg:col-span-1 flex flex-col">
+          <ChartCard title="Spending by Category" isLoading={reportsLoading} className="flex-1">
             <SpendingByCategoryChart data={categorySpending} currency={defaultCurrency} />
           </ChartCard>
         </div>
 
         {/* Monthly trend */}
-        <div className="lg:col-span-2">
-          <ChartCard title="Monthly Trend" isLoading={reportsLoading}>
+        <div className="lg:col-span-2 flex flex-col">
+          <ChartCard title="Monthly Trend" isLoading={reportsLoading} className="flex-1">
             <MonthlyTrendChart data={monthlyTrend} currency={defaultCurrency} />
           </ChartCard>
         </div>

@@ -29,23 +29,23 @@ export const AccountCard = ({ account, onEdit, onDelete }: AccountCardProps) => 
   const isNegative = account.balance < 0;
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 gap-4">
-      {/* Icon + info */}
-      <div className="flex items-center gap-3 min-w-0">
-        <div
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white"
-          style={{ backgroundColor: account.color }}
-        >
-          {ACCOUNT_TYPE_ICONS[account.type] ?? <Wallet className="h-5 w-5" />}
-        </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-[var(--color-foreground)]">{account.name}</p>
-          <p className="text-xs text-[var(--color-muted-foreground)]">{ACCOUNT_TYPE_LABELS[account.type]}</p>
-        </div>
+    <div className="flex items-center gap-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
+      {/* Icon */}
+      <div
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white"
+        style={{ backgroundColor: account.color }}
+      >
+        {ACCOUNT_TYPE_ICONS[account.type] ?? <Wallet className="h-5 w-5" />}
       </div>
 
-      {/* Balance */}
-      <div className="shrink-0 text-right">
+      {/* Name + type — takes all remaining space */}
+      <div className="flex-1 min-w-0">
+        <p className="truncate text-sm font-medium text-[var(--color-foreground)]">{account.name}</p>
+        <p className="text-xs text-[var(--color-muted-foreground)]">{ACCOUNT_TYPE_LABELS[account.type]}</p>
+      </div>
+
+      {/* Balance — fixed width, right-aligned */}
+      <div className="w-36 shrink-0 text-right">
         <p
           className={cn(
             "text-sm font-semibold tabular-nums",
@@ -68,7 +68,7 @@ export const AccountCard = ({ account, onEdit, onDelete }: AccountCardProps) => 
         </button>
         <button
           onClick={() => onDelete(account.id)}
-          className="rounded-lg p-1.5 text-[var(--color-muted-foreground)] hover:bg-red-50 hover:text-[var(--color-danger)] dark:hover:bg-red-900/20 transition-colors"
+          className="rounded-lg p-1.5 text-[var(--color-muted-foreground)] hover:bg-red-500/10 hover:text-[var(--color-danger)] transition-colors"
           aria-label="Delete account"
         >
           <Trash2 className="h-4 w-4" />
