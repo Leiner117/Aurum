@@ -5,8 +5,8 @@
 
 @theme inline {
   /* Brand colors */
-  --color-primary: #d97706;
-  --color-primary-hover: #b45309;
+  --color-primary: #10b981;
+  --color-primary-hover: #059669;
   --color-primary-foreground: #ffffff;
 
   /* Semantic colors — light mode */
@@ -27,24 +27,24 @@
 
 /* Light mode tokens */
 :root {
-  --background: #faf8f5;
-  --foreground: #1c1410;
+  --background: #f0faf6;
+  --foreground: #0d1f1a;
   --surface: #ffffff;
-  --surface-hover: #f5f0e8;
-  --border: #e8dcc8;
-  --muted: #f5f0e8;
-  --muted-foreground: #8a7560;
+  --surface-hover: #e6f5ef;
+  --border: #c9e8dc;
+  --muted: #e6f5ef;
+  --muted-foreground: #4d8070;
 }
 
 /* Dark mode tokens */
 .dark {
-  --background: #1c1410;
-  --foreground: #f5f0e8;
-  --surface: #2a1f14;
-  --surface-hover: #3d2f1e;
-  --border: #3d2f1e;
-  --muted: #2a1f14;
-  --muted-foreground: #b09070;
+  --background: #0d1f1a;
+  --foreground: #e6f5ef;
+  --surface: #132a22;
+  --surface-hover: #1e3d30;
+  --border: #1e3d30;
+  --muted: #132a22;
+  --muted-foreground: #6bbfa0;
 }
 
 body {
