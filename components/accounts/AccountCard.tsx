@@ -45,7 +45,7 @@ export const AccountCard = ({ account, onEdit, onDelete }: AccountCardProps) => 
       </div>
 
       {/* Balance — fixed width, right-aligned */}
-      <div className="w-36 shrink-0 text-right">
+      <div className="w-24 shrink-0 text-right sm:w-36">
         <p
           className={cn(
             "text-sm font-semibold tabular-nums",

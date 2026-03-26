@@ -47,7 +47,7 @@ export const CategoryList = ({
     <>
       <ul className="divide-y divide-[var(--color-border)]">
         {categories.map((cat) => (
-          <li key={cat.id} className="flex items-center gap-3 py-3">
+          <li key={cat.id} className="flex items-center gap-2 py-3">
             {/* Icon bubble */}
             <div
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
@@ -57,7 +57,7 @@ export const CategoryList = ({
             </div>
 
             {/* Name */}
-            <span className="flex-1 text-sm font-medium text-[var(--color-foreground)]">
+            <span className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--color-foreground)]">
               {cat.name}
             </span>
 
@@ -65,11 +65,13 @@ export const CategoryList = ({
             <Badge variant={cat.type === "income" ? "success" : "default"}>
               {cat.type === "income" ? "Income" : "Expense"}
             </Badge>
-            {/* Default badge */}
-            {cat.is_default && <Badge variant="default">Default</Badge>}
+            {/* Default badge — hidden on mobile to save space */}
+            {cat.is_default && (
+              <Badge variant="default" className="hidden sm:inline-flex">Default</Badge>
+            )}
 
             {/* Actions */}
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"

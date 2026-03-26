@@ -106,7 +106,7 @@ export default function ExpensesPage() {
                 color={row.category.color}
               />
             </div>
-            <span className="text-sm">{row.category.name}</span>
+            <span className="hidden sm:inline text-sm">{row.category.name}</span>
           </div>
         ) : (
           <span className="text-[var(--color-muted-foreground)]">—</span>
@@ -115,6 +115,7 @@ export default function ExpensesPage() {
     {
       key: "date",
       header: "Date",
+      className: "hidden sm:table-cell",
       cell: (row) => (
         <span className="text-sm text-[var(--color-muted-foreground)]">
           {formatDate(row.date)}

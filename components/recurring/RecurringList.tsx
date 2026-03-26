@@ -33,7 +33,7 @@ export const RecurringList = ({
       {items.map((item) => (
         <li
           key={item.id}
-          className="flex items-center gap-3 py-4 px-1"
+          className="flex items-center gap-2 py-4 px-1 sm:gap-3"
         >
           {/* Category icon */}
           <div
@@ -79,12 +79,12 @@ export const RecurringList = ({
           </div>
 
           {/* Amount */}
-          <span className="shrink-0 text-sm font-semibold text-[var(--color-foreground)]">
+          <span className="shrink-0 text-right text-sm font-semibold tabular-nums text-[var(--color-foreground)]">
             {formatCurrency(item.amount, item.currency)}
           </span>
 
           {/* Actions */}
-          <div className="flex shrink-0 items-center gap-1">
+          <div className="flex shrink-0 items-center">
             <Button
               size="sm"
               variant="ghost"
