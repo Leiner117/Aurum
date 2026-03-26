@@ -50,3 +50,4 @@
 - Recharts v3 Tooltip `formatter`: value is `ValueType | undefined`, not `number` — use `Number(value ?? 0)` to cast safely
 - Recharts requires `"use client"` — all chart components must be client components
 - For DB-computed shapes (RPC results), define a dedicated type matching the exact column names returned instead of extending table row types
+- Next.js 16 `next dev` uses Turbopack by default — Turbopack does NOT support `@tailwindcss/postcss`, so CSS is broken in dev mode. Always use `next dev --webpack` (already set in package.json `dev` script). Flag is `--webpack` not `--no-turbopack` (that flag doesn't exist in Next.js 16)

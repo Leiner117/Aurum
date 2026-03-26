@@ -12,7 +12,7 @@ import { CategoryIcon } from "@/components/categories/CategoryIcon";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
-import { SkeletonRow } from "@/components/ui/Skeleton";
+import { Spinner } from "@/components/ui/Spinner";
 import { Modal } from "@/components/ui/Modal";
 import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { useReportsViewModel } from "@/viewModels/useReportsViewModel";
@@ -138,8 +138,8 @@ const DashboardPage = () => {
           </CardHeader>
           <CardBody className="p-0">
             {expensesLoading ? (
-              <div className="px-5 py-2">
-                {Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} />)}
+              <div className="flex justify-center py-8">
+                <Spinner />
               </div>
             ) : recentExpenses.length === 0 ? (
               <p className="px-5 py-8 text-center text-sm text-[var(--color-muted-foreground)]">

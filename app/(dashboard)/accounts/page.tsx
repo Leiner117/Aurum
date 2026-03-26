@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
-import { SkeletonRow } from "@/components/ui/Skeleton";
+import { Spinner } from "@/components/ui/Spinner";
 import { AccountList } from "@/components/accounts/AccountList";
 import { AccountForm } from "@/components/accounts/AccountForm";
 import { useAccountsViewModel } from "@/viewModels/useAccountsViewModel";
@@ -91,8 +91,8 @@ export default function AccountsPage() {
       <Card>
         <CardBody className={accounts.length > 0 ? "p-4" : "p-0"}>
           {isLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)}
+            <div className="flex justify-center py-10">
+              <Spinner />
             </div>
           ) : (
             <AccountList

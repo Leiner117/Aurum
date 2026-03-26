@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { SkeletonRow } from "@/components/ui/Skeleton";
+import { Spinner } from "@/components/ui/Spinner";
 import { Badge } from "@/components/ui/Badge";
 import { RecurringList } from "@/components/recurring/RecurringList";
 import { RecurringForm } from "@/components/recurring/RecurringForm";
@@ -123,10 +123,8 @@ export default function RecurringPage() {
       {/* List */}
       <Card>
         {isLoading ? (
-          <div className="space-y-3 p-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <SkeletonRow key={i} />
-            ))}
+          <div className="flex justify-center py-10">
+            <Spinner />
           </div>
         ) : recurring.length === 0 ? (
           <EmptyState
