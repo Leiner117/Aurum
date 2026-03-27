@@ -25,8 +25,8 @@ export const useAccountsViewModel = () => {
   const { items: accounts, isLoading, error } = useAppSelector((s) => s.accounts);
 
   useEffect(() => {
-    dispatch(fetchAccountsThunk());
-  }, [dispatch]);
+    if (accounts.length === 0) dispatch(fetchAccountsThunk());
+  }, [dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const createAccount = async (data: CreateAccountInput): Promise<boolean> => {
     const result = await dispatch(createAccountThunk(data));

@@ -35,9 +35,11 @@ export const useRecurringViewModel = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchRecurringThunk());
+    // Only fetch list if not already in store; always process so new recurring
+    // expenses get generated if their next_date has passed
+    if (recurring.length === 0) dispatch(fetchRecurringThunk());
     dispatch(processRecurringThunk());
-  }, [dispatch]);
+  }, [dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const createRecurring = async (data: CreateRecurringExpenseInput): Promise<boolean> => {
     const result = await dispatch(createRecurringThunk(data));

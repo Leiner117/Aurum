@@ -1,12 +1,25 @@
 "use client";
 
 import { Provider } from "react-redux";
-import { store } from "@/store/store";
+import { PersistGate } from "redux-persist/integration/react";
+import { store, persistor } from "@/store/store";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface ReduxProviderProps {
   children: React.ReactNode;
 }
 
 export const ReduxProvider = ({ children }: ReduxProviderProps) => (
-  <Provider store={store}>{children}</Provider>
+  <Provider store={store}>
+    <PersistGate
+      loading={
+        <div className="flex h-screen items-center justify-center">
+          <Spinner size="lg" />
+        </div>
+      }
+      persistor={persistor}
+    >
+      {children}
+    </PersistGate>
+  </Provider>
 );

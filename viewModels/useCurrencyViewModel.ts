@@ -22,11 +22,13 @@ export const useCurrencyViewModel = (): CurrencyViewModelReturn => {
   const { defaultCurrency, rates, isLoadingRates } = useAppSelector((s) => s.currency);
 
   useEffect(() => {
+    // Skip if currency profile and rates are already in the persisted store
+    if (defaultCurrency && Object.keys(rates).length > 0) return;
     dispatch(loadCurrencyProfileThunk()).then((action) => {
       const currency = action.payload as string;
       if (currency) dispatch(loadExchangeRatesThunk(currency));
     });
-  }, [dispatch]);
+  }, [dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const convert = (amount: number, from: string, to?: string): number => {
     const target = to ?? defaultCurrency;

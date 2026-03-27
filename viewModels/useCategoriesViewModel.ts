@@ -25,8 +25,8 @@ export const useCategoriesViewModel = () => {
   const { items: categories, isLoading, error } = useAppSelector((s) => s.categories);
 
   useEffect(() => {
-    dispatch(fetchCategoriesThunk());
-  }, [dispatch]);
+    if (categories.length === 0) dispatch(fetchCategoriesThunk());
+  }, [dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const createCategory = async (data: CreateCategoryInput): Promise<boolean> => {
     const result = await dispatch(createCategoryThunk(data));
