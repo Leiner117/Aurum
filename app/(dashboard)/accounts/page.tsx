@@ -25,7 +25,7 @@ export default function AccountsPage() {
 
   const { accounts, isLoading, createAccount, updateAccount, deleteAccount } =
     useAccountsViewModel();
-  const { convert, defaultCurrency, isLoadingRates } = useCurrencyViewModel();
+  const { convert, defaultCurrency, isLoadingRates, rates } = useCurrencyViewModel();
 
   const totalBalance = accounts.reduce(
     (sum, a) => sum + convert(a.balance, a.currency),
@@ -85,7 +85,9 @@ export default function AccountsPage() {
             Total balance
           </p>
           <p className="mt-1 text-2xl font-bold text-[var(--color-foreground)]">
-            {isLoadingRates ? "—" : formatCurrency(totalBalance, defaultCurrency)}
+            {isLoadingRates || !Object.keys(rates).length
+              ? "—"
+              : formatCurrency(totalBalance, defaultCurrency)}
           </p>
           <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
             Across {accounts.length} account{accounts.length !== 1 ? "s" : ""}

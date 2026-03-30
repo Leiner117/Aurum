@@ -32,7 +32,8 @@ export const useCurrencyViewModel = (): CurrencyViewModelReturn => {
 
   const convert = (amount: number, from: string, to?: string): number => {
     const target = to ?? defaultCurrency;
-    if (!Object.keys(rates).length || from === target) return amount;
+    if (from === target) return amount;
+    if (!(from in rates) || !(target in rates)) return 0;
     return convertAmount(amount, from, target, rates);
   };
 

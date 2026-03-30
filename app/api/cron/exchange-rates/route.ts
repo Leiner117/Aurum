@@ -16,7 +16,7 @@ async function fetchBacVentaRate(): Promise<number> {
   );
   if (!costaRicaBlock) throw new Error("Costa Rica block not found in BAC XML");
 
-  const match = costaRicaBlock[0].match(/<saleRateUSD>([\d.]+)<\/saleRateUSD>/);
+  const match = costaRicaBlock[0].match(/<buyRateUSD>([\d.]+)<\/buyRateUSD>/);
   if (!match) throw new Error("saleRateUSD not found in Costa Rica block");
 
   return parseFloat(match[1]);
