@@ -18,28 +18,22 @@ export const BudgetProgress = ({ summary, className }: BudgetProgressProps) => {
 
   return (
     <div className={cn("space-y-1", className)}>
+      {/* Labels row */}
       <div className="flex items-center justify-between text-xs text-[var(--color-muted-foreground)]">
         <span>{Math.round(summary.percentage)}% used</span>
-        <span>{summary.alert_threshold}% alert</span>
+        <div className="flex items-center gap-1.5">
+          <div className="h-3 w-px bg-[var(--color-muted-foreground)] opacity-50" />
+          <span>{summary.alert_threshold}% alert</span>
+        </div>
       </div>
       {/* Track */}
-      <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--color-muted)]">
+      <div className="relative h-2 w-full overflow-hidden rounded-full bg-[var(--color-muted)]">
         <div
           className={cn(
             "h-full rounded-full transition-all duration-500",
             STATUS_TRACK[summary.status]
           )}
           style={{ width: `${pct}%` }}
-        />
-      </div>
-      {/* Alert threshold marker */}
-      <div
-        className="relative h-0"
-        style={{ marginTop: "-10px" }}
-      >
-        <div
-          className="absolute top-0 h-4 w-0.5 -translate-y-3 bg-[var(--color-muted-foreground)] opacity-40"
-          style={{ left: `${summary.alert_threshold}%` }}
         />
       </div>
     </div>
