@@ -22,8 +22,8 @@ export const useCurrencyViewModel = (): CurrencyViewModelReturn => {
   const { defaultCurrency, rates, isLoadingRates } = useAppSelector((s) => s.currency);
 
   useEffect(() => {
-    // Skip if currency profile and rates are already in the persisted store
-    if (defaultCurrency && Object.keys(rates).length > 0) return;
+    // Skip if we already have real rates (more than just the base currency placeholder)
+    if (defaultCurrency && Object.keys(rates).length > 1) return;
     dispatch(loadCurrencyProfileThunk()).then((action) => {
       const currency = action.payload as string;
       if (currency) dispatch(loadExchangeRatesThunk(currency));

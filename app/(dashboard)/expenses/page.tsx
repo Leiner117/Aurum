@@ -196,7 +196,7 @@ export default function ExpensesPage() {
             className={cn(
               "flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
               activeType === tab.value
-                ? "bg-[var(--color-surface)] text-[var(--color-foreground)] shadow-sm"
+                ? "bg-[var(--color-surface)] text-[var(--color-primary)] shadow-sm"
                 : "text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
             )}
           >
@@ -380,6 +380,7 @@ export default function ExpensesPage() {
           categories={categories}
           accounts={accounts}
           type={activeType}
+          hideTypeToggle
           isLoading={createLoading}
           onSubmit={handleCreate}
           onCancel={() => setIsCreateOpen(false)}

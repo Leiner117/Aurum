@@ -28,7 +28,6 @@ import { ROUTES } from "@/constants/routes.constants";
 import { format } from "date-fns";
 import { useState } from "react";
 import type { ExpenseInput } from "@/lib/validators";
-import type { TransactionType } from "@/types/expense.types";
 
 const STATUS_BADGE: Record<string, "success" | "warning" | "danger"> = {
   ok: "success",
@@ -39,7 +38,7 @@ const STATUS_BADGE: Record<string, "success" | "warning" | "danger"> = {
 const DashboardPage = () => {
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [quickAddLoading, setQuickAddLoading] = useState(false);
-  const [quickAddType, setQuickAddType] = useState<TransactionType>("expense");
+  const [quickAddType, setQuickAddType] = useState<"expense" | "income">("expense");
   const { showToast } = useToast();
 
   const { defaultCurrency } = useCurrencyViewModel();
@@ -74,10 +73,16 @@ const DashboardPage = () => {
         title="Dashboard"
         description={`${format(new Date(), "MMMM yyyy")} overview`}
         actions={
-          <Button size="sm" onClick={() => setIsQuickAddOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Quick add
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" variant="secondary" onClick={() => { setQuickAddType("income"); setIsQuickAddOpen(true); }}>
+              <Plus className="h-4 w-4" />
+              Income
+            </Button>
+            <Button size="sm" onClick={() => { setQuickAddType("expense"); setIsQuickAddOpen(true); }}>
+              <Plus className="h-4 w-4" />
+              Expense
+            </Button>
+          </div>
         }
       />
 
@@ -227,26 +232,9 @@ const DashboardPage = () => {
         title="Quick Add"
         size="lg"
       >
-        {/* Expense / Income toggle */}
-        <div className="mb-4 flex gap-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-muted)] p-1">
-          {(["expense", "income"] as TransactionType[]).map((t) => (
-            <button
-              key={t}
-              onClick={() => setQuickAddType(t)}
-              className={`flex-1 rounded-md py-1.5 text-sm font-medium capitalize transition-colors ${
-                quickAddType === t
-                  ? "bg-[var(--color-surface)] text-[var(--color-foreground)] shadow-sm"
-                  : "text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
-              }`}
-            >
-              {t === "expense" ? "Expense" : "Income"}
-            </button>
-          ))}
-        </div>
         <ExpenseForm
           categories={categories}
           accounts={accounts}
-          type={quickAddType}
           defaultCurrency={defaultCurrency}
           isLoading={quickAddLoading}
           onSubmit={handleQuickAdd}

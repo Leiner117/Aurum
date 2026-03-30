@@ -7,6 +7,7 @@ import { expenseSchema, type ExpenseInput } from "@/lib/validators";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 import { SUPPORTED_CURRENCIES } from "@/constants/currency.constants";
 import type { ExpenseWithCategory, TransactionType } from "@/types/expense.types";
 import type { Category } from "@/types/category.types";
@@ -18,6 +19,7 @@ interface ExpenseFormProps {
   accounts?: Account[];
   type?: TransactionType;
   defaultCurrency?: string;
+  hideTypeToggle?: boolean;
   isLoading: boolean;
   onSubmit: (data: ExpenseInput) => void;
   onCancel: () => void;
@@ -31,17 +33,18 @@ export const ExpenseForm = ({
   accounts = [],
   type = "expense",
   defaultCurrency = "USD",
+  hideTypeToggle = false,
   isLoading,
   onSubmit,
   onCancel,
 }: ExpenseFormProps) => {
-  const activeType = expense?.type ?? type;
-
   const {
     register,
     handleSubmit,
     control,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<ExpenseInput>({
     resolver: zodResolver(expenseSchema),
@@ -53,7 +56,7 @@ export const ExpenseForm = ({
       account_id: expense?.account_id ?? null,
       date: expense?.date ?? today,
       notes: expense?.notes ?? "",
-      type: activeType,
+      type: expense?.type ?? type,
     },
   });
 
@@ -71,6 +74,9 @@ export const ExpenseForm = ({
       });
     }
   }, [expense, reset]);
+
+  const activeType = watch("type");
+  const isIncome = activeType === "income";
 
   const filteredCategories = categories.filter((c) => c.type === activeType);
   const categoryOptions = [
@@ -93,15 +99,36 @@ export const ExpenseForm = ({
       ...data,
       category_id: data.category_id || null,
       account_id: data.account_id || null,
-      type: activeType,
     });
   };
 
-  const isIncome = activeType === "income";
-
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-      <input type="hidden" {...register("type")} value={activeType} />
+      {/* Type toggle */}
+      {!expense && !hideTypeToggle && (
+        <div className="space-y-1.5">
+          <p className="text-sm font-medium text-[var(--color-foreground)]">Type</p>
+          <div className="flex gap-2">
+            {(["expense", "income"] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setValue("type", t, { shouldValidate: true })}
+                className={cn(
+                  "flex-1 rounded-lg border px-3 py-2 text-sm font-medium capitalize transition-colors",
+                  activeType === t
+                    ? t === "expense"
+                      ? "border-[var(--color-danger)] bg-red-50 text-[var(--color-danger)] dark:bg-red-900/20"
+                      : "border-[var(--color-success)] bg-green-50 text-[var(--color-success)] dark:bg-green-900/20"
+                    : "border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:bg-[var(--color-surface-hover)]"
+                )}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <Input
         label="Description"
