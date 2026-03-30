@@ -8,7 +8,11 @@
       "Bash(npx tsc:*)",
       "Bash(git checkout:*)",
       "Bash(git add:*)",
-      "Bash(true git:*)"
+      "Bash(true git:*)",
+      "WebFetch(domain:www.baccredomatic.com)",
+      "WebSearch",
+      "WebFetch(domain:api-bac.baccredomatic.com)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }

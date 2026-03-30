@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { createClient } from "@/lib/supabase/client";
 import { SUPABASE_TABLES } from "@/constants/supabase.constants";
 import { DEFAULT_CURRENCY } from "@/constants/currency.constants";
-import { fetchExchangeRates } from "@/lib/currency/convert";
 
 interface CurrencyState {
   defaultCurrency: string;
@@ -34,9 +33,27 @@ export const loadCurrencyProfileThunk = createAsyncThunk(
 export const loadExchangeRatesThunk = createAsyncThunk(
   "currency/loadRates",
   async (base: string, { rejectWithValue }) => {
-    if (!process.env.NEXT_PUBLIC_EXCHANGE_RATE_API_KEY) return {};
     try {
-      return await fetchExchangeRates(base);
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from(SUPABASE_TABLES.EXCHANGE_RATES)
+        .select("base_currency, target_currency, rate");
+      if (error) return rejectWithValue(error.message);
+
+      // Build a rates object where every value is relative to `base`.
+      // convertAmount uses rates[to] / rates[from], so we need both
+      // base currency and all others expressed in the same unit.
+      const rates: Record<string, number> = { [base]: 1 };
+      for (const row of data ?? []) {
+        if (row.base_currency === "USD" && row.target_currency === "CRC") {
+          if (base === "USD") {
+            rates["CRC"] = row.rate;          // 1 USD = X CRC
+          } else if (base === "CRC") {
+            rates["USD"] = 1 / row.rate;      // 1 CRC = 1/X USD
+          }
+        }
+      }
+      return rates;
     } catch {
       return rejectWithValue("Failed to fetch exchange rates");
     }

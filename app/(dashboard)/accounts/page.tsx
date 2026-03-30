@@ -10,6 +10,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { AccountList } from "@/components/accounts/AccountList";
 import { AccountForm } from "@/components/accounts/AccountForm";
 import { useAccountsViewModel } from "@/viewModels/useAccountsViewModel";
+import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
 import { useToast } from "@/providers/ToastProvider";
 import { formatCurrency } from "@/lib/currency/format";
 import type { AccountInput } from "@/lib/validators";
@@ -24,8 +25,12 @@ export default function AccountsPage() {
 
   const { accounts, isLoading, createAccount, updateAccount, deleteAccount } =
     useAccountsViewModel();
+  const { convert, defaultCurrency, isLoadingRates } = useCurrencyViewModel();
 
-  const totalBalance = accounts.reduce((sum, a) => sum + a.balance, 0);
+  const totalBalance = accounts.reduce(
+    (sum, a) => sum + convert(a.balance, a.currency),
+    0
+  );
 
   const handleCreate = async (data: AccountInput) => {
     setIsSubmitting(true);
@@ -80,7 +85,7 @@ export default function AccountsPage() {
             Total balance
           </p>
           <p className="mt-1 text-2xl font-bold text-[var(--color-foreground)]">
-            {formatCurrency(totalBalance, accounts[0]?.currency ?? "USD")}
+            {isLoadingRates ? "—" : formatCurrency(totalBalance, defaultCurrency)}
           </p>
           <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
             Across {accounts.length} account{accounts.length !== 1 ? "s" : ""}
