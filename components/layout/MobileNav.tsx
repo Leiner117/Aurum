@@ -13,6 +13,8 @@ import {
   Menu,
   X,
   Landmark,
+  PiggyBank,
+  ArrowLeftRight,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -27,6 +29,8 @@ const NAV_ITEMS = [
   { label: "Budgets", href: ROUTES.BUDGETS, icon: <Target className="h-4 w-4" /> },
   { label: "Reports", href: ROUTES.REPORTS, icon: <BarChart3 className="h-4 w-4" /> },
   { label: "Recurring", href: ROUTES.RECURRING, icon: <RefreshCw className="h-4 w-4" /> },
+  { label: "Goals", href: ROUTES.GOALS, icon: <PiggyBank className="h-4 w-4" /> },
+  { label: "Transfers", href: ROUTES.TRANSFERS, icon: <ArrowLeftRight className="h-4 w-4" /> },
   { label: "Settings", href: ROUTES.SETTINGS, icon: <Settings className="h-4 w-4" /> },
 ];
 

@@ -18,6 +18,8 @@ import budgetsReducer from "./slices/budgetsSlice";
 import recurringReducer from "./slices/recurringSlice";
 import reportsReducer from "./slices/reportsSlice";
 import currencyReducer from "./slices/currencySlice";
+import goalsReducer from "./slices/goalsSlice";
+import transfersReducer from "./slices/transfersSlice";
 
 // Reset transient loading/error state on rehydration so spinners never get stuck
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,6 +43,8 @@ const rootReducer = combineReducers({
   recurring: recurringReducer,
   reports: reportsReducer,
   currency: currencyReducer,
+  goals: goalsReducer,
+  transfers: transfersReducer,
 });
 
 // Persist stable slices — expenses and reports are excluded because they

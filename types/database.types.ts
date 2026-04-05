@@ -252,6 +252,112 @@ export interface Database {
         };
         Relationships: [];
       };
+      goals: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          description: string | null;
+          target_amount: number;
+          current_amount: number;
+          currency: string;
+          target_date: string | null;
+          color: string;
+          icon: string;
+          is_completed: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          description?: string | null;
+          target_amount: number;
+          current_amount?: number;
+          currency?: string;
+          target_date?: string | null;
+          color?: string;
+          icon?: string;
+          is_completed?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          name?: string;
+          description?: string | null;
+          target_amount?: number;
+          current_amount?: number;
+          currency?: string;
+          target_date?: string | null;
+          color?: string;
+          icon?: string;
+          is_completed?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      goal_contributions: {
+        Row: {
+          id: string;
+          user_id: string;
+          goal_id: string;
+          account_id: string | null;
+          amount: number;
+          currency: string;
+          notes: string | null;
+          date: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          goal_id: string;
+          account_id?: string | null;
+          amount: number;
+          currency?: string;
+          notes?: string | null;
+          date?: string;
+          created_at?: string;
+        };
+        Update: Record<never, never>;
+        Relationships: [];
+      };
+      transfers: {
+        Row: {
+          id: string;
+          user_id: string;
+          from_account_id: string | null;
+          to_account_id: string | null;
+          amount: number;
+          from_currency: string;
+          to_currency: string;
+          converted_amount: number;
+          notes: string | null;
+          date: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          from_account_id?: string | null;
+          to_account_id?: string | null;
+          amount: number;
+          from_currency: string;
+          to_currency: string;
+          converted_amount: number;
+          notes?: string | null;
+          date?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          notes?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<never, never>;
     Functions: {

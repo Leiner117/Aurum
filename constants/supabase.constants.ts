@@ -6,6 +6,9 @@ export const SUPABASE_TABLES = {
   RECURRING_EXPENSES: "recurring_expenses",
   EXCHANGE_RATES: "exchange_rates",
   ACCOUNTS: "accounts",
+  GOALS: "goals",
+  GOAL_CONTRIBUTIONS: "goal_contributions",
+  TRANSFERS: "transfers",
 } as const;
 
 export const SUPABASE_FUNCTIONS = {

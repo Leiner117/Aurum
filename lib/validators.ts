@@ -91,6 +91,38 @@ export const accountSchema = z.object({
   icon: z.string().min(1, "Icon is required"),
 });
 
+// ── Goals ─────────────────────────────────────────────────
+export const goalSchema = z.object({
+  name: z.string().min(1, "Name is required").max(60, "Max 60 characters"),
+  description: z.string().max(200, "Max 200 characters").optional(),
+  target_amount: z.number().positive("Amount must be greater than 0").multipleOf(0.01, "Max 2 decimal places"),
+  currency: z.string().length(3, "Must be a valid currency code"),
+  target_date: z.string().nullable().optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color"),
+  icon: z.string().min(1, "Icon is required"),
+});
+
+export const goalContributionSchema = z.object({
+  goal_id: z.string().uuid("Invalid goal"),
+  account_id: z.string().uuid("Invalid account").nullable().optional(),
+  amount: z.number().positive("Amount must be greater than 0").multipleOf(0.01, "Max 2 decimal places"),
+  currency: z.string().length(3, "Must be a valid currency code"),
+  notes: z.string().max(500, "Max 500 characters").optional(),
+  date: z.string().min(1, "Date is required"),
+});
+
+// ── Transfers ─────────────────────────────────────────────
+export const transferSchema = z.object({
+  from_account_id: z.string().uuid("Select source account"),
+  to_account_id: z.string().uuid("Select destination account"),
+  amount: z.number().positive("Amount must be greater than 0").multipleOf(0.01, "Max 2 decimal places"),
+  notes: z.string().max(500, "Max 500 characters").optional(),
+  date: z.string().min(1, "Date is required"),
+}).refine((d) => d.from_account_id !== d.to_account_id, {
+  message: "Source and destination must be different",
+  path: ["to_account_id"],
+});
+
 // ── Inferred types ────────────────────────────────────────
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
@@ -99,3 +131,6 @@ export type ExpenseInput = z.infer<typeof expenseSchema>;
 export type BudgetInput = z.infer<typeof budgetSchema>;
 export type RecurringExpenseInput = z.infer<typeof recurringExpenseSchema>;
 export type AccountInput = z.infer<typeof accountSchema>;
+export type GoalInput = z.infer<typeof goalSchema>;
+export type GoalContributionInput = z.infer<typeof goalContributionSchema>;
+export type TransferInput = z.infer<typeof transferSchema>;

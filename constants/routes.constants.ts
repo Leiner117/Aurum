@@ -13,6 +13,8 @@ export const ROUTES = {
   REPORTS: "/reports",
   RECURRING: "/recurring",
   SETTINGS: "/settings",
+  GOALS: "/goals",
+  TRANSFERS: "/transfers",
 } as const;
 
 export const PUBLIC_ROUTES: string[] = [

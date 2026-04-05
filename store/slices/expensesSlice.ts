@@ -2,12 +2,16 @@ import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/tool
 import { createClient } from "@/lib/supabase/client";
 import { SUPABASE_TABLES } from "@/constants/supabase.constants";
 import { EXPENSES_PAGE_SIZE } from "@/constants/expenses.constants";
+import { fetchAccountsThunk } from "@/store/slices/accountsSlice";
+import { fetchReportsThunk } from "@/store/slices/reportsSlice";
 import type {
   ExpenseWithCategory,
   CreateExpenseInput,
   UpdateExpenseInput,
   ExpenseFilters,
 } from "@/types/expense";
+
+interface ReportsSliceState { monthsBack: number; }
 
 interface ExpensesState {
   items: ExpenseWithCategory[];
@@ -73,8 +77,10 @@ export const createExpenseThunk = createAsyncThunk(
       .from(SUPABASE_TABLES.EXPENSES)
       .insert({ ...input, user_id: user.id });
     if (error) return rejectWithValue(error.message);
-    const s = (getState() as { expenses: ExpensesState }).expenses;
-    dispatch(fetchExpensesThunk({ filters: s.filters, page: s.currentPage }));
+    const root = getState() as { expenses: ExpensesState; reports: ReportsSliceState };
+    dispatch(fetchExpensesThunk({ filters: root.expenses.filters, page: root.expenses.currentPage }));
+    dispatch(fetchAccountsThunk());
+    dispatch(fetchReportsThunk(root.reports.monthsBack));
   }
 );
 
@@ -87,8 +93,10 @@ export const updateExpenseThunk = createAsyncThunk(
       .update({ ...input, updated_at: new Date().toISOString() })
       .eq("id", id);
     if (error) return rejectWithValue(error.message);
-    const s = (getState() as { expenses: ExpensesState }).expenses;
-    dispatch(fetchExpensesThunk({ filters: s.filters, page: s.currentPage }));
+    const root = getState() as { expenses: ExpensesState; reports: ReportsSliceState };
+    dispatch(fetchExpensesThunk({ filters: root.expenses.filters, page: root.expenses.currentPage }));
+    dispatch(fetchAccountsThunk());
+    dispatch(fetchReportsThunk(root.reports.monthsBack));
   }
 );
 
@@ -101,8 +109,10 @@ export const deleteExpenseThunk = createAsyncThunk(
       .delete()
       .eq("id", id);
     if (error) return rejectWithValue(error.message);
-    const s = (getState() as { expenses: ExpensesState }).expenses;
-    dispatch(fetchExpensesThunk({ filters: s.filters, page: s.currentPage }));
+    const root = getState() as { expenses: ExpensesState; reports: ReportsSliceState };
+    dispatch(fetchExpensesThunk({ filters: root.expenses.filters, page: root.expenses.currentPage }));
+    dispatch(fetchAccountsThunk());
+    dispatch(fetchReportsThunk(root.reports.monthsBack));
   }
 );
 

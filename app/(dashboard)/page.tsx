@@ -38,7 +38,6 @@ const STATUS_BADGE: Record<string, "success" | "warning" | "danger"> = {
 const DashboardPage = () => {
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [quickAddLoading, setQuickAddLoading] = useState(false);
-  const [quickAddType, setQuickAddType] = useState<"expense" | "income">("expense");
   const { showToast } = useToast();
 
   const { defaultCurrency } = useCurrencyViewModel();
@@ -57,11 +56,11 @@ const DashboardPage = () => {
 
   const handleQuickAdd = async (data: ExpenseInput) => {
     setQuickAddLoading(true);
-    const ok = await createExpense({ ...data, type: quickAddType });
+    const ok = await createExpense(data);
     setQuickAddLoading(false);
     if (ok) {
       setIsQuickAddOpen(false);
-      showToast(quickAddType === "income" ? "Income added" : "Expense added", "success");
+      showToast(data.type === "income" ? "Income added" : "Expense added", "success");
     } else {
       showToast("Failed to add transaction", "error");
     }
@@ -73,16 +72,10 @@ const DashboardPage = () => {
         title="Dashboard"
         description={`${format(new Date(), "MMMM yyyy")} overview`}
         actions={
-          <div className="flex gap-2">
-            <Button size="sm" variant="secondary" onClick={() => { setQuickAddType("income"); setIsQuickAddOpen(true); }}>
-              <Plus className="h-4 w-4" />
-              Income
-            </Button>
-            <Button size="sm" onClick={() => { setQuickAddType("expense"); setIsQuickAddOpen(true); }}>
-              <Plus className="h-4 w-4" />
-              Expense
-            </Button>
-          </div>
+          <Button size="sm" onClick={() => setIsQuickAddOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Add Transaction
+          </Button>
         }
       />
 
