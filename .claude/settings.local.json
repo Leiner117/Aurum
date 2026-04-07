@@ -12,7 +12,9 @@
       "WebFetch(domain:www.baccredomatic.com)",
       "WebSearch",
       "WebFetch(domain:api-bac.baccredomatic.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(node_modules/.bin/tsc --noEmit)"
     ]
   }
 }
