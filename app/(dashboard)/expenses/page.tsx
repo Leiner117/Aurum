@@ -57,11 +57,6 @@ export default function ExpensesPage() {
     setFilters({ ...filters, type: tab });
   };
 
-  // Initialize type filter on mount
-  useState(() => {
-    setFilters({ type: "expense" });
-  });
-
   const handleCreate = async (data: ExpenseInput) => {
     setCreateLoading(true);
     const ok = await createExpense({ ...data, type: activeType });
