@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { budgetSchema, type BudgetInput } from "@/lib/validators";
@@ -52,7 +51,6 @@ export const BudgetForm = ({
     register,
     handleSubmit,
     control,
-    reset,
     formState: { errors },
   } = useForm<BudgetInput>({
     resolver: zodResolver(budgetSchema),
@@ -66,22 +64,6 @@ export const BudgetForm = ({
       is_recurring: budget?.is_recurring ?? false,
     },
   });
-
-  useEffect(() => {
-    if (budget) {
-      reset({
-        category_id: budget.category_id,
-        amount: budget.budget_amount,
-        currency: budget.budget_currency,
-        month: budget.month,
-        year: budget.year,
-        alert_threshold: budget.alert_threshold,
-        is_recurring: budget.is_recurring ?? false,
-      });
-    }
-    // Only reset when the budget ID changes (switching budgets), not on every re-render
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [budget?.id]);
 
   const handleFormSubmit: SubmitHandler<BudgetInput> = (data) => onSubmit(data);
 
