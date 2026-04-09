@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm, Controller, type SubmitHandler } from "react-hook-form";
+import { useState } from "react";
+import { useForm, Controller, type SubmitHandler, type ControllerRenderProps } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { budgetSchema, type BudgetInput } from "@/lib/validators";
 import { Input } from "@/components/ui/Input";
@@ -26,6 +26,50 @@ const YEAR_OPTIONS = [0, 1, 2].map((offset) => ({
   label: String(currentYear + offset),
   value: String(currentYear + offset),
 }));
+
+// Defined at module level (outside BudgetForm) so React sees a stable component
+// type and never remounts it during parent re-renders.
+//
+// Root cause of the "digits come back" bug:
+// react-hook-form falls back to defaultValues when field.onChange(undefined) is called,
+// making field.value revert to the original budget amount (e.g. 85000).
+// By keeping a local `raw` string state for display, we decouple the visible input
+// from react-hook-form's internal value — the user can freely clear the field.
+const AmountInput = ({
+  field,
+  initialValue,
+  error,
+}: {
+  field: ControllerRenderProps<BudgetInput, "amount">;
+  initialValue?: number;
+  error?: string;
+}) => {
+  const [raw, setRaw] = useState(initialValue != null ? String(initialValue) : "");
+
+  return (
+    <Input
+      ref={field.ref}
+      name={field.name}
+      label="Budget amount"
+      type="number"
+      step="0.01"
+      placeholder="0.00"
+      error={error}
+      onBlur={field.onBlur}
+      value={raw}
+      onChange={(e) => {
+        const val = e.target.value;
+        setRaw(val);
+        if (val === "") {
+          field.onChange(undefined);
+        } else {
+          const num = parseFloat(val);
+          if (!isNaN(num)) field.onChange(num);
+        }
+      }}
+    />
+  );
+};
 
 interface BudgetFormProps {
   budget?: BudgetSummary;
@@ -52,7 +96,6 @@ export const BudgetForm = ({
     register,
     handleSubmit,
     control,
-    reset,
     formState: { errors },
   } = useForm<BudgetInput>({
     resolver: zodResolver(budgetSchema),
@@ -66,22 +109,6 @@ export const BudgetForm = ({
       is_recurring: budget?.is_recurring ?? false,
     },
   });
-
-  useEffect(() => {
-    if (budget) {
-      reset({
-        category_id: budget.category_id,
-        amount: budget.budget_amount,
-        currency: budget.budget_currency,
-        month: budget.month,
-        year: budget.year,
-        alert_threshold: budget.alert_threshold,
-        is_recurring: budget.is_recurring ?? false,
-      });
-    }
-    // Only reset when the budget ID changes (switching budgets), not on every re-render
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [budget?.id]);
 
   const handleFormSubmit: SubmitHandler<BudgetInput> = (data) => onSubmit(data);
 
@@ -109,15 +136,10 @@ export const BudgetForm = ({
           name="amount"
           control={control}
           render={({ field }) => (
-            <Input
-              label="Budget amount"
-              type="number"
-              step="0.01"
-              placeholder="0.00"
+            <AmountInput
+              field={field}
+              initialValue={budget?.budget_amount}
               error={errors.amount?.message}
-              {...field}
-              onChange={(e) => field.onChange(e.target.value === "" ? undefined : parseFloat(e.target.value))}
-              value={field.value ?? ""}
             />
           )}
         />
