@@ -79,7 +79,9 @@ export const BudgetForm = ({
         is_recurring: budget.is_recurring ?? false,
       });
     }
-  }, [budget, reset]);
+    // Only reset when the budget ID changes (switching budgets), not on every re-render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [budget?.id]);
 
   const handleFormSubmit: SubmitHandler<BudgetInput> = (data) => onSubmit(data);
 
@@ -114,7 +116,7 @@ export const BudgetForm = ({
               placeholder="0.00"
               error={errors.amount?.message}
               {...field}
-              onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+              onChange={(e) => field.onChange(e.target.value === "" ? undefined : parseFloat(e.target.value))}
               value={field.value ?? ""}
             />
           )}
