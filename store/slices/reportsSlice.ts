@@ -29,11 +29,13 @@ export interface DailySpending {
 
 interface ReportsState {
   categorySpending: CategorySpending[];
+  categorySpendingThisMonth: CategorySpending[];
   monthlyTrend: MonthlyTrend[];
   dailySpending: DailySpending[];
   totalThisMonth: number;
   totalLastMonth: number;
   totalExpenses: number;
+  totalThisMonthCount: number;
   monthsBack: number;
   isLoading: boolean;
   error: string | null;
@@ -41,11 +43,13 @@ interface ReportsState {
 
 const initialState: ReportsState = {
   categorySpending: [],
+  categorySpendingThisMonth: [],
   monthlyTrend: [],
   dailySpending: [],
   totalThisMonth: 0,
   totalLastMonth: 0,
   totalExpenses: 0,
+  totalThisMonthCount: 0,
   monthsBack: 6,
   isLoading: true,
   error: null,
@@ -81,7 +85,9 @@ export const fetchReportsThunk = createAsyncThunk(
 
     const rows = (data as unknown as ExpenseRow[]) ?? [];
 
-    // Category spending
+    const thisMonthRows = rows.filter((r) => r.date >= thisMonthStart);
+
+    // Category spending (full range)
     const catMap = new Map<string, CategorySpending>();
     rows.forEach((r) => {
       const key = r.category_id ?? "uncategorized";
@@ -98,6 +104,24 @@ export const fetchReportsThunk = createAsyncThunk(
       }
     });
     const categorySpending = Array.from(catMap.values()).sort((a, b) => b.total - a.total);
+
+    // Category spending (current month only)
+    const catMapThisMonth = new Map<string, CategorySpending>();
+    thisMonthRows.forEach((r) => {
+      const key = r.category_id ?? "uncategorized";
+      const existing = catMapThisMonth.get(key);
+      if (existing) {
+        existing.total += r.amount;
+      } else {
+        catMapThisMonth.set(key, {
+          category_id: r.category_id,
+          category_name: r.categories?.name ?? "Uncategorized",
+          category_color: r.categories?.color ?? "#64748b",
+          total: r.amount,
+        });
+      }
+    });
+    const categorySpendingThisMonth = Array.from(catMapThisMonth.values()).sort((a, b) => b.total - a.total);
 
     // Monthly trend
     const monthMap = new Map<string, number>();
@@ -122,13 +146,14 @@ export const fetchReportsThunk = createAsyncThunk(
     const dailySpending = Array.from(dayMap.entries()).map(([day, total]) => ({ day, total }));
 
     // Totals
-    const totalThisMonth = rows.filter((r) => r.date >= thisMonthStart).reduce((s, r) => s + r.amount, 0);
+    const totalThisMonth = thisMonthRows.reduce((s, r) => s + r.amount, 0);
+    const totalThisMonthCount = thisMonthRows.length;
     const totalLastMonth = rows
       .filter((r) => r.date >= lastMonthStart && r.date <= lastMonthEnd)
       .reduce((s, r) => s + r.amount, 0);
     const totalExpenses = rows.reduce((s, r) => s + r.amount, 0);
 
-    return { categorySpending, monthlyTrend, dailySpending, totalThisMonth, totalLastMonth, totalExpenses };
+    return { categorySpending, categorySpendingThisMonth, monthlyTrend, dailySpending, totalThisMonth, totalThisMonthCount, totalLastMonth, totalExpenses };
   }
 );
 
@@ -144,9 +169,11 @@ const reportsSlice = createSlice({
       .addCase(fetchReportsThunk.fulfilled, (s, a) => {
         s.isLoading = false;
         s.categorySpending = a.payload.categorySpending;
+        s.categorySpendingThisMonth = a.payload.categorySpendingThisMonth;
         s.monthlyTrend = a.payload.monthlyTrend;
         s.dailySpending = a.payload.dailySpending;
         s.totalThisMonth = a.payload.totalThisMonth;
+        s.totalThisMonthCount = a.payload.totalThisMonthCount;
         s.totalLastMonth = a.payload.totalLastMonth;
         s.totalExpenses = a.payload.totalExpenses;
       })
