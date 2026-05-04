@@ -9,6 +9,7 @@ import { fetchTransfersThunk } from "@/store/slices/transfersSlice";
 import { fetchBudgetsThunk, fetchSummariesThunk } from "@/store/slices/budgetsSlice";
 import { fetchGoalsThunk } from "@/store/slices/goalsSlice";
 import { fetchReportsThunk } from "@/store/slices/reportsSlice";
+import { processRecurringThunk } from "@/store/slices/recurringSlice";
 import type { ExpenseFilters } from "@/types/expense.types";
 
 interface SyncState {
@@ -39,6 +40,16 @@ export const useRealtimeSyncViewModel = () => {
   useEffect(() => {
     stateRef.current = { expenseFilters, expensePage, budgetMonth, budgetYear, monthsBack };
   }, [expenseFilters, expensePage, budgetMonth, budgetYear, monthsBack]);
+
+  useEffect(() => {
+    dispatch(processRecurringThunk()).then((result) => {
+      if (processRecurringThunk.fulfilled.match(result) && (result.payload as number) > 0) {
+        const { expenseFilters, expensePage, monthsBack } = stateRef.current;
+        dispatch(fetchExpensesThunk({ filters: expenseFilters, page: expensePage }));
+        dispatch(fetchReportsThunk(monthsBack));
+      }
+    });
+  }, [dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const supabase = createClient();

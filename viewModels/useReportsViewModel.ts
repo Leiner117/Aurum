@@ -9,11 +9,13 @@ export type { CategorySpending, MonthlyTrend, DailySpending };
 
 export interface ReportsViewModelReturn {
   categorySpending: CategorySpending[];
+  categorySpendingThisMonth: CategorySpending[];
   monthlyTrend: MonthlyTrend[];
   dailySpending: DailySpending[];
   totalThisMonth: number;
   totalLastMonth: number;
   totalExpenses: number;
+  totalThisMonthCount: number;
   isLoading: boolean;
   error: string | null;
   monthsBack: number;
@@ -25,11 +27,13 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
   const dispatch = useAppDispatch();
   const {
     categorySpending,
+    categorySpendingThisMonth,
     monthlyTrend,
     dailySpending,
     totalThisMonth,
     totalLastMonth,
     totalExpenses,
+    totalThisMonthCount,
     isLoading,
     error,
     monthsBack,
@@ -44,11 +48,13 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
 
   return {
     categorySpending,
+    categorySpendingThisMonth,
     monthlyTrend,
     dailySpending,
     totalThisMonth,
     totalLastMonth,
     totalExpenses,
+    totalThisMonthCount,
     isLoading,
     error,
     monthsBack,
