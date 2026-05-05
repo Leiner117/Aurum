@@ -30,9 +30,11 @@ const GoalsPage = () => {
 
   const handleGoalSubmit = async (data: GoalInput) => {
     setFormLoading(true);
+    // Normalize empty string from the account selector to null
+    const normalized = { ...data, account_id: data.account_id || null };
     const ok = editingGoal
-      ? await updateGoal({ ...data, id: editingGoal.id })
-      : await createGoal(data);
+      ? await updateGoal({ ...normalized, id: editingGoal.id })
+      : await createGoal(normalized);
     setFormLoading(false);
     if (ok) {
       setIsGoalFormOpen(false);
@@ -152,6 +154,7 @@ const GoalsPage = () => {
       >
         <GoalForm
           goal={editingGoal}
+          accounts={accounts}
           defaultCurrency={defaultCurrency}
           isLoading={formLoading}
           onSubmit={handleGoalSubmit}

@@ -21,7 +21,13 @@ import currencyReducer from "./slices/currencySlice";
 import goalsReducer from "./slices/goalsSlice";
 import transfersReducer from "./slices/transfersSlice";
 
-// Reset transient loading/error state on rehydration so spinners never get stuck
+const _now = new Date();
+const _currentMonth = _now.getMonth() + 1;
+const _currentYear = _now.getFullYear();
+
+// Reset transient loading/error state on rehydration so spinners never get stuck.
+// Also reset selectedMonth/Year to the current month so the budgets page always
+// opens on the correct month after a new session (fixes stale persisted month).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const resetLoadingState = createTransform<any, any>(
   (state) => state,
@@ -32,6 +38,10 @@ const resetLoadingState = createTransform<any, any>(
     isProcessing: false,
     isLoadingRates: false,
     error: null,
+    ...(state.selectedMonth !== undefined && {
+      selectedMonth: _currentMonth,
+      selectedYear: _currentYear,
+    }),
   })
 );
 
