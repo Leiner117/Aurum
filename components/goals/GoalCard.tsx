@@ -22,7 +22,7 @@ export const GoalCard = ({ goal, onContribute, onEdit, onDelete }: GoalCardProps
 
   return (
     <Card>
-      <CardBody className="space-y-4">
+      <CardBody className="flex flex-col gap-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
@@ -67,7 +67,7 @@ export const GoalCard = ({ goal, onContribute, onEdit, onDelete }: GoalCardProps
         )}
 
         {/* Actions */}
-        <div className="flex gap-2 pt-1">
+        <div className="flex gap-2 pt-1 mt-auto">
           {!goal.is_completed && (
             <Button size="sm" onClick={() => onContribute(goal)} className="flex-1">
               <PiggyBank className="h-4 w-4" />
