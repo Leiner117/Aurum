@@ -13,13 +13,17 @@ import type { Account } from "@/types/account";
 
 interface TransferFormProps {
   accounts: Account[];
+  defaultCurrency: string;
   isLoading: boolean;
   convert: (amount: number, from: string, to?: string) => number;
   onSubmit: (data: TransferInput) => void;
   onCancel: () => void;
 }
 
-export const TransferForm = ({ accounts, isLoading, convert, onSubmit, onCancel }: TransferFormProps) => {
+export const TransferForm = ({ accounts, defaultCurrency, isLoading, convert, onSubmit, onCancel }: TransferFormProps) => {
+  const defaultFromAccount = accounts.find((a) => a.currency === defaultCurrency) ?? accounts[0];
+  const defaultToAccount = accounts.find((a) => a.id !== defaultFromAccount?.id) ?? accounts[1];
+
   const {
     register,
     handleSubmit,
@@ -28,8 +32,8 @@ export const TransferForm = ({ accounts, isLoading, convert, onSubmit, onCancel 
   } = useForm<TransferInput>({
     resolver: zodResolver(transferSchema),
     defaultValues: {
-      from_account_id: accounts[0]?.id ?? "",
-      to_account_id: accounts[1]?.id ?? "",
+      from_account_id: defaultFromAccount?.id ?? "",
+      to_account_id: defaultToAccount?.id ?? "",
       amount: 0,
       notes: "",
       date: format(new Date(), "yyyy-MM-dd"),

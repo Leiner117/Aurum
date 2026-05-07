@@ -97,6 +97,7 @@ export const goalSchema = z.object({
   description: z.string().max(200, "Max 200 characters").optional(),
   target_amount: z.number().positive("Amount must be greater than 0").multipleOf(0.01, "Max 2 decimal places"),
   currency: z.string().length(3, "Must be a valid currency code"),
+  account_id: z.string().uuid("Invalid account").nullable().optional(),
   target_date: z.string().nullable().optional(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color"),
   icon: z.string().min(1, "Icon is required"),

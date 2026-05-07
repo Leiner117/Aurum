@@ -39,7 +39,7 @@ export const GoalContributionForm = ({
     resolver: zodResolver(goalContributionSchema),
     defaultValues: {
       goal_id: goal.id,
-      account_id: accounts[0]?.id ?? null,
+      account_id: goal.account_id ?? accounts[0]?.id ?? null,
       amount: 0,
       currency: defaultCurrency ?? goal.currency,
       notes: "",

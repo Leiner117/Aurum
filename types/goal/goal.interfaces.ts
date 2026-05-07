@@ -6,6 +6,7 @@ export interface Goal {
   target_amount: number;
   current_amount: number;
   currency: string;
+  account_id: string | null;
   target_date: string | null;
   color: string;
   icon: string;
@@ -31,6 +32,7 @@ export interface CreateGoalInput {
   description?: string;
   target_amount: number;
   currency: string;
+  account_id?: string | null;
   target_date?: string | null;
   color: string;
   icon: string;

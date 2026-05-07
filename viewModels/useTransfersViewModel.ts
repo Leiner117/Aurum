@@ -38,9 +38,15 @@ export const useTransfersViewModel = (): TransfersViewModelReturn => {
     const fromCurrency = fromAccount.currency;
     const toCurrency = toAccount.currency;
 
-    const convertedAmount = fromCurrency === toCurrency
-      ? data.amount
-      : convert(data.amount, fromCurrency, toCurrency) || data.amount;
+    let convertedAmount: number;
+    if (fromCurrency === toCurrency) {
+      convertedAmount = data.amount;
+    } else {
+      const converted = convert(data.amount, fromCurrency, toCurrency);
+      // converted is 0 when rates aren't loaded — fall back to 1:1 rather than 0
+      // so the destination account isn't credited with nothing
+      convertedAmount = converted > 0 ? converted : data.amount;
+    }
 
     const result = await dispatch(createTransferThunk({
       from_account_id: data.from_account_id,
