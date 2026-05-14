@@ -43,7 +43,7 @@ export const loadExchangeRatesThunk = createAsyncThunk(
       const supabase = createClient();
       const { data, error } = await supabase
         .from(SUPABASE_TABLES.EXCHANGE_RATES)
-        .select("base_currency, target_currency, rate, sell_rate, fetched_at");
+        .select("*");
       if (error) return rejectWithValue(error.message);
 
       const rates: Record<string, number> = { [base]: 1 };
