@@ -6,12 +6,18 @@ import { DEFAULT_CURRENCY } from "@/constants/currency.constants";
 interface CurrencyState {
   defaultCurrency: string;
   rates: Record<string, number>;
+  buyRate: number | null;
+  sellRate: number | null;
+  rateUpdatedAt: string | null;
   isLoadingRates: boolean;
 }
 
 const initialState: CurrencyState = {
   defaultCurrency: DEFAULT_CURRENCY,
   rates: {},
+  buyRate: null,
+  sellRate: null,
+  rateUpdatedAt: null,
   isLoadingRates: false,
 };
 
@@ -37,23 +43,29 @@ export const loadExchangeRatesThunk = createAsyncThunk(
       const supabase = createClient();
       const { data, error } = await supabase
         .from(SUPABASE_TABLES.EXCHANGE_RATES)
-        .select("base_currency, target_currency, rate");
+        .select("base_currency, target_currency, rate, sell_rate, fetched_at");
       if (error) return rejectWithValue(error.message);
 
-      // Build a rates object where every value is relative to `base`.
-      // convertAmount uses rates[to] / rates[from], so we need both
-      // base currency and all others expressed in the same unit.
       const rates: Record<string, number> = { [base]: 1 };
+      let buyRate: number | null = null;
+      let sellRate: number | null = null;
+      let rateUpdatedAt: string | null = null;
+
       for (const row of data ?? []) {
         if (row.base_currency === "USD" && row.target_currency === "CRC") {
+          buyRate = row.rate;
+          sellRate = row.sell_rate ?? null;
+          rateUpdatedAt = row.fetched_at ?? null;
+
           if (base === "USD") {
-            rates["CRC"] = row.rate;          // 1 USD = X CRC
+            rates["CRC"] = row.rate;
           } else if (base === "CRC") {
-            rates["USD"] = 1 / row.rate;      // 1 CRC = 1/X USD
+            rates["USD"] = 1 / row.rate;
           }
         }
       }
-      return rates;
+
+      return { rates, buyRate, sellRate, rateUpdatedAt };
     } catch {
       return rejectWithValue("Failed to fetch exchange rates");
     }
@@ -86,7 +98,11 @@ const currencySlice = createSlice({
       .addCase(loadExchangeRatesThunk.pending, (s) => { s.isLoadingRates = true; })
       .addCase(loadExchangeRatesThunk.fulfilled, (s, a) => {
         s.isLoadingRates = false;
-        s.rates = (a.payload as Record<string, number>) ?? {};
+        const payload = a.payload as { rates: Record<string, number>; buyRate: number | null; sellRate: number | null; rateUpdatedAt: string | null };
+        s.rates = payload.rates;
+        s.buyRate = payload.buyRate;
+        s.sellRate = payload.sellRate;
+        s.rateUpdatedAt = payload.rateUpdatedAt;
       })
       .addCase(loadExchangeRatesThunk.rejected, (s) => { s.isLoadingRates = false; })
       .addCase(setDefaultCurrencyThunk.fulfilled, (s, a) => { s.defaultCurrency = a.payload as string; });
