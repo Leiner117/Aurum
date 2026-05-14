@@ -5,7 +5,7 @@ import { SUPABASE_TABLES } from "@/constants/supabase.constants";
 const BAC_XML_URL =
   "https://www.sucursalelectronica.com/exchangerate/showXmlExchangeRate.do";
 
-async function fetchBacVentaRate(): Promise<number> {
+async function fetchBacRates(): Promise<{ buyRate: number; sellRate: number }> {
   const response = await fetch(BAC_XML_URL, { cache: "no-store" });
   if (!response.ok) throw new Error(`BAC fetch failed: ${response.status}`);
 
@@ -16,10 +16,16 @@ async function fetchBacVentaRate(): Promise<number> {
   );
   if (!costaRicaBlock) throw new Error("Costa Rica block not found in BAC XML");
 
-  const match = costaRicaBlock[0].match(/<buyRateUSD>([\d.]+)<\/buyRateUSD>/);
-  if (!match) throw new Error("saleRateUSD not found in Costa Rica block");
+  const buyMatch = costaRicaBlock[0].match(/<buyRateUSD>([\d.]+)<\/buyRateUSD>/);
+  if (!buyMatch) throw new Error("buyRateUSD (compra) not found in Costa Rica block");
 
-  return parseFloat(match[1]);
+  const sellMatch = costaRicaBlock[0].match(/<saleRateUSD>([\d.]+)<\/saleRateUSD>/);
+  if (!sellMatch) throw new Error("saleRateUSD (venta) not found in Costa Rica block");
+
+  return {
+    buyRate: parseFloat(buyMatch[1]),
+    sellRate: parseFloat(sellMatch[1]),
+  };
 }
 
 export async function GET(request: Request) {
@@ -28,7 +34,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const ventaRate = await fetchBacVentaRate();
+  const { buyRate, sellRate } = await fetchBacRates();
 
   const { error } = await supabaseAdmin
     .from(SUPABASE_TABLES.EXCHANGE_RATES)
@@ -36,7 +42,8 @@ export async function GET(request: Request) {
       {
         base_currency: "USD",
         target_currency: "CRC",
-        rate: ventaRate,
+        rate: buyRate,
+        sell_rate: sellRate,
         fetched_at: new Date().toISOString(),
       },
       { onConflict: "base_currency,target_currency" }
@@ -46,5 +53,5 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, rate: ventaRate });
+  return NextResponse.json({ ok: true, buyRate, sellRate });
 }

@@ -15,6 +15,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { Modal } from "@/components/ui/Modal";
 import { ExpenseForm } from "@/components/expenses/ExpenseForm";
+import { ExchangeRateCard } from "@/components/dashboard/ExchangeRateCard";
 import { useReportsViewModel } from "@/viewModels/useReportsViewModel";
 import { useBudgetsViewModel } from "@/viewModels/useBudgetsViewModel";
 import { useExpensesViewModel } from "@/viewModels/useExpensesViewModel";
@@ -40,7 +41,7 @@ const DashboardPage = () => {
   const [quickAddLoading, setQuickAddLoading] = useState(false);
   const { showToast } = useToast();
 
-  const { defaultCurrency } = useCurrencyViewModel();
+  const { defaultCurrency, buyRate, sellRate, rateUpdatedAt, isLoadingRates } = useCurrencyViewModel();
   const { categorySpendingThisMonth, monthlyTrend, totalThisMonth, totalLastMonth, totalThisMonthCount, isLoading: reportsLoading } =
     useReportsViewModel();
   const { summaries } = useBudgetsViewModel();
@@ -107,6 +108,14 @@ const DashboardPage = () => {
           trend={exceededBudgets > 0 ? "up" : "neutral"}
         />
       </div>
+
+      {/* Exchange rate strip */}
+      <ExchangeRateCard
+        buyRate={buyRate}
+        sellRate={sellRate}
+        rateUpdatedAt={rateUpdatedAt}
+        isLoading={isLoadingRates}
+      />
 
       {/* Charts + recent */}
       <div className="grid gap-4 lg:grid-cols-3 items-stretch">

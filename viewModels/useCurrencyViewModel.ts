@@ -12,6 +12,9 @@ import { convertAmount } from "@/lib/currency/convert";
 export interface CurrencyViewModelReturn {
   defaultCurrency: string;
   rates: Record<string, number>;
+  buyRate: number | null;
+  sellRate: number | null;
+  rateUpdatedAt: string | null;
   isLoadingRates: boolean;
   convert: (amount: number, from: string, to?: string) => number;
   setDefaultCurrency: (currency: string) => Promise<boolean>;
@@ -19,7 +22,7 @@ export interface CurrencyViewModelReturn {
 
 export const useCurrencyViewModel = (): CurrencyViewModelReturn => {
   const dispatch = useAppDispatch();
-  const { defaultCurrency, rates, isLoadingRates } = useAppSelector((s) => s.currency);
+  const { defaultCurrency, rates, buyRate, sellRate, rateUpdatedAt, isLoadingRates } = useAppSelector((s) => s.currency);
 
   useEffect(() => {
     // Skip if we already have real rates (more than just the base currency placeholder)
@@ -42,5 +45,5 @@ export const useCurrencyViewModel = (): CurrencyViewModelReturn => {
     return !result.type.endsWith("/rejected");
   };
 
-  return { defaultCurrency, rates, isLoadingRates, convert, setDefaultCurrency };
+  return { defaultCurrency, rates, buyRate, sellRate, rateUpdatedAt, isLoadingRates, convert, setDefaultCurrency };
 };
