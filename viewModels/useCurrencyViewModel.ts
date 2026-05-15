@@ -26,7 +26,7 @@ export const useCurrencyViewModel = (): CurrencyViewModelReturn => {
 
   useEffect(() => {
     // Skip if we already have real rates (more than just the base currency placeholder)
-    if (defaultCurrency && Object.keys(rates).length > 1) return;
+    if (defaultCurrency && Object.keys(rates).length > 1 && buyRate !== null) return;
     dispatch(loadCurrencyProfileThunk()).then((action) => {
       const currency = action.payload as string;
       if (currency) dispatch(loadExchangeRatesThunk(currency));
