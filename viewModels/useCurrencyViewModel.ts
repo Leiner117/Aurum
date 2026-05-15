@@ -8,6 +8,7 @@ import {
   setDefaultCurrencyThunk,
 } from "@/store/slices/currencySlice";
 import { convertAmount } from "@/lib/currency/convert";
+import { EXCHANGE_RATE_CACHE_HOURS } from "@/constants/currency.constants";
 
 export interface CurrencyViewModelReturn {
   defaultCurrency: string;
@@ -25,8 +26,9 @@ export const useCurrencyViewModel = (): CurrencyViewModelReturn => {
   const { defaultCurrency, rates, buyRate, sellRate, rateUpdatedAt, isLoadingRates } = useAppSelector((s) => s.currency);
 
   useEffect(() => {
-    // Skip if we already have real rates (more than just the base currency placeholder)
-    if (defaultCurrency && Object.keys(rates).length > 1 && buyRate !== null) return;
+    const cacheMs = EXCHANGE_RATE_CACHE_HOURS * 60 * 60 * 1000;
+    const isStale = !rateUpdatedAt || Date.now() - new Date(rateUpdatedAt).getTime() > cacheMs;
+    if (defaultCurrency && Object.keys(rates).length > 1 && buyRate !== null && !isStale) return;
     dispatch(loadCurrencyProfileThunk()).then((action) => {
       const currency = action.payload as string;
       if (currency) dispatch(loadExchangeRatesThunk(currency));
