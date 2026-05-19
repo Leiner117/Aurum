@@ -2,29 +2,30 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { SUPABASE_TABLES } from "@/constants/supabase.constants";
 
-const BAC_XML_URL =
-  "https://www.sucursalelectronica.com/exchangerate/showXmlExchangeRate.do";
+const BCCR_VENTANILLA_URL =
+  "https://gee.bccr.fi.cr/IndicadoresEconomicos/Cuadros/frmConsultaTCVentanilla.aspx";
 
 async function fetchBacRates(): Promise<{ buyRate: number; sellRate: number }> {
-  const response = await fetch(BAC_XML_URL, { cache: "no-store" });
-  if (!response.ok) throw new Error(`BAC fetch failed: ${response.status}`);
+  const response = await fetch(BCCR_VENTANILLA_URL, {
+    cache: "no-store",
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; AurumApp/1.0)" },
+  });
+  if (!response.ok) throw new Error(`BCCR fetch failed: ${response.status}`);
 
-  const xml = await response.text();
+  const html = await response.text();
 
-  const costaRicaBlock = xml.match(
-    /<country>[\s\S]*?<name>Costa Rica<\/name>[\s\S]*?<\/country>/
+  // Row format: "Banco BAC San José S.A.   </td><td ...>445,00</td><td ...>459,00</td>"
+  const bacMatch = html.match(
+    /Banco BAC[^<]+<\/td><td[^>]+>([\d,.]+)<\/td><td[^>]+>([\d,.]+)/
   );
-  if (!costaRicaBlock) throw new Error("Costa Rica block not found in BAC XML");
+  if (!bacMatch) throw new Error("BAC row not found in BCCR ventanilla page");
 
-  const buyMatch = costaRicaBlock[0].match(/<buyRateUSD>([\d.]+)<\/buyRateUSD>/);
-  if (!buyMatch) throw new Error("buyRateUSD (compra) not found in Costa Rica block");
-
-  const sellMatch = costaRicaBlock[0].match(/<saleRateUSD>([\d.]+)<\/saleRateUSD>/);
-  if (!sellMatch) throw new Error("saleRateUSD (venta) not found in Costa Rica block");
+  // BCCR uses comma as decimal separator: "445,00" → 445.0
+  const parseRate = (s: string) => parseFloat(s.replace(",", "."));
 
   return {
-    buyRate: parseFloat(buyMatch[1]),
-    sellRate: parseFloat(sellMatch[1]),
+    buyRate: parseRate(bacMatch[1]),
+    sellRate: parseRate(bacMatch[2]),
   };
 }
 
