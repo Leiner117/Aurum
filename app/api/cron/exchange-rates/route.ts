@@ -2,22 +2,31 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { SUPABASE_TABLES } from "@/constants/supabase.constants";
 
-const HACIENDA_TC_URL = "https://api.hacienda.go.cr/indicadores/tc";
+const BCCR_VENTANILLA_URL =
+  "https://gee.bccr.fi.cr/IndicadoresEconomicos/Cuadros/frmConsultaTCVentanilla.aspx";
 
-async function fetchHaciendaRates(): Promise<{ buyRate: number; sellRate: number }> {
-  const response = await fetch(HACIENDA_TC_URL, { cache: "no-store" });
-  if (!response.ok) throw new Error(`Hacienda fetch failed: ${response.status}`);
+async function fetchBacRates(): Promise<{ buyRate: number; sellRate: number }> {
+  const response = await fetch(BCCR_VENTANILLA_URL, {
+    cache: "no-store",
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; AurumApp/1.0)" },
+  });
+  if (!response.ok) throw new Error(`BCCR fetch failed: ${response.status}`);
 
-  const data = await response.json();
+  const html = await response.text();
 
-  const buyRate = data?.dolar?.compra?.valor;
-  const sellRate = data?.dolar?.venta?.valor;
+  // Row format: "Banco BAC San José S.A.   </td><td ...>445,00</td><td ...>459,00</td>"
+  const bacMatch = html.match(
+    /Banco BAC[^<]+<\/td><td[^>]+>([\d,.]+)<\/td><td[^>]+>([\d,.]+)/
+  );
+  if (!bacMatch) throw new Error("BAC row not found in BCCR ventanilla page");
 
-  if (typeof buyRate !== "number" || typeof sellRate !== "number") {
-    throw new Error("Unexpected response structure from Hacienda API");
-  }
+  // BCCR uses comma as decimal separator: "445,00" → 445.0
+  const parseRate = (s: string) => parseFloat(s.replace(",", "."));
 
-  return { buyRate, sellRate };
+  return {
+    buyRate: parseRate(bacMatch[1]),
+    sellRate: parseRate(bacMatch[2]),
+  };
 }
 
 export async function GET(request: Request) {
@@ -26,7 +35,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { buyRate, sellRate } = await fetchHaciendaRates();
+  const { buyRate, sellRate } = await fetchBacRates();
 
   const { error } = await supabaseAdmin
     .from(SUPABASE_TABLES.EXCHANGE_RATES)
