@@ -2,30 +2,22 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { SUPABASE_TABLES } from "@/constants/supabase.constants";
 
-const BAC_XML_URL =
-  "https://www.sucursalelectronica.com/exchangerate/showXmlExchangeRate.do";
+const HACIENDA_TC_URL = "https://api.hacienda.go.cr/indicadores/tc";
 
-async function fetchBacRates(): Promise<{ buyRate: number; sellRate: number }> {
-  const response = await fetch(BAC_XML_URL, { cache: "no-store" });
-  if (!response.ok) throw new Error(`BAC fetch failed: ${response.status}`);
+async function fetchHaciendaRates(): Promise<{ buyRate: number; sellRate: number }> {
+  const response = await fetch(HACIENDA_TC_URL, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Hacienda fetch failed: ${response.status}`);
 
-  const xml = await response.text();
+  const data = await response.json();
 
-  const costaRicaBlock = xml.match(
-    /<country>[\s\S]*?<name>Costa Rica<\/name>[\s\S]*?<\/country>/
-  );
-  if (!costaRicaBlock) throw new Error("Costa Rica block not found in BAC XML");
+  const buyRate = data?.dolar?.compra?.valor;
+  const sellRate = data?.dolar?.venta?.valor;
 
-  const buyMatch = costaRicaBlock[0].match(/<buyRateUSD>([\d.]+)<\/buyRateUSD>/);
-  if (!buyMatch) throw new Error("buyRateUSD (compra) not found in Costa Rica block");
+  if (typeof buyRate !== "number" || typeof sellRate !== "number") {
+    throw new Error("Unexpected response structure from Hacienda API");
+  }
 
-  const sellMatch = costaRicaBlock[0].match(/<saleRateUSD>([\d.]+)<\/saleRateUSD>/);
-  if (!sellMatch) throw new Error("saleRateUSD (venta) not found in Costa Rica block");
-
-  return {
-    buyRate: parseFloat(buyMatch[1]),
-    sellRate: parseFloat(sellMatch[1]),
-  };
+  return { buyRate, sellRate };
 }
 
 export async function GET(request: Request) {
@@ -34,7 +26,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { buyRate, sellRate } = await fetchBacRates();
+  const { buyRate, sellRate } = await fetchHaciendaRates();
 
   const { error } = await supabaseAdmin
     .from(SUPABASE_TABLES.EXCHANGE_RATES)
