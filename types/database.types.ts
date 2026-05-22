@@ -237,6 +237,7 @@ export interface Database {
           base_currency: string;
           target_currency: string;
           rate: number;
+          sell_rate: number | null;
           fetched_at: string;
         };
         Insert: {
@@ -244,10 +245,12 @@ export interface Database {
           base_currency: string;
           target_currency: string;
           rate: number;
+          sell_rate?: number | null;
           fetched_at?: string;
         };
         Update: {
           rate?: number;
+          sell_rate?: number | null;
           fetched_at?: string;
         };
         Relationships: [];

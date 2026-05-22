@@ -2,24 +2,31 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { SUPABASE_TABLES } from "@/constants/supabase.constants";
 
-const BAC_XML_URL =
-  "https://www.sucursalelectronica.com/exchangerate/showXmlExchangeRate.do";
+const BCCR_VENTANILLA_URL =
+  "https://gee.bccr.fi.cr/IndicadoresEconomicos/Cuadros/frmConsultaTCVentanilla.aspx";
 
-async function fetchBacVentaRate(): Promise<number> {
-  const response = await fetch(BAC_XML_URL, { cache: "no-store" });
-  if (!response.ok) throw new Error(`BAC fetch failed: ${response.status}`);
+async function fetchBacRates(): Promise<{ buyRate: number; sellRate: number }> {
+  const response = await fetch(BCCR_VENTANILLA_URL, {
+    cache: "no-store",
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; AurumApp/1.0)" },
+  });
+  if (!response.ok) throw new Error(`BCCR fetch failed: ${response.status}`);
 
-  const xml = await response.text();
+  const html = await response.text();
 
-  const costaRicaBlock = xml.match(
-    /<country>[\s\S]*?<name>Costa Rica<\/name>[\s\S]*?<\/country>/
+  // Row format: "Banco BAC San José S.A.   </td><td ...>445,00</td><td ...>459,00</td>"
+  const bacMatch = html.match(
+    /Banco BAC[^<]+<\/td><td[^>]+>([\d,.]+)<\/td><td[^>]+>([\d,.]+)/
   );
-  if (!costaRicaBlock) throw new Error("Costa Rica block not found in BAC XML");
+  if (!bacMatch) throw new Error("BAC row not found in BCCR ventanilla page");
 
-  const match = costaRicaBlock[0].match(/<buyRateUSD>([\d.]+)<\/buyRateUSD>/);
-  if (!match) throw new Error("saleRateUSD not found in Costa Rica block");
+  // BCCR uses comma as decimal separator: "445,00" → 445.0
+  const parseRate = (s: string) => parseFloat(s.replace(",", "."));
 
-  return parseFloat(match[1]);
+  return {
+    buyRate: parseRate(bacMatch[1]),
+    sellRate: parseRate(bacMatch[2]),
+  };
 }
 
 export async function GET(request: Request) {
@@ -28,7 +35,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const ventaRate = await fetchBacVentaRate();
+  const { buyRate, sellRate } = await fetchBacRates();
 
   const { error } = await supabaseAdmin
     .from(SUPABASE_TABLES.EXCHANGE_RATES)
@@ -36,7 +43,8 @@ export async function GET(request: Request) {
       {
         base_currency: "USD",
         target_currency: "CRC",
-        rate: ventaRate,
+        rate: buyRate,
+        sell_rate: sellRate,
         fetched_at: new Date().toISOString(),
       },
       { onConflict: "base_currency,target_currency" }
@@ -46,5 +54,5 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, rate: ventaRate });
+  return NextResponse.json({ ok: true, buyRate, sellRate });
 }

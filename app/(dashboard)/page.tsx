@@ -15,6 +15,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { Modal } from "@/components/ui/Modal";
 import { ExpenseForm } from "@/components/expenses/ExpenseForm";
+import { ExchangeRateCard } from "@/components/dashboard/ExchangeRateCard";
 import { useReportsViewModel } from "@/viewModels/useReportsViewModel";
 import { useBudgetsViewModel } from "@/viewModels/useBudgetsViewModel";
 import { useExpensesViewModel } from "@/viewModels/useExpensesViewModel";
@@ -40,8 +41,8 @@ const DashboardPage = () => {
   const [quickAddLoading, setQuickAddLoading] = useState(false);
   const { showToast } = useToast();
 
-  const { defaultCurrency } = useCurrencyViewModel();
-  const { categorySpending, monthlyTrend, totalThisMonth, totalLastMonth, isLoading: reportsLoading } =
+  const { defaultCurrency, buyRate, sellRate, rateUpdatedAt, isLoadingRates } = useCurrencyViewModel();
+  const { categorySpendingThisMonth, monthlyTrend, totalThisMonth, totalLastMonth, totalThisMonthCount, isLoading: reportsLoading } =
     useReportsViewModel();
   const { summaries } = useBudgetsViewModel();
   const { expenses, isLoading: expensesLoading, createExpense } = useExpensesViewModel();
@@ -95,7 +96,7 @@ const DashboardPage = () => {
         />
         <SummaryCard
           title="Total Expenses"
-          value={String(expenses.length)}
+          value={String(totalThisMonthCount)}
           subtitle="this month"
           icon={<Receipt className="h-5 w-5" />}
         />
@@ -108,12 +109,20 @@ const DashboardPage = () => {
         />
       </div>
 
+      {/* Exchange rate strip */}
+      <ExchangeRateCard
+        buyRate={buyRate}
+        sellRate={sellRate}
+        rateUpdatedAt={rateUpdatedAt}
+        isLoading={isLoadingRates}
+      />
+
       {/* Charts + recent */}
       <div className="grid gap-4 lg:grid-cols-3 items-stretch">
         {/* Spending by category */}
         <div className="lg:col-span-1 flex flex-col">
           <ChartCard title="Spending by Category" isLoading={reportsLoading} className="flex-1">
-            <SpendingByCategoryChart data={categorySpending} currency={defaultCurrency} />
+            <SpendingByCategoryChart data={categorySpendingThisMonth} currency={defaultCurrency} />
           </ChartCard>
         </div>
 

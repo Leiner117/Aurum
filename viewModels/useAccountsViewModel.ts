@@ -25,8 +25,14 @@ export const useAccountsViewModel = () => {
   const { items: accounts, isLoading, error } = useAppSelector((s) => s.accounts);
 
   useEffect(() => {
-    if (accounts.length === 0) dispatch(fetchAccountsThunk());
-  }, [dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
+    dispatch(fetchAccountsThunk());
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") dispatch(fetchAccountsThunk());
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [dispatch]);
 
   const createAccount = async (data: CreateAccountInput): Promise<boolean> => {
     const result = await dispatch(createAccountThunk(data));

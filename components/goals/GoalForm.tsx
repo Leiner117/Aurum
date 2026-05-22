@@ -13,16 +13,18 @@ import { SUPPORTED_CURRENCIES } from "@/constants/currency.constants";
 import { CategoryIcon } from "@/components/categories/CategoryIcon";
 import { Check } from "lucide-react";
 import type { Goal } from "@/types/goal";
+import type { Account } from "@/types/account";
 
 interface GoalFormProps {
   goal?: Goal;
+  accounts?: Account[];
   defaultCurrency?: string;
   isLoading: boolean;
   onSubmit: (data: GoalInput) => void;
   onCancel: () => void;
 }
 
-export const GoalForm = ({ goal, defaultCurrency, isLoading, onSubmit, onCancel }: GoalFormProps) => {
+export const GoalForm = ({ goal, accounts = [], defaultCurrency, isLoading, onSubmit, onCancel }: GoalFormProps) => {
   const {
     register,
     handleSubmit,
@@ -37,6 +39,7 @@ export const GoalForm = ({ goal, defaultCurrency, isLoading, onSubmit, onCancel 
       description: goal?.description ?? "",
       target_amount: goal?.target_amount ?? 0,
       currency: goal?.currency ?? defaultCurrency ?? "USD",
+      account_id: goal?.account_id ?? null,
       target_date: goal?.target_date ?? null,
       color: goal?.color ?? GOAL_DEFAULT_COLOR,
       icon: goal?.icon ?? GOAL_DEFAULT_ICON,
@@ -53,6 +56,7 @@ export const GoalForm = ({ goal, defaultCurrency, isLoading, onSubmit, onCancel 
         description: goal.description ?? "",
         target_amount: goal.target_amount,
         currency: goal.currency,
+        account_id: goal.account_id ?? null,
         target_date: goal.target_date ?? null,
         color: goal.color,
         icon: goal.icon,
@@ -101,6 +105,18 @@ export const GoalForm = ({ goal, defaultCurrency, isLoading, onSubmit, onCancel 
         error={errors.target_date?.message}
         {...register("target_date")}
       />
+
+      {accounts.length > 0 && (
+        <Select
+          label="Linked account (optional)"
+          error={errors.account_id?.message}
+          options={[
+            { value: "", label: "No linked account" },
+            ...accounts.map((a) => ({ value: a.id, label: `${a.name} (${a.currency})` })),
+          ]}
+          {...register("account_id")}
+        />
+      )}
 
       {/* Color picker */}
       <div className="space-y-1.5">

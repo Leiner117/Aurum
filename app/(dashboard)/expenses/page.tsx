@@ -16,6 +16,7 @@ import { CategoryIcon } from "@/components/categories/CategoryIcon";
 import { useExpensesViewModel } from "@/viewModels/useExpensesViewModel";
 import { useCategoriesViewModel } from "@/viewModels/useCategoriesViewModel";
 import { useAccountsViewModel } from "@/viewModels/useAccountsViewModel";
+import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
 import { useToast } from "@/providers/ToastProvider";
 import { formatCurrency } from "@/lib/currency/format";
 import { formatDate } from "@/lib/utils";
@@ -51,16 +52,12 @@ export default function ExpensesPage() {
 
   const { categories } = useCategoriesViewModel();
   const { accounts } = useAccountsViewModel();
+  const { defaultCurrency } = useCurrencyViewModel();
 
   const handleTabChange = (tab: TransactionType) => {
     setActiveType(tab);
     setFilters({ ...filters, type: tab });
   };
-
-  // Initialize type filter on mount
-  useState(() => {
-    setFilters({ type: "expense" });
-  });
 
   const handleCreate = async (data: ExpenseInput) => {
     setCreateLoading(true);
@@ -380,6 +377,7 @@ export default function ExpensesPage() {
           categories={categories}
           accounts={accounts}
           type={activeType}
+          defaultCurrency={defaultCurrency}
           hideTypeToggle
           isLoading={createLoading}
           onSubmit={handleCreate}

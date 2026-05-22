@@ -28,7 +28,7 @@ const initialState: ExpensesState = {
   currentPage: 1,
   isLoading: true,
   error: null,
-  filters: {},
+  filters: { type: "expense" },
 };
 
 export const fetchExpensesThunk = createAsyncThunk(

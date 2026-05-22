@@ -22,7 +22,7 @@ const TransfersPage = () => {
 
   const { transfers, isLoading, createTransfer, deleteTransfer } = useTransfersViewModel();
   const { accounts } = useAccountsViewModel();
-  const { convert } = useCurrencyViewModel();
+  const { convert, defaultCurrency } = useCurrencyViewModel();
 
   const handleTransfer = async (data: TransferInput) => {
     setFormLoading(true);
@@ -89,6 +89,7 @@ const TransfersPage = () => {
       >
         <TransferForm
           accounts={accounts}
+          defaultCurrency={defaultCurrency}
           isLoading={formLoading}
           convert={convert}
           onSubmit={handleTransfer}

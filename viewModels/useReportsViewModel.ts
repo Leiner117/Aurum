@@ -36,6 +36,7 @@ export interface AvailableCategory {
 export interface ReportsViewModelReturn {
   rawRows: ReportExpenseRow[];
   categorySpending: CategorySpending[];
+  categorySpendingThisMonth: CategorySpending[];
   monthlyTrend: MonthlyTrend[];
   dailySpending: DailySpending[];
   sortedExpenses: ReportExpenseRow[];
@@ -176,6 +177,7 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
   return {
     rawRows,
     categorySpending,
+    categorySpendingThisMonth,
     monthlyTrend,
     dailySpending,
     sortedExpenses,
