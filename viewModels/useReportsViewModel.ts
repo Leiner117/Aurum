@@ -42,6 +42,7 @@ export interface ReportsViewModelReturn {
   sortedExpenses: ReportExpenseRow[];
   availableCategories: AvailableCategory[];
   totalThisMonth: number;
+  totalThisMonthCount: number;
   totalLastMonth: number;
   totalPeriod: number;
   isLoading: boolean;
@@ -134,10 +135,17 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
   const lastMonthStart = format(startOfMonth(subMonths(now, 1)), "yyyy-MM-dd");
   const lastMonthEnd = format(endOfMonth(subMonths(now, 1)), "yyyy-MM-dd");
 
-  const totalThisMonth = useMemo(
-    () => filteredRows.filter((r) => r.date >= thisMonthStart).reduce((s, r) => s + r.amount, 0),
+  const thisMonthRows = useMemo(
+    () => filteredRows.filter((r) => r.date >= thisMonthStart),
     [filteredRows, thisMonthStart]
   );
+
+  const totalThisMonth = useMemo(
+    () => thisMonthRows.reduce((s, r) => s + r.amount, 0),
+    [thisMonthRows]
+  );
+
+  const totalThisMonthCount = useMemo(() => thisMonthRows.length, [thisMonthRows]);
 
   const totalLastMonth = useMemo(
     () =>
@@ -151,6 +159,25 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
     () => filteredRows.reduce((s, r) => s + r.amount, 0),
     [filteredRows]
   );
+
+  const categorySpendingThisMonth = useMemo<CategorySpending[]>(() => {
+    const catMap = new Map<string, CategorySpending>();
+    thisMonthRows.forEach((r) => {
+        const key = r.category_id ?? "uncategorized";
+        const existing = catMap.get(key);
+        if (existing) {
+          existing.total += r.amount;
+        } else {
+          catMap.set(key, {
+            category_id: r.category_id,
+            category_name: r.category_name,
+            category_color: r.category_color,
+            total: r.amount,
+          });
+        }
+      });
+    return Array.from(catMap.values()).sort((a, b) => b.total - a.total);
+  }, [thisMonthRows]);
 
   const sortedExpenses = useMemo<ReportExpenseRow[]>(() => {
     return [...filteredRows].sort((a, b) => {
@@ -183,6 +210,7 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
     sortedExpenses,
     availableCategories,
     totalThisMonth,
+    totalThisMonthCount,
     totalLastMonth,
     totalPeriod,
     isLoading,
