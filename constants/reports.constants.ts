@@ -1,9 +1,7 @@
 export const REPORT_PERIODS = [
-  { label: "Last 3 months", value: "3m" },
-  { label: "Last 6 months", value: "6m" },
-  { label: "Last 12 months", value: "12m" },
-  { label: "This year", value: "year" },
-  { label: "Custom range", value: "custom" },
+  { label: "Monthly", value: "1m", months: 1 },
+  { label: "6 Months", value: "6m", months: 6 },
+  { label: "Annual", value: "12m", months: 12 },
 ] as const;
 
 export const CHART_COLORS = [

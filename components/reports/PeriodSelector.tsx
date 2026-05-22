@@ -1,13 +1,12 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { REPORT_PERIODS } from "@/constants/reports.constants";
 
-const PERIOD_MONTHS: Record<string, number> = {
-  "3m": 3,
-  "6m": 6,
-  "12m": 12,
-};
+const PERIODS = [
+  { label: "Monthly", months: 1 },
+  { label: "6 Months", months: 6 },
+  { label: "Annual", months: 12 },
+] as const;
 
 interface PeriodSelectorProps {
   value: number;
@@ -17,13 +16,12 @@ interface PeriodSelectorProps {
 export const PeriodSelector = ({ value, onChange }: PeriodSelectorProps) => {
   return (
     <div className="flex rounded-lg border border-[var(--color-border)] bg-[var(--color-muted)] p-0.5">
-      {REPORT_PERIODS.filter((p) => p.value !== "custom" && p.value !== "year").map((period) => {
-        const months = PERIOD_MONTHS[period.value];
-        const isActive = value === months;
+      {PERIODS.map((period) => {
+        const isActive = value === period.months;
         return (
           <button
-            key={period.value}
-            onClick={() => onChange(months)}
+            key={period.months}
+            onClick={() => onChange(period.months)}
             className={cn(
               "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
               isActive

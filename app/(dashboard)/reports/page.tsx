@@ -8,10 +8,12 @@ import { SpendingByCategoryChart } from "@/components/reports/SpendingByCategory
 import { MonthlyTrendChart } from "@/components/reports/MonthlyTrendChart";
 import { DailySpendingChart } from "@/components/reports/DailySpendingChart";
 import { PeriodSelector } from "@/components/reports/PeriodSelector";
+import { CategoryFilter } from "@/components/reports/CategoryFilter";
+import { ExpenseListTable } from "@/components/reports/ExpenseListTable";
 import { useReportsViewModel } from "@/viewModels/useReportsViewModel";
 import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
-import { useExpensesViewModel } from "@/viewModels/useExpensesViewModel";
 import { exportExpensesToCsv } from "@/lib/export";
+import type { ExpenseWithCategory } from "@/types/expense.types";
 import { formatCurrency } from "@/lib/currency/format";
 import { format } from "date-fns";
 
@@ -20,15 +22,21 @@ const ReportsPage = () => {
     categorySpending,
     monthlyTrend,
     dailySpending,
+    sortedExpenses,
+    availableCategories,
     totalThisMonth,
     totalLastMonth,
+    totalPeriod,
     isLoading,
     monthsBack,
+    selectedCategoryIds,
+    expenseSortBy,
     setMonthsBack,
+    setSelectedCategoryIds,
+    setExpenseSortBy,
   } = useReportsViewModel();
 
   const { defaultCurrency } = useCurrencyViewModel();
-  const { expenses } = useExpensesViewModel();
 
   const monthLabel = format(new Date(), "MMMM yyyy");
   const diff = totalThisMonth - totalLastMonth;
@@ -36,7 +44,15 @@ const ReportsPage = () => {
 
   const handleExport = () => {
     const filename = `expenses-${format(new Date(), "yyyy-MM")}.csv`;
-    exportExpensesToCsv(expenses, filename);
+    const rows = sortedExpenses.map((r) => ({
+      date: r.date,
+      description: r.description,
+      amount: r.amount,
+      currency: r.currency,
+      notes: null,
+      category: { name: r.category_name },
+    })) as unknown as ExpenseWithCategory[];
+    exportExpensesToCsv(rows, filename);
   };
 
   return (
@@ -47,6 +63,11 @@ const ReportsPage = () => {
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <PeriodSelector value={monthsBack} onChange={setMonthsBack} />
+            <CategoryFilter
+              categories={availableCategories}
+              selected={selectedCategoryIds}
+              onChange={setSelectedCategoryIds}
+            />
             <Button variant="secondary" size="sm" onClick={handleExport}>
               <Download className="h-4 w-4" />
               <span className="hidden sm:inline">Export CSV</span>
@@ -66,14 +87,18 @@ const ReportsPage = () => {
         </div>
         <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
           <p className="text-xs text-[var(--color-muted-foreground)]">vs last month</p>
-          <p className={`mt-1 text-xl font-semibold ${diff > 0 ? "text-[var(--color-danger)]" : "text-[var(--color-success)]"}`}>
+          <p
+            className={`mt-1 text-xl font-semibold ${
+              diff > 0 ? "text-[var(--color-danger)]" : "text-[var(--color-success)]"
+            }`}
+          >
             {diffSign}{formatCurrency(Math.abs(diff), defaultCurrency)}
           </p>
         </div>
-        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 col-span-2 sm:col-span-1">
+        <div className="col-span-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 sm:col-span-1">
           <p className="text-xs text-[var(--color-muted-foreground)]">Period total</p>
           <p className="mt-1 text-xl font-semibold text-[var(--color-foreground)]">
-            {formatCurrency(monthlyTrend.reduce((s, m) => s + m.total, 0), defaultCurrency)}
+            {formatCurrency(totalPeriod, defaultCurrency)}
           </p>
         </div>
       </div>
@@ -84,7 +109,7 @@ const ReportsPage = () => {
           <SpendingByCategoryChart data={categorySpending} currency={defaultCurrency} />
         </ChartCard>
 
-        <ChartCard title="Monthly Trend" isLoading={isLoading}>
+        <ChartCard title="Monthly Comparison" isLoading={isLoading}>
           <MonthlyTrendChart data={monthlyTrend} currency={defaultCurrency} />
         </ChartCard>
 
@@ -113,11 +138,23 @@ const ReportsPage = () => {
               );
             })}
             {!isLoading && !categorySpending.length && (
-              <p className="py-4 text-center text-sm text-[var(--color-muted-foreground)]">No data yet.</p>
+              <p className="py-4 text-center text-sm text-[var(--color-muted-foreground)]">
+                No data yet.
+              </p>
             )}
           </ul>
         </ChartCard>
       </div>
+
+      {/* Expense list */}
+      <ChartCard title="All Expenses" isLoading={isLoading}>
+        <ExpenseListTable
+          expenses={sortedExpenses}
+          currency={defaultCurrency}
+          sortBy={expenseSortBy}
+          onSortChange={setExpenseSortBy}
+        />
+      </ChartCard>
     </div>
   );
 };
