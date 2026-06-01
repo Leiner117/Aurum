@@ -65,24 +65,31 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
     dispatch(fetchReportsThunk(monthsBack));
   }, [dispatch, monthsBack]);
 
+  // Rows limited to the displayed period (excludes the extra "last month comparison" month).
+  const periodRows = useMemo(() => {
+    const now = new Date();
+    const periodStart = format(startOfMonth(subMonths(now, monthsBack - 1)), "yyyy-MM-dd");
+    return rawRows.filter((r) => r.date >= periodStart);
+  }, [rawRows, monthsBack]);
+
   const filteredRows = useMemo(() => {
-    if (selectedCategoryIds.length === 0) return rawRows;
-    return rawRows.filter((r) => {
+    if (selectedCategoryIds.length === 0) return periodRows;
+    return periodRows.filter((r) => {
       const key = r.category_id ?? "uncategorized";
       return selectedCategoryIds.includes(key);
     });
-  }, [rawRows, selectedCategoryIds]);
+  }, [periodRows, selectedCategoryIds]);
 
   const availableCategories = useMemo<AvailableCategory[]>(() => {
     const seen = new Map<string, AvailableCategory>();
-    rawRows.forEach((r) => {
+    periodRows.forEach((r) => {
       const key = r.category_id ?? "uncategorized";
       if (!seen.has(key)) {
         seen.set(key, { id: r.category_id, key, name: r.category_name, color: r.category_color });
       }
     });
     return Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name));
-  }, [rawRows]);
+  }, [periodRows]);
 
   const categorySpending = useMemo<CategorySpending[]>(() => {
     const catMap = new Map<string, CategorySpending>();
@@ -147,13 +154,17 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
 
   const totalThisMonthCount = useMemo(() => thisMonthRows.length, [thisMonthRows]);
 
-  const totalLastMonth = useMemo(
-    () =>
-      filteredRows
-        .filter((r) => r.date >= lastMonthStart && r.date <= lastMonthEnd)
-        .reduce((s, r) => s + r.amount, 0),
-    [filteredRows, lastMonthStart, lastMonthEnd]
-  );
+  const totalLastMonth = useMemo(() => {
+    const rows =
+      selectedCategoryIds.length === 0
+        ? rawRows
+        : rawRows.filter((r) =>
+            selectedCategoryIds.includes(r.category_id ?? "uncategorized")
+          );
+    return rows
+      .filter((r) => r.date >= lastMonthStart && r.date <= lastMonthEnd)
+      .reduce((s, r) => s + r.amount, 0);
+  }, [rawRows, selectedCategoryIds, lastMonthStart, lastMonthEnd]);
 
   const totalPeriod = useMemo(
     () => filteredRows.reduce((s, r) => s + r.amount, 0),
