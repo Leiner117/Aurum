@@ -10,6 +10,7 @@ export interface RecurringExpense {
   description: string;
   frequency: RecurringFrequency;
   next_date: string;
+  specific_day: number | null;
   is_active: boolean;
   type: "expense" | "income";
   created_at: string;
@@ -28,6 +29,7 @@ export interface CreateRecurringExpenseInput {
   description: string;
   frequency: RecurringFrequency;
   next_date: string;
+  specific_day?: number | null;
   type: "expense" | "income";
 }
 

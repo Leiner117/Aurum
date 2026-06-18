@@ -156,8 +156,9 @@ export interface Database {
           amount: number;
           currency: string;
           description: string;
-          frequency: "daily" | "weekly" | "monthly" | "yearly";
+          frequency: "daily" | "weekly" | "monthly" | "yearly" | "specific_day_monthly";
           next_date: string;
+          specific_day: number | null;
           is_active: boolean;
           type: "expense" | "income";
           created_at: string;
@@ -171,8 +172,9 @@ export interface Database {
           amount: number;
           currency?: string;
           description: string;
-          frequency: "daily" | "weekly" | "monthly" | "yearly";
+          frequency: "daily" | "weekly" | "monthly" | "yearly" | "specific_day_monthly";
           next_date: string;
+          specific_day?: number | null;
           is_active?: boolean;
           type?: "expense" | "income";
           created_at?: string;
@@ -184,8 +186,9 @@ export interface Database {
           amount?: number;
           currency?: string;
           description?: string;
-          frequency?: "daily" | "weekly" | "monthly" | "yearly";
+          frequency?: "daily" | "weekly" | "monthly" | "yearly" | "specific_day_monthly";
           next_date?: string;
+          specific_day?: number | null;
           is_active?: boolean;
           type?: "expense" | "income";
           updated_at?: string;
