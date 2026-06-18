@@ -29,7 +29,7 @@ export const FloatingMenu = () => {
         <div className="fixed inset-0 z-30" onClick={close} aria-hidden="true" />
       )}
 
-      <div className="fixed bottom-6 left-6 z-40 flex flex-col-reverse items-start gap-3">
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col-reverse items-end gap-3">
         {MENU_ITEMS.map((item, index) => {
           const Icon = item.icon;
           const active = isActive(item.href);
