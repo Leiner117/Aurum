@@ -76,10 +76,14 @@ export const recurringExpenseSchema = z.object({
   currency: z.string().length(3, "Must be a valid currency code"),
   category_id: z.string().uuid("Invalid category").nullable(),
   account_id: z.string().uuid("Invalid account").nullable().optional(),
-  frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
+  frequency: z.enum(["daily", "weekly", "monthly", "yearly", "specific_day_monthly"]),
   next_date: z.string().min(1, "Next date is required"),
+  specific_day: z.number().int().min(1).max(31).nullable().optional(),
   type: z.enum(["expense", "income"]),
-});
+}).refine(
+  (d) => d.frequency !== "specific_day_monthly" || (d.specific_day != null),
+  { message: "Select a day of the month", path: ["specific_day"] }
+);
 
 // ── Accounts ─────────────────────────────────────────────
 export const accountSchema = z.object({

@@ -1,1 +1,1 @@
-export type RecurringFrequency = "daily" | "weekly" | "monthly" | "yearly";
+export type RecurringFrequency = "daily" | "weekly" | "monthly" | "yearly" | "specific_day_monthly";

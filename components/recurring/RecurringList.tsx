@@ -20,6 +20,20 @@ const FREQUENCY_LABEL: Record<string, string> = {
   weekly: "Weekly",
   monthly: "Monthly",
   yearly: "Yearly",
+  specific_day_monthly: "Monthly",
+};
+
+const ordinal = (n: number) => {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] ?? s[v] ?? s[0]);
+};
+
+const frequencyLabel = (item: { frequency: string; specific_day: number | null }) => {
+  if (item.frequency === "specific_day_monthly" && item.specific_day != null) {
+    return `Every ${ordinal(item.specific_day)}`;
+  }
+  return FREQUENCY_LABEL[item.frequency] ?? item.frequency;
 };
 
 export const RecurringList = ({
@@ -69,7 +83,7 @@ export const RecurringList = ({
               </Badge>
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-[var(--color-muted-foreground)]">
-              <span>{FREQUENCY_LABEL[item.frequency]}</span>
+              <span>{frequencyLabel(item)}</span>
               {item.category && <span>{item.category.name}</span>}
               <span>Next: {formatDate(item.next_date)}</span>
             </div>

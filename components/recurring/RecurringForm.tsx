@@ -9,6 +9,7 @@ import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { SUPPORTED_CURRENCIES } from "@/constants/currency.constants";
 import { cn } from "@/lib/utils";
+import { getNextSpecificDayDate } from "@/lib/recurrence";
 import type { RecurringExpenseWithCategory } from "@/types/recurring.types";
 import type { Category } from "@/types/category.types";
 import type { Account } from "@/types/account.types";
@@ -18,7 +19,13 @@ const FREQUENCY_OPTIONS = [
   { label: "Weekly", value: "weekly" },
   { label: "Monthly", value: "monthly" },
   { label: "Yearly", value: "yearly" },
+  { label: "Specific day of month", value: "specific_day_monthly" },
 ];
+
+const DAY_OPTIONS = Array.from({ length: 31 }, (_, i) => ({
+  label: `Day ${i + 1}`,
+  value: String(i + 1),
+}));
 
 interface RecurringFormProps {
   recurring?: RecurringExpenseWithCategory;
@@ -57,6 +64,7 @@ export const RecurringForm = ({
       account_id: recurring?.account_id ?? null,
       frequency: recurring?.frequency ?? "monthly",
       next_date: recurring?.next_date ?? "",
+      specific_day: recurring?.specific_day ?? null,
       type: recurring?.type ?? "expense",
     },
   });
@@ -71,6 +79,7 @@ export const RecurringForm = ({
         account_id: recurring.account_id ?? null,
         frequency: recurring.frequency,
         next_date: recurring.next_date,
+        specific_day: recurring.specific_day ?? null,
         type: recurring.type,
       });
     }
@@ -79,6 +88,9 @@ export const RecurringForm = ({
   const handleFormSubmit: SubmitHandler<RecurringExpenseInput> = (data) => onSubmit(data);
 
   const activeType = watch("type");
+  const activeFrequency = watch("frequency");
+  const isSpecificDay = activeFrequency === "specific_day_monthly";
+
   const filteredCategories = categories.filter((c) => c.type === activeType);
   const categoryOptions = [
     { label: "No category", value: "" },
@@ -94,6 +106,11 @@ export const RecurringForm = ({
     { label: "No account", value: "" },
     ...accounts.map((a) => ({ label: `${a.name} (${a.currency})`, value: a.id })),
   ];
+
+  const handleDayChange = (day: number) => {
+    setValue("specific_day", day, { shouldValidate: true });
+    setValue("next_date", getNextSpecificDayDate(day), { shouldValidate: true });
+  };
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
@@ -169,6 +186,36 @@ export const RecurringForm = ({
         />
       </div>
 
+      {isSpecificDay ? (
+        <>
+          <Controller
+            name="specific_day"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Day of the month"
+                options={DAY_OPTIONS}
+                error={errors.specific_day?.message}
+                value={field.value != null ? String(field.value) : ""}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  if (!isNaN(val)) handleDayChange(val);
+                }}
+              />
+            )}
+          />
+          {/* next_date is auto-calculated — keep hidden field so RHF holds value */}
+          <input type="hidden" {...register("next_date")} />
+        </>
+      ) : (
+        <Input
+          label="Next date"
+          type="date"
+          error={errors.next_date?.message}
+          {...register("next_date")}
+        />
+      )}
+
       {accounts.length > 0 && (
         <Select
           label="Account (optional)"
@@ -177,13 +224,6 @@ export const RecurringForm = ({
           {...register("account_id")}
         />
       )}
-
-      <Input
-        label="Next date"
-        type="date"
-        error={errors.next_date?.message}
-        {...register("next_date")}
-      />
 
       <div className="flex justify-end gap-2 pt-2">
         <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>

@@ -68,7 +68,7 @@ export const processRecurringThunk = createAsyncThunk(
         is_recurring: true,
         recurring_expense_id: item.id,
       });
-      const nextDate = getNextDate(item.next_date, item.frequency);
+      const nextDate = getNextDate(item.next_date, item.frequency, item.specific_day);
       await supabase
         .from(SUPABASE_TABLES.RECURRING_EXPENSES)
         .update({ next_date: nextDate, updated_at: new Date().toISOString() })
