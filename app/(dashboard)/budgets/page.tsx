@@ -10,14 +10,18 @@ import { PageSpinner } from "@/components/ui/Spinner";
 import { BudgetCard } from "@/components/budgets/BudgetCard";
 import { BudgetForm } from "@/components/budgets/BudgetForm";
 import { MonthSelector } from "@/components/budgets/MonthSelector";
+import { BudgetOverviewCard } from "@/components/budgets/BudgetOverviewCard";
+import { BudgetComplianceGrid } from "@/components/budgets/BudgetComplianceGrid";
+import { MonthlyIncomeModal } from "@/components/budgets/MonthlyIncomeModal";
 import { useBudgetsViewModel } from "@/viewModels/useBudgetsViewModel";
 import { useBudgetAlertsViewModel } from "@/viewModels/useBudgetAlertsViewModel";
 import { useCategoriesViewModel } from "@/viewModels/useCategoriesViewModel";
 import { useToast } from "@/providers/ToastProvider";
-import type { BudgetInput } from "@/lib/validators";
+import type { BudgetInput, MonthlyIncomeInput } from "@/lib/validators";
 
 const BudgetsPage = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isIncomeOpen, setIsIncomeOpen] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const { showToast } = useToast();
 
@@ -30,11 +34,16 @@ const BudgetsPage = () => {
     createBudget,
     updateBudget,
     deleteBudget,
+    overview,
+    compliance,
+    isComplianceLoading,
+    monthlyIncome,
+    isIncomeLoading,
+    setMonthlyIncome,
   } = useBudgetsViewModel();
 
   const { categories } = useCategoriesViewModel();
 
-  // Triggers warning/exceeded toasts when summaries load
   useBudgetAlertsViewModel(summaries);
 
   const handleCreate = async (data: BudgetInput) => {
@@ -46,6 +55,16 @@ const BudgetsPage = () => {
       showToast("Budget created", "success");
     } else {
       showToast("Failed to create budget", "error");
+    }
+  };
+
+  const handleSetIncome = async (data: MonthlyIncomeInput) => {
+    const ok = await setMonthlyIncome(data.monthly_income);
+    if (ok) {
+      setIsIncomeOpen(false);
+      showToast("Monthly income updated", "success");
+    } else {
+      showToast("Failed to update income", "error");
     }
   };
 
@@ -73,6 +92,21 @@ const BudgetsPage = () => {
           {summaries.length} budget{summaries.length !== 1 ? "s" : ""}
         </p>
       </div>
+
+      {/* Monthly overview */}
+      <BudgetOverviewCard
+        overview={overview}
+        onEditIncome={() => setIsIncomeOpen(true)}
+        isLoading={isIncomeLoading}
+      />
+
+      {/* Year compliance grid */}
+      <BudgetComplianceGrid
+        compliance={compliance}
+        year={selectedYear}
+        currency={overview.currency}
+        isLoading={isComplianceLoading}
+      />
 
       {/* Budget cards grid */}
       {isLoading ? (
@@ -124,6 +158,15 @@ const BudgetsPage = () => {
           onCancel={() => setIsCreateOpen(false)}
         />
       </Modal>
+
+      <MonthlyIncomeModal
+        isOpen={isIncomeOpen}
+        currentIncome={monthlyIncome}
+        currency={overview.currency}
+        isLoading={isIncomeLoading}
+        onSubmit={handleSetIncome}
+        onClose={() => setIsIncomeOpen(false)}
+      />
     </div>
   );
 };

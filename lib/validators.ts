@@ -128,6 +128,14 @@ export const transferSchema = z.object({
   path: ["to_account_id"],
 });
 
+// ── Monthly income ────────────────────────────────────────
+export const monthlyIncomeSchema = z.object({
+  monthly_income: z
+    .number()
+    .positive("Must be greater than 0")
+    .multipleOf(0.01, "Max 2 decimal places"),
+});
+
 // ── Inferred types ────────────────────────────────────────
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
@@ -139,3 +147,4 @@ export type AccountInput = z.infer<typeof accountSchema>;
 export type GoalInput = z.infer<typeof goalSchema>;
 export type GoalContributionInput = z.infer<typeof goalContributionSchema>;
 export type TransferInput = z.infer<typeof transferSchema>;
+export type MonthlyIncomeInput = z.infer<typeof monthlyIncomeSchema>;

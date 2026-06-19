@@ -1,15 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
+import { MonthlyIncomeModal } from "@/components/budgets/MonthlyIncomeModal";
 import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAuthViewModel } from "@/viewModels/useAuthViewModel";
+import { useBudgetsViewModel } from "@/viewModels/useBudgetsViewModel";
 import { useToast } from "@/providers/ToastProvider";
 import { SUPPORTED_CURRENCIES } from "@/constants/currency.constants";
-import { Sun, Moon, Monitor, LogOut } from "lucide-react";
+import { formatCurrency } from "@/lib/currency/format";
+import { Sun, Moon, Monitor, LogOut, Pencil } from "lucide-react";
+import type { MonthlyIncomeInput } from "@/lib/validators";
 
 const THEME_OPTIONS = [
   { label: "Light", value: "light", icon: <Sun className="h-4 w-4" /> },
@@ -23,9 +28,11 @@ const currencyOptions = SUPPORTED_CURRENCIES.map((c) => ({
 }));
 
 const SettingsPage = () => {
+  const [isIncomeOpen, setIsIncomeOpen] = useState(false);
   const { defaultCurrency, setDefaultCurrency } = useCurrencyViewModel();
   const { theme, setTheme } = useTheme();
   const { logout, isLoading } = useAuthViewModel();
+  const { monthlyIncome, isIncomeLoading, setMonthlyIncome, overview } = useBudgetsViewModel();
   const { showToast } = useToast();
 
   const handleCurrencyChange = async (currency: string) => {
@@ -34,9 +41,45 @@ const SettingsPage = () => {
     else showToast("Failed to update currency", "error");
   };
 
+  const handleSetIncome = async (data: MonthlyIncomeInput) => {
+    const ok = await setMonthlyIncome(data.monthly_income);
+    if (ok) {
+      setIsIncomeOpen(false);
+      showToast("Monthly income updated", "success");
+    } else {
+      showToast("Failed to update income", "error");
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-lg">
       <PageHeader title="Settings" description="Manage your preferences." />
+
+      {/* Monthly income */}
+      <Card>
+        <CardHeader>
+          <h2 className="text-sm font-semibold text-[var(--color-foreground)]">
+            Monthly Income
+          </h2>
+        </CardHeader>
+        <CardBody>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-[var(--color-muted-foreground)]">
+              {monthlyIncome !== null
+                ? formatCurrency(monthlyIncome, overview.currency)
+                : "Not set — used to calculate savings and budget compliance."}
+            </p>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setIsIncomeOpen(true)}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              {monthlyIncome !== null ? "Edit" : "Set"}
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Currency */}
       <Card>
@@ -101,6 +144,14 @@ const SettingsPage = () => {
           </Button>
         </CardBody>
       </Card>
+      <MonthlyIncomeModal
+        isOpen={isIncomeOpen}
+        currentIncome={monthlyIncome}
+        currency={overview.currency}
+        isLoading={isIncomeLoading}
+        onSubmit={handleSetIncome}
+        onClose={() => setIsIncomeOpen(false)}
+      />
     </div>
   );
 };
