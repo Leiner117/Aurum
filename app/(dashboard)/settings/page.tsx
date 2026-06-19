@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
@@ -9,7 +9,8 @@ import { MonthlyIncomeModal } from "@/components/budgets/MonthlyIncomeModal";
 import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAuthViewModel } from "@/viewModels/useAuthViewModel";
-import { useBudgetsViewModel } from "@/viewModels/useBudgetsViewModel";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchMonthlyIncomeThunk, updateMonthlyIncomeThunk } from "@/store/slices/budgetsSlice";
 import { useToast } from "@/providers/ToastProvider";
 import { SUPPORTED_CURRENCIES } from "@/constants/currency.constants";
 import { formatCurrency } from "@/lib/currency/format";
@@ -32,17 +33,25 @@ const SettingsPage = () => {
   const { defaultCurrency, setDefaultCurrency } = useCurrencyViewModel();
   const { theme, setTheme } = useTheme();
   const { logout, isLoading } = useAuthViewModel();
-  const { monthlyIncome, isIncomeLoading, setMonthlyIncome, overview } = useBudgetsViewModel();
   const { showToast } = useToast();
+  const dispatch = useAppDispatch();
+  const monthlyIncome = useAppSelector((s) => s.budgets.monthlyIncome);
+  const isIncomeLoading = useAppSelector((s) => s.budgets.isIncomeLoading);
+  const currency = defaultCurrency ?? "USD";
 
-  const handleCurrencyChange = async (currency: string) => {
-    const ok = await setDefaultCurrency(currency);
-    if (ok) showToast(`Default currency set to ${currency}`, "success");
+  useEffect(() => {
+    dispatch(fetchMonthlyIncomeThunk());
+  }, [dispatch]);
+
+  const handleCurrencyChange = async (cur: string) => {
+    const ok = await setDefaultCurrency(cur);
+    if (ok) showToast(`Default currency set to ${cur}`, "success");
     else showToast("Failed to update currency", "error");
   };
 
   const handleSetIncome = async (data: MonthlyIncomeInput) => {
-    const ok = await setMonthlyIncome(data.monthly_income);
+    const result = await dispatch(updateMonthlyIncomeThunk(data.monthly_income));
+    const ok = !result.type.endsWith("/rejected");
     if (ok) {
       setIsIncomeOpen(false);
       showToast("Monthly income updated", "success");
@@ -65,8 +74,8 @@ const SettingsPage = () => {
         <CardBody>
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-[var(--color-muted-foreground)]">
-              {monthlyIncome !== null
-                ? formatCurrency(monthlyIncome, overview.currency)
+              {monthlyIncome !== null && monthlyIncome !== undefined
+                ? formatCurrency(monthlyIncome, currency)
                 : "Not set — used to calculate savings and budget compliance."}
             </p>
             <Button
@@ -75,7 +84,7 @@ const SettingsPage = () => {
               onClick={() => setIsIncomeOpen(true)}
             >
               <Pencil className="h-3.5 w-3.5" />
-              {monthlyIncome !== null ? "Edit" : "Set"}
+              {monthlyIncome != null ? "Edit" : "Set"}
             </Button>
           </div>
         </CardBody>
@@ -144,10 +153,11 @@ const SettingsPage = () => {
           </Button>
         </CardBody>
       </Card>
+
       <MonthlyIncomeModal
         isOpen={isIncomeOpen}
-        currentIncome={monthlyIncome}
-        currency={overview.currency}
+        currentIncome={monthlyIncome ?? null}
+        currency={currency}
         isLoading={isIncomeLoading}
         onSubmit={handleSetIncome}
         onClose={() => setIsIncomeOpen(false)}
