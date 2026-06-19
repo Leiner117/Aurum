@@ -102,7 +102,7 @@ const BudgetsPage = () => {
 
       {/* Year compliance grid */}
       <BudgetComplianceGrid
-        compliance={compliance}
+        compliance={compliance ?? []}
         year={selectedYear}
         currency={overview.currency}
         isLoading={isComplianceLoading}
