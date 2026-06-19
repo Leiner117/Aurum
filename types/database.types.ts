@@ -400,6 +400,18 @@ export interface Database {
         Args: { p_user_id: string };
         Returns: undefined;
       };
+      get_budget_compliance: {
+        Args: {
+          p_user_id: string;
+          p_year: number;
+        };
+        Returns: {
+          month: number;
+          total_budgeted: number;
+          total_spent: number;
+          budget_met: boolean;
+        }[];
+      };
     };
     Enums: Record<never, never>;
     CompositeTypes: Record<never, never>;
