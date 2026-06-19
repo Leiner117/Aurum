@@ -46,3 +46,18 @@ export interface CreateBudgetInput {
 export interface UpdateBudgetInput extends Partial<CreateBudgetInput> {
   id: string;
 }
+
+export interface BudgetOverview {
+  monthlyIncome: number | null;
+  totalBudgeted: number;
+  impliedSavings: number | null;
+  currency: string;
+}
+
+export interface BudgetComplianceMonth {
+  month: number;
+  totalBudgeted: number;
+  totalSpent: number;
+  budgetMet: boolean;
+  hasData: boolean;
+}

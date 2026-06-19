@@ -15,6 +15,7 @@ export interface Database {
           email: string;
           full_name: string | null;
           default_currency: string;
+          monthly_income: number | null;
           theme: "light" | "dark" | "system";
           created_at: string;
           updated_at: string;
@@ -24,6 +25,7 @@ export interface Database {
           email: string;
           full_name?: string | null;
           default_currency?: string;
+          monthly_income?: number | null;
           theme?: "light" | "dark" | "system";
           created_at?: string;
           updated_at?: string;
@@ -31,6 +33,7 @@ export interface Database {
         Update: {
           full_name?: string | null;
           default_currency?: string;
+          monthly_income?: number | null;
           theme?: "light" | "dark" | "system";
           updated_at?: string;
         };
@@ -396,6 +399,18 @@ export interface Database {
       seed_default_accounts: {
         Args: { p_user_id: string };
         Returns: undefined;
+      };
+      get_budget_compliance: {
+        Args: {
+          p_user_id: string;
+          p_year: number;
+        };
+        Returns: {
+          month: number;
+          total_budgeted: number;
+          total_spent: number;
+          budget_met: boolean;
+        }[];
       };
     };
     Enums: Record<never, never>;

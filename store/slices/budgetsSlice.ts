@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/tool
 import { createClient } from "@/lib/supabase/client";
 import { SUPABASE_TABLES, SUPABASE_FUNCTIONS } from "@/constants/supabase.constants";
 import { BUDGET_ALERT_THRESHOLD_DEFAULT } from "@/constants/budgets.constants";
-import type { Budget, BudgetSummary, CreateBudgetInput, UpdateBudgetInput } from "@/types/budget.types";
+import type { Budget, BudgetSummary, BudgetComplianceMonth, CreateBudgetInput, UpdateBudgetInput } from "@/types/budget.types";
 
 interface BudgetsState {
   items: Budget[];
@@ -12,6 +12,10 @@ interface BudgetsState {
   isLoading: boolean;
   isSummaryLoading: boolean;
   error: string | null;
+  monthlyIncome: number | null;
+  isIncomeLoading: boolean;
+  compliance: BudgetComplianceMonth[];
+  isComplianceLoading: boolean;
 }
 
 const now = new Date();
@@ -24,6 +28,10 @@ const initialState: BudgetsState = {
   isLoading: true,
   isSummaryLoading: true,
   error: null,
+  monthlyIncome: null,
+  isIncomeLoading: false,
+  compliance: [],
+  isComplianceLoading: false,
 };
 
 export const fetchBudgetsThunk = createAsyncThunk(
@@ -156,6 +164,60 @@ export const processRecurringBudgetsThunk = createAsyncThunk(
   }
 );
 
+export const fetchMonthlyIncomeThunk = createAsyncThunk(
+  "budgets/fetchIncome",
+  async (_, { rejectWithValue }) => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return rejectWithValue("Not authenticated");
+    const { data, error } = await supabase
+      .from(SUPABASE_TABLES.PROFILES)
+      .select("monthly_income")
+      .eq("id", user.id)
+      .single();
+    if (error) return rejectWithValue(error.message);
+    return (data?.monthly_income ?? null) as number | null;
+  }
+);
+
+export const updateMonthlyIncomeThunk = createAsyncThunk(
+  "budgets/updateIncome",
+  async (amount: number | null, { rejectWithValue }) => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return rejectWithValue("Not authenticated");
+    const { error } = await supabase
+      .from(SUPABASE_TABLES.PROFILES)
+      .update({ monthly_income: amount })
+      .eq("id", user.id);
+    if (error) return rejectWithValue(error.message);
+    return amount;
+  }
+);
+
+export const fetchComplianceThunk = createAsyncThunk(
+  "budgets/fetchCompliance",
+  async (year: number, { rejectWithValue }) => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return rejectWithValue("Not authenticated");
+    const { data, error } = await supabase.rpc(SUPABASE_FUNCTIONS.GET_BUDGET_COMPLIANCE, {
+      p_user_id: user.id,
+      p_year: year,
+    });
+    if (error) return rejectWithValue(error.message);
+    return ((data ?? []) as { month: number; total_budgeted: number; total_spent: number; budget_met: boolean }[]).map(
+      (r) => ({
+        month: r.month,
+        totalBudgeted: r.total_budgeted,
+        totalSpent: r.total_spent,
+        budgetMet: r.budget_met,
+        hasData: true,
+      }) satisfies BudgetComplianceMonth
+    );
+  }
+);
+
 const budgetsSlice = createSlice({
   name: "budgets",
   initialState,
@@ -175,7 +237,16 @@ const budgetsSlice = createSlice({
       .addCase(fetchSummariesThunk.rejected, (s) => { s.isSummaryLoading = false; })
       .addCase(createBudgetThunk.rejected, (s, a) => { s.error = a.payload as string; })
       .addCase(updateBudgetThunk.rejected, (s, a) => { s.error = a.payload as string; })
-      .addCase(deleteBudgetThunk.rejected, (s, a) => { s.error = a.payload as string; });
+      .addCase(deleteBudgetThunk.rejected, (s, a) => { s.error = a.payload as string; })
+      .addCase(fetchMonthlyIncomeThunk.pending, (s) => { s.isIncomeLoading = true; })
+      .addCase(fetchMonthlyIncomeThunk.fulfilled, (s, a) => { s.isIncomeLoading = false; s.monthlyIncome = a.payload; })
+      .addCase(fetchMonthlyIncomeThunk.rejected, (s) => { s.isIncomeLoading = false; })
+      .addCase(updateMonthlyIncomeThunk.pending, (s) => { s.isIncomeLoading = true; })
+      .addCase(updateMonthlyIncomeThunk.fulfilled, (s, a) => { s.isIncomeLoading = false; s.monthlyIncome = a.payload; })
+      .addCase(updateMonthlyIncomeThunk.rejected, (s) => { s.isIncomeLoading = false; })
+      .addCase(fetchComplianceThunk.pending, (s) => { s.isComplianceLoading = true; })
+      .addCase(fetchComplianceThunk.fulfilled, (s, a) => { s.isComplianceLoading = false; s.compliance = a.payload; })
+      .addCase(fetchComplianceThunk.rejected, (s) => { s.isComplianceLoading = false; });
   },
 });
 

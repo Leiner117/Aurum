@@ -13,6 +13,7 @@ export const SUPABASE_TABLES = {
 
 export const SUPABASE_FUNCTIONS = {
   GET_BUDGET_SUMMARY: "get_budget_summary",
+  GET_BUDGET_COMPLIANCE: "get_budget_compliance",
 } as const;
 
 export const AUTH_COOKIE_OPTIONS = {
