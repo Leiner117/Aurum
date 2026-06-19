@@ -14,10 +14,10 @@ interface MenuItem {
 }
 
 const MENU_ITEMS: MenuItem[] = [
-  { label: "Transacciones", href: ROUTES.EXPENSES, icon: Receipt },
-  { label: "Cuentas", href: ROUTES.ACCOUNTS, icon: Landmark },
-  { label: "Presupuestos", href: ROUTES.BUDGETS, icon: Target },
-  { label: "Transferencias", href: ROUTES.TRANSFERS, icon: ArrowLeftRight },
+  { label: "Transactions", href: ROUTES.EXPENSES, icon: Receipt },
+  { label: "Accounts", href: ROUTES.ACCOUNTS, icon: Landmark },
+  { label: "Budgets", href: ROUTES.BUDGETS, icon: Target },
+  { label: "Transfers", href: ROUTES.TRANSFERS, icon: ArrowLeftRight },
 ];
 
 export const FloatingMenu = () => {
@@ -66,7 +66,7 @@ export const FloatingMenu = () => {
 
         <button
           onClick={toggle}
-          aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
+          aria-label={isOpen ? "Close menu" : "Open menu"}
           aria-expanded={isOpen}
           className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-xl transition-all duration-200 hover:bg-[var(--color-primary-hover)] hover:scale-105 active:scale-95"
         >
