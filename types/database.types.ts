@@ -15,6 +15,7 @@ export interface Database {
           email: string;
           full_name: string | null;
           default_currency: string;
+          monthly_income: number | null;
           theme: "light" | "dark" | "system";
           created_at: string;
           updated_at: string;
@@ -24,6 +25,7 @@ export interface Database {
           email: string;
           full_name?: string | null;
           default_currency?: string;
+          monthly_income?: number | null;
           theme?: "light" | "dark" | "system";
           created_at?: string;
           updated_at?: string;
@@ -31,6 +33,7 @@ export interface Database {
         Update: {
           full_name?: string | null;
           default_currency?: string;
+          monthly_income?: number | null;
           theme?: "light" | "dark" | "system";
           updated_at?: string;
         };
