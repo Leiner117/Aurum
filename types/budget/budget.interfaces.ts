@@ -49,6 +49,7 @@ export interface UpdateBudgetInput extends Partial<CreateBudgetInput> {
 
 export interface BudgetOverview {
   monthlyIncome: number | null;
+  monthlyIncomeCurrency: string;
   totalBudgeted: number;
   impliedSavings: number | null;
   currency: string;

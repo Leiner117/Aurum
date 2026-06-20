@@ -1,13 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm, type SubmitHandler, type ControllerRenderProps } from "react-hook-form";
+import { useForm, type SubmitHandler, type ControllerRenderProps, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller } from "react-hook-form";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { monthlyIncomeSchema, type MonthlyIncomeInput } from "@/lib/validators";
+import { SUPPORTED_CURRENCIES } from "@/constants/currency.constants";
+
+const currencyOptions = SUPPORTED_CURRENCIES.map((c) => ({
+  label: `${c.code} — ${c.name} (${c.symbol})`,
+  value: c.code,
+}));
 
 const IncomeInput = ({
   field,
@@ -50,7 +56,7 @@ const IncomeInput = ({
 interface MonthlyIncomeModalProps {
   isOpen: boolean;
   currentIncome: number | null;
-  currency: string;
+  currentCurrency: string;
   isLoading: boolean;
   onSubmit: (data: MonthlyIncomeInput) => void;
   onClose: () => void;
@@ -59,6 +65,7 @@ interface MonthlyIncomeModalProps {
 export const MonthlyIncomeModal = ({
   isOpen,
   currentIncome,
+  currentCurrency,
   isLoading,
   onSubmit,
   onClose,
@@ -70,12 +77,12 @@ export const MonthlyIncomeModal = ({
     reset,
   } = useForm<MonthlyIncomeInput>({
     resolver: zodResolver(monthlyIncomeSchema),
-    defaultValues: { monthly_income: currentIncome ?? undefined },
+    defaultValues: { monthly_income: currentIncome ?? undefined, currency: currentCurrency },
   });
 
   useEffect(() => {
-    if (isOpen) reset({ monthly_income: currentIncome ?? undefined });
-  }, [isOpen, currentIncome, reset]);
+    if (isOpen) reset({ monthly_income: currentIncome ?? undefined, currency: currentCurrency });
+  }, [isOpen, currentIncome, currentCurrency, reset]);
 
   const handleFormSubmit: SubmitHandler<MonthlyIncomeInput> = (data) => onSubmit(data);
 
@@ -93,6 +100,19 @@ export const MonthlyIncomeModal = ({
               field={field}
               initialValue={currentIncome}
               error={errors.monthly_income?.message}
+            />
+          )}
+        />
+        <Controller
+          name="currency"
+          control={control}
+          render={({ field }) => (
+            <Select
+              label="Currency"
+              options={currencyOptions}
+              value={field.value}
+              onChange={(e) => field.onChange(e.target.value)}
+              error={errors.currency?.message}
             />
           )}
         />

@@ -13,6 +13,7 @@ interface BudgetsState {
   isSummaryLoading: boolean;
   error: string | null;
   monthlyIncome: number | null;
+  monthlyIncomeCurrency: string;
   isIncomeLoading: boolean;
   compliance: BudgetComplianceMonth[];
   isComplianceLoading: boolean;
@@ -29,6 +30,7 @@ const initialState: BudgetsState = {
   isSummaryLoading: true,
   error: null,
   monthlyIncome: null,
+  monthlyIncomeCurrency: "USD",
   isIncomeLoading: false,
   compliance: [],
   isComplianceLoading: false,
@@ -172,38 +174,42 @@ export const fetchMonthlyIncomeThunk = createAsyncThunk(
     if (!user) return rejectWithValue("Not authenticated");
     const { data, error } = await supabase
       .from(SUPABASE_TABLES.PROFILES)
-      .select("monthly_income")
+      .select("monthly_income, monthly_income_currency")
       .eq("id", user.id)
       .single();
     if (error) return rejectWithValue(error.message);
-    return (data?.monthly_income ?? null) as number | null;
+    return {
+      amount: (data?.monthly_income ?? null) as number | null,
+      currency: (data?.monthly_income_currency ?? "USD") as string,
+    };
   }
 );
 
 export const updateMonthlyIncomeThunk = createAsyncThunk(
   "budgets/updateIncome",
-  async (amount: number | null, { rejectWithValue }) => {
+  async ({ amount, currency }: { amount: number | null; currency: string }, { rejectWithValue }) => {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return rejectWithValue("Not authenticated");
     const { error } = await supabase
       .from(SUPABASE_TABLES.PROFILES)
-      .update({ monthly_income: amount })
+      .update({ monthly_income: amount, monthly_income_currency: currency })
       .eq("id", user.id);
     if (error) return rejectWithValue(error.message);
-    return amount;
+    return { amount, currency };
   }
 );
 
 export const fetchComplianceThunk = createAsyncThunk(
   "budgets/fetchCompliance",
-  async (year: number, { rejectWithValue }) => {
+  async ({ year, currency }: { year: number; currency?: string }, { rejectWithValue }) => {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return rejectWithValue("Not authenticated");
     const { data, error } = await supabase.rpc(SUPABASE_FUNCTIONS.GET_BUDGET_COMPLIANCE, {
       p_user_id: user.id,
       p_year: year,
+      p_currency: currency ?? null,
     });
     if (error) return rejectWithValue(error.message);
     return ((data ?? []) as { month: number; total_budgeted: number; total_spent: number; budget_met: boolean }[]).map(
@@ -239,10 +245,10 @@ const budgetsSlice = createSlice({
       .addCase(updateBudgetThunk.rejected, (s, a) => { s.error = a.payload as string; })
       .addCase(deleteBudgetThunk.rejected, (s, a) => { s.error = a.payload as string; })
       .addCase(fetchMonthlyIncomeThunk.pending, (s) => { s.isIncomeLoading = true; })
-      .addCase(fetchMonthlyIncomeThunk.fulfilled, (s, a) => { s.isIncomeLoading = false; s.monthlyIncome = a.payload; })
+      .addCase(fetchMonthlyIncomeThunk.fulfilled, (s, a) => { s.isIncomeLoading = false; s.monthlyIncome = a.payload.amount; s.monthlyIncomeCurrency = a.payload.currency; })
       .addCase(fetchMonthlyIncomeThunk.rejected, (s) => { s.isIncomeLoading = false; })
       .addCase(updateMonthlyIncomeThunk.pending, (s) => { s.isIncomeLoading = true; })
-      .addCase(updateMonthlyIncomeThunk.fulfilled, (s, a) => { s.isIncomeLoading = false; s.monthlyIncome = a.payload; })
+      .addCase(updateMonthlyIncomeThunk.fulfilled, (s, a) => { s.isIncomeLoading = false; s.monthlyIncome = a.payload.amount; s.monthlyIncomeCurrency = a.payload.currency; })
       .addCase(updateMonthlyIncomeThunk.rejected, (s) => { s.isIncomeLoading = false; })
       .addCase(fetchComplianceThunk.pending, (s) => { s.isComplianceLoading = true; })
       .addCase(fetchComplianceThunk.fulfilled, (s, a) => { s.isComplianceLoading = false; s.compliance = a.payload; })

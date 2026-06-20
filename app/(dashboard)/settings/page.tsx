@@ -36,8 +36,8 @@ const SettingsPage = () => {
   const { showToast } = useToast();
   const dispatch = useAppDispatch();
   const monthlyIncome = useAppSelector((s) => s.budgets.monthlyIncome);
+  const monthlyIncomeCurrency = useAppSelector((s) => s.budgets.monthlyIncomeCurrency);
   const isIncomeLoading = useAppSelector((s) => s.budgets.isIncomeLoading);
-  const currency = defaultCurrency ?? "USD";
 
   useEffect(() => {
     dispatch(fetchMonthlyIncomeThunk());
@@ -50,7 +50,7 @@ const SettingsPage = () => {
   };
 
   const handleSetIncome = async (data: MonthlyIncomeInput) => {
-    const result = await dispatch(updateMonthlyIncomeThunk(data.monthly_income));
+    const result = await dispatch(updateMonthlyIncomeThunk({ amount: data.monthly_income, currency: data.currency }));
     const ok = !result.type.endsWith("/rejected");
     if (ok) {
       setIsIncomeOpen(false);
@@ -75,7 +75,7 @@ const SettingsPage = () => {
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-[var(--color-muted-foreground)]">
               {monthlyIncome !== null && monthlyIncome !== undefined
-                ? formatCurrency(monthlyIncome, currency)
+                ? formatCurrency(monthlyIncome, monthlyIncomeCurrency)
                 : "Not set — used to calculate savings and budget compliance."}
             </p>
             <Button
@@ -157,7 +157,7 @@ const SettingsPage = () => {
       <MonthlyIncomeModal
         isOpen={isIncomeOpen}
         currentIncome={monthlyIncome ?? null}
-        currency={currency}
+        currentCurrency={monthlyIncomeCurrency}
         isLoading={isIncomeLoading}
         onSubmit={handleSetIncome}
         onClose={() => setIsIncomeOpen(false)}
