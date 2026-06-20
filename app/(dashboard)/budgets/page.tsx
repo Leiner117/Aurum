@@ -38,6 +38,7 @@ const BudgetsPage = () => {
     compliance,
     isComplianceLoading,
     monthlyIncome,
+    monthlyIncomeCurrency,
     isIncomeLoading,
     setMonthlyIncome,
   } = useBudgetsViewModel();
@@ -59,7 +60,7 @@ const BudgetsPage = () => {
   };
 
   const handleSetIncome = async (data: MonthlyIncomeInput) => {
-    const ok = await setMonthlyIncome(data.monthly_income);
+    const ok = await setMonthlyIncome(data.monthly_income, data.currency);
     if (ok) {
       setIsIncomeOpen(false);
       showToast("Monthly income updated", "success");
@@ -162,7 +163,7 @@ const BudgetsPage = () => {
       <MonthlyIncomeModal
         isOpen={isIncomeOpen}
         currentIncome={monthlyIncome}
-        currency={overview.currency}
+        currentCurrency={monthlyIncomeCurrency}
         isLoading={isIncomeLoading}
         onSubmit={handleSetIncome}
         onClose={() => setIsIncomeOpen(false)}

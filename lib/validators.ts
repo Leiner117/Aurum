@@ -134,6 +134,7 @@ export const monthlyIncomeSchema = z.object({
     .number()
     .positive("Must be greater than 0")
     .multipleOf(0.01, "Max 2 decimal places"),
+  currency: z.string().length(3, "Must be a valid currency code"),
 });
 
 // ── Inferred types ────────────────────────────────────────

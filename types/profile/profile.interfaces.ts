@@ -6,6 +6,7 @@ export interface Profile {
   full_name: string | null;
   default_currency: string;
   monthly_income: number | null;
+  monthly_income_currency: string;
   theme: ProfileTheme;
   created_at: string;
   updated_at: string;

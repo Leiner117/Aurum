@@ -14,6 +14,7 @@ import {
   fetchComplianceThunk,
   setMonth as setMonthAction,
 } from "@/store/slices/budgetsSlice";
+import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
 import type { BudgetOverview, BudgetComplianceMonth, CreateBudgetInput, UpdateBudgetInput } from "@/types/budget.types";
 import type { BudgetSummary } from "@/types/budget.types";
 
@@ -26,12 +27,13 @@ export interface BudgetsViewModelReturn {
   selectedMonth: number;
   selectedYear: number;
   monthlyIncome: number | null;
+  monthlyIncomeCurrency: string;
   isIncomeLoading: boolean;
   compliance: BudgetComplianceMonth[];
   isComplianceLoading: boolean;
   overview: BudgetOverview;
   setMonth: (month: number, year: number) => void;
-  setMonthlyIncome: (amount: number | null) => Promise<boolean>;
+  setMonthlyIncome: (amount: number | null, currency: string) => Promise<boolean>;
   createBudget: (data: CreateBudgetInput) => Promise<boolean>;
   updateBudget: (data: UpdateBudgetInput) => Promise<boolean>;
   deleteBudget: (id: string) => Promise<boolean>;
@@ -49,10 +51,13 @@ export const useBudgetsViewModel = () => {
     isSummaryLoading,
     error,
     monthlyIncome,
+    monthlyIncomeCurrency,
     isIncomeLoading,
     compliance,
     isComplianceLoading,
   } = useAppSelector((s) => s.budgets);
+
+  const { defaultCurrency } = useCurrencyViewModel();
 
   const incomeFetched = useRef(false);
 
@@ -70,24 +75,29 @@ export const useBudgetsViewModel = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(fetchComplianceThunk(selectedYear));
-  }, [dispatch, selectedYear]);
+    const refCurrency = defaultCurrency ?? "USD";
+    dispatch(fetchComplianceThunk({ year: selectedYear, currency: refCurrency }));
+  }, [dispatch, selectedYear, defaultCurrency]);
 
   const overview = useMemo<BudgetOverview>(() => {
-    const totalBudgeted = summaries.reduce((s, r) => s + r.budget_amount, 0);
-    const currency = summaries[0]?.budget_currency ?? "USD";
+    const refCurrency = defaultCurrency ?? "USD";
+    const totalBudgeted = summaries
+      .filter((r) => r.budget_currency === refCurrency)
+      .reduce((s, r) => s + r.budget_amount, 0);
+    const canCompare = monthlyIncomeCurrency === refCurrency;
     return {
       monthlyIncome,
+      monthlyIncomeCurrency,
       totalBudgeted,
-      impliedSavings: monthlyIncome !== null ? monthlyIncome - totalBudgeted : null,
-      currency,
+      impliedSavings: monthlyIncome !== null && canCompare ? monthlyIncome - totalBudgeted : null,
+      currency: refCurrency,
     };
-  }, [summaries, monthlyIncome]);
+  }, [summaries, monthlyIncome, monthlyIncomeCurrency, defaultCurrency]);
 
   const setMonth = (month: number, year: number) => dispatch(setMonthAction({ month, year }));
 
-  const setMonthlyIncome = async (amount: number | null): Promise<boolean> => {
-    const result = await dispatch(updateMonthlyIncomeThunk(amount));
+  const setMonthlyIncome = async (amount: number | null, currency: string): Promise<boolean> => {
+    const result = await dispatch(updateMonthlyIncomeThunk({ amount, currency }));
     return !result.type.endsWith("/rejected");
   };
 
@@ -120,6 +130,7 @@ export const useBudgetsViewModel = () => {
     selectedMonth,
     selectedYear,
     monthlyIncome,
+    monthlyIncomeCurrency,
     isIncomeLoading,
     compliance,
     isComplianceLoading,

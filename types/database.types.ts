@@ -16,6 +16,7 @@ export interface Database {
           full_name: string | null;
           default_currency: string;
           monthly_income: number | null;
+          monthly_income_currency: string;
           theme: "light" | "dark" | "system";
           created_at: string;
           updated_at: string;
@@ -26,6 +27,7 @@ export interface Database {
           full_name?: string | null;
           default_currency?: string;
           monthly_income?: number | null;
+          monthly_income_currency?: string;
           theme?: "light" | "dark" | "system";
           created_at?: string;
           updated_at?: string;
@@ -34,6 +36,7 @@ export interface Database {
           full_name?: string | null;
           default_currency?: string;
           monthly_income?: number | null;
+          monthly_income_currency?: string;
           theme?: "light" | "dark" | "system";
           updated_at?: string;
         };
@@ -404,6 +407,7 @@ export interface Database {
         Args: {
           p_user_id: string;
           p_year: number;
+          p_currency?: string | null;
         };
         Returns: {
           month: number;

@@ -14,7 +14,8 @@ interface BudgetOverviewCardProps {
 }
 
 export const BudgetOverviewCard = ({ overview, onEditIncome, isLoading }: BudgetOverviewCardProps) => {
-  const { monthlyIncome, totalBudgeted, impliedSavings, currency } = overview;
+  const { monthlyIncome, monthlyIncomeCurrency, totalBudgeted, impliedSavings, currency } = overview;
+  const currenciesDiffer = monthlyIncomeCurrency !== currency;
 
   if (isLoading) {
     return (
@@ -45,7 +46,7 @@ export const BudgetOverviewCard = ({ overview, onEditIncome, isLoading }: Budget
           <div className="flex items-center gap-2">
             {monthlyIncome !== null ? (
               <span className="font-semibold text-[var(--color-foreground)]">
-                {formatCurrency(monthlyIncome, currency)}
+                {formatCurrency(monthlyIncome, monthlyIncomeCurrency)}
               </span>
             ) : (
               <span className="text-sm text-[var(--color-muted-foreground)]">Not set</span>
@@ -66,7 +67,12 @@ export const BudgetOverviewCard = ({ overview, onEditIncome, isLoading }: Budget
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-sm text-[var(--color-muted-foreground)]">
             <TrendingUp className="h-4 w-4 shrink-0" />
-            <span>Total budgeted</span>
+            <span>
+              Total budgeted
+              {currenciesDiffer && (
+                <span className="ml-1 text-xs">({currency})</span>
+              )}
+            </span>
           </div>
           <span className="font-semibold text-[var(--color-foreground)]">
             {formatCurrency(totalBudgeted, currency)}
@@ -89,6 +95,10 @@ export const BudgetOverviewCard = ({ overview, onEditIncome, isLoading }: Budget
             >
               {formatCurrency(impliedSavings, currency)}
             </span>
+          ) : currenciesDiffer && monthlyIncome !== null ? (
+            <span className="text-xs text-[var(--color-muted-foreground)]">
+              Set income in {currency} to see savings
+            </span>
           ) : (
             <button
               onClick={onEditIncome}
@@ -99,8 +109,8 @@ export const BudgetOverviewCard = ({ overview, onEditIncome, isLoading }: Budget
           )}
         </div>
 
-        {/* Income bar */}
-        {monthlyIncome !== null && monthlyIncome > 0 && (
+        {/* Income allocation bar — only when currencies match */}
+        {impliedSavings !== null && monthlyIncome !== null && monthlyIncome > 0 && (
           <div className="pt-1">
             <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--color-border)]">
               <div
