@@ -10,6 +10,7 @@ export interface Budget {
   year: number;
   alert_threshold: number;
   is_recurring: boolean;
+  notifications_enabled: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -31,6 +32,7 @@ export interface BudgetSummary {
   month: number;
   year: number;
   is_recurring: boolean;
+  notifications_enabled: boolean;
 }
 
 export interface CreateBudgetInput {
@@ -41,6 +43,7 @@ export interface CreateBudgetInput {
   year: number;
   alert_threshold?: number;
   is_recurring?: boolean;
+  notifications_enabled?: boolean;
 }
 
 export interface UpdateBudgetInput extends Partial<CreateBudgetInput> {

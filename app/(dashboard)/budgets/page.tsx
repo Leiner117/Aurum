@@ -41,6 +41,7 @@ const BudgetsPage = () => {
     monthlyIncomeCurrency,
     isIncomeLoading,
     setMonthlyIncome,
+    defaultCurrency,
   } = useBudgetsViewModel();
 
   const { categories } = useCategoriesViewModel();
@@ -154,6 +155,7 @@ const BudgetsPage = () => {
           categories={categories}
           defaultMonth={selectedMonth}
           defaultYear={selectedYear}
+          defaultCurrency={defaultCurrency}
           isLoading={createLoading}
           onSubmit={handleCreate}
           onCancel={() => setIsCreateOpen(false)}

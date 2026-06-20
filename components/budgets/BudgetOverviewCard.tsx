@@ -44,13 +44,6 @@ export const BudgetOverviewCard = ({ overview, onEditIncome, isLoading }: Budget
             <span>Monthly income</span>
           </div>
           <div className="flex items-center gap-2">
-            {monthlyIncome !== null ? (
-              <span className="font-semibold text-[var(--color-foreground)]">
-                {formatCurrency(monthlyIncome, monthlyIncomeCurrency)}
-              </span>
-            ) : (
-              <span className="text-sm text-[var(--color-muted-foreground)]">Not set</span>
-            )}
             <Button
               variant="ghost"
               size="sm"
@@ -60,6 +53,13 @@ export const BudgetOverviewCard = ({ overview, onEditIncome, isLoading }: Budget
             >
               <Pencil className="h-3.5 w-3.5" />
             </Button>
+            {monthlyIncome !== null ? (
+              <span className="font-semibold text-[var(--color-foreground)]">
+                {formatCurrency(monthlyIncome, monthlyIncomeCurrency)}
+              </span>
+            ) : (
+              <span className="text-sm text-[var(--color-muted-foreground)]">Not set</span>
+            )}
           </div>
         </div>
 
