@@ -11,6 +11,7 @@ export const useBudgetAlertsViewModel = (summaries: BudgetSummary[]) => {
   useEffect(() => {
     summaries.forEach((summary) => {
       if (alertedIds.current.has(summary.id)) return;
+      if (summary.notifications_enabled === false) return;
 
       if (summary.status === "exceeded") {
         showToast(

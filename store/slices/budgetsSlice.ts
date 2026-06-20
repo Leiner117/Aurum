@@ -83,6 +83,7 @@ export const createBudgetThunk = createAsyncThunk(
       ...input,
       user_id: user.id,
       alert_threshold: input.alert_threshold ?? BUDGET_ALERT_THRESHOLD_DEFAULT,
+      notifications_enabled: input.notifications_enabled ?? true,
     });
     if (error) return rejectWithValue(error.message);
     const s = (getState() as { budgets: BudgetsState }).budgets;

@@ -61,6 +61,7 @@ export const budgetSchema = z.object({
   year: z.number().int().min(2000),
   alert_threshold: z.number().int().min(1).max(100).optional(),
   is_recurring: z.boolean(),
+  notifications_enabled: z.boolean(),
 });
 
 // ── Recurring Expenses ────────────────────────────────────

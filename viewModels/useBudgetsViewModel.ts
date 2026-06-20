@@ -32,6 +32,7 @@ export interface BudgetsViewModelReturn {
   compliance: BudgetComplianceMonth[];
   isComplianceLoading: boolean;
   overview: BudgetOverview;
+  defaultCurrency: string;
   setMonth: (month: number, year: number) => void;
   setMonthlyIncome: (amount: number | null, currency: string) => Promise<boolean>;
   createBudget: (data: CreateBudgetInput) => Promise<boolean>;
@@ -135,6 +136,7 @@ export const useBudgetsViewModel = () => {
     compliance,
     isComplianceLoading,
     overview,
+    defaultCurrency: defaultCurrency ?? "USD",
     setMonth,
     setMonthlyIncome,
     createBudget,
