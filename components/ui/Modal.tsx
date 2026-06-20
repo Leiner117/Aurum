@@ -50,7 +50,8 @@ export const Modal = ({
       {/* Dialog */}
       <div
         className={cn(
-          "relative w-full rounded-xl shadow-xl",
+          "relative w-full rounded-xl shadow-xl overflow-y-auto",
+          "max-h-[90dvh]",
           "bg-[var(--color-surface)] border border-[var(--color-border)]",
           sizeClasses[size]
         )}
