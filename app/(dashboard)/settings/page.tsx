@@ -16,6 +16,7 @@ import { SUPPORTED_CURRENCIES } from "@/constants/currency.constants";
 import { formatCurrency } from "@/lib/currency/format";
 import { Sun, Moon, Monitor, LogOut, Pencil } from "lucide-react";
 import type { MonthlyIncomeInput } from "@/lib/validators";
+import { ApiTokenSection } from "@/components/settings/ApiTokenSection";
 
 const THEME_OPTIONS = [
   { label: "Light", value: "light", icon: <Sun className="h-4 w-4" /> },
@@ -133,6 +134,9 @@ const SettingsPage = () => {
           </div>
         </CardBody>
       </Card>
+
+      {/* Gmail Add-on */}
+      <ApiTokenSection />
 
       {/* Danger zone */}
       <Card>
