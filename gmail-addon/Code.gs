@@ -10,14 +10,14 @@ function onGmailMessage(e) {
   var props = PropertiesService.getUserProperties();
   var apiUrl = props.getProperty("AURUM_API_URL");
   var apiToken = props.getProperty("AURUM_API_TOKEN");
-  var accounts = fetchAccounts(apiUrl, apiToken);
+  var data = fetchData(apiUrl, apiToken);
 
   var msg = getCurrentMessage(e);
   var from = msg.getFrom();
   var subject = msg.getSubject();
   var body = msg.getPlainBody();
   var parsed = parseTransactionEmail(from, subject, body);
-  return buildCard(parsed, subject, accounts).build();
+  return buildCard(parsed, subject, data.accounts, data.categories).build();
 }
 
 function getCurrentMessage(e) {
@@ -25,8 +25,8 @@ function getCurrentMessage(e) {
   return GmailApp.getMessageById(id);
 }
 
-function fetchAccounts(apiUrl, apiToken) {
-  if (!apiUrl || !apiToken) return [];
+function fetchData(apiUrl, apiToken) {
+  if (!apiUrl || !apiToken) return { accounts: [], categories: [] };
   try {
     var resp = UrlFetchApp.fetch(apiUrl + "/api/gmail-addon", {
       method: "get",
@@ -37,10 +37,10 @@ function fetchAccounts(apiUrl, apiToken) {
       return JSON.parse(resp.getContentText());
     }
   } catch (err) {}
-  return [];
+  return { accounts: [], categories: [] };
 }
 
-function buildCard(parsed, fallbackSubject, accounts) {
+function buildCard(parsed, fallbackSubject, accounts, categories) {
   var card = CardService.newCardBuilder().setHeader(
     CardService.newCardHeader()
       .setTitle("Aurum — Register Transaction")
@@ -100,6 +100,21 @@ function buildCard(parsed, fallbackSubject, accounts) {
   }
   section.addWidget(accountInput);
 
+  var categoryInput = CardService.newSelectionInput()
+    .setType(CardService.SelectionInputType.DROPDOWN)
+    .setFieldName("category_id")
+    .setTitle("Category")
+    .addItem("No category", "none", true);
+  if (categories && categories.length > 0) {
+    var txType = parsed ? parsed.type : "expense";
+    categories.forEach(function(cat) {
+      if (cat.type === txType) {
+        categoryInput.addItem(cat.icon + " " + cat.name, cat.id, false);
+      }
+    });
+  }
+  section.addWidget(categoryInput);
+
   section.addWidget(
     CardService.newTextInput()
       .setFieldName("notes")
@@ -147,6 +162,9 @@ function submitExpense(e) {
   var accountId = inputs.account_id.stringInputs.value[0];
   accountId = (accountId && accountId !== "none") ? accountId : null;
 
+  var categoryId = inputs.category_id.stringInputs.value[0];
+  categoryId = (categoryId && categoryId !== "none") ? categoryId : null;
+
   var payload = {
     amount: amount,
     currency: inputs.currency.stringInputs.value[0],
@@ -154,7 +172,7 @@ function submitExpense(e) {
     date: inputs.date.stringInputs.value[0],
     type: inputs.type.stringInputs.value[0],
     notes: inputs.notes.stringInputs.value[0] || null,
-    category_id: null,
+    category_id: categoryId,
     account_id: accountId
   };
 
