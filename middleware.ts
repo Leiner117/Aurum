@@ -6,6 +6,7 @@ const PUBLIC_PATHS = [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.AUTH_CALLBACK];
 
 function isPublicPath(pathname: string): boolean {
   if (pathname.startsWith("/api/cron/")) return true;
+  if (pathname === "/api/gmail-addon") return true;
   return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(path + "/"));
 }
 
