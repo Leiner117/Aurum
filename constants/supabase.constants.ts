@@ -9,6 +9,7 @@ export const SUPABASE_TABLES = {
   GOALS: "goals",
   GOAL_CONTRIBUTIONS: "goal_contributions",
   TRANSFERS: "transfers",
+  API_TOKENS: "api_tokens",
 } as const;
 
 export const SUPABASE_FUNCTIONS = {

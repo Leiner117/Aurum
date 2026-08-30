@@ -1,0 +1,23 @@
+{
+  "timeZone": "America/Costa_Rica",
+  "dependencies": {},
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "gmail": {
+    "name": "Aurum Expense Tracker",
+    "contextualTriggers": [
+      {
+        "unconditional": {},
+        "onTriggerFunction": "onGmailMessage"
+      }
+    ],
+    "primaryColor": "#F59E0B",
+    "secondaryColor": "#92400E",
+    "openLinkUrlPrefixes": ["https://"]
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.addons.execute",
+    "https://www.googleapis.com/auth/script.external_request"
+  ]
+}
