@@ -6,12 +6,18 @@ function onGmailMessage(e) {
   if (!e || !e.gmail || !e.gmail.messageId) {
     return buildSettingsCard();
   }
+
+  var props = PropertiesService.getUserProperties();
+  var apiUrl = props.getProperty("AURUM_API_URL");
+  var apiToken = props.getProperty("AURUM_API_TOKEN");
+  var accounts = fetchAccounts(apiUrl, apiToken);
+
   var msg = getCurrentMessage(e);
   var from = msg.getFrom();
   var subject = msg.getSubject();
   var body = msg.getPlainBody();
   var parsed = parseTransactionEmail(from, subject, body);
-  return buildCard(parsed, subject).build();
+  return buildCard(parsed, subject, accounts).build();
 }
 
 function getCurrentMessage(e) {
@@ -19,7 +25,22 @@ function getCurrentMessage(e) {
   return GmailApp.getMessageById(id);
 }
 
-function buildCard(parsed, fallbackSubject) {
+function fetchAccounts(apiUrl, apiToken) {
+  if (!apiUrl || !apiToken) return [];
+  try {
+    var resp = UrlFetchApp.fetch(apiUrl + "/api/gmail-addon", {
+      method: "get",
+      headers: { "Authorization": "Bearer " + apiToken },
+      muteHttpExceptions: true
+    });
+    if (resp.getResponseCode() === 200) {
+      return JSON.parse(resp.getContentText());
+    }
+  } catch (err) {}
+  return [];
+}
+
+function buildCard(parsed, fallbackSubject, accounts) {
   var card = CardService.newCardBuilder().setHeader(
     CardService.newCardHeader()
       .setTitle("Aurum — Register Transaction")
@@ -67,6 +88,18 @@ function buildCard(parsed, fallbackSubject) {
       .setValue(parsed ? parsed.date : todayIso())
   );
 
+  var accountInput = CardService.newSelectionInput()
+    .setType(CardService.SelectionInputType.DROPDOWN)
+    .setFieldName("account_id")
+    .setTitle("Account")
+    .addItem("— None —", "", true);
+  if (accounts && accounts.length > 0) {
+    accounts.forEach(function(acc) {
+      accountInput.addItem(acc.name + " (" + acc.currency + ")", acc.id, false);
+    });
+  }
+  section.addWidget(accountInput);
+
   section.addWidget(
     CardService.newTextInput()
       .setFieldName("notes")
@@ -111,6 +144,8 @@ function submitExpense(e) {
       .build();
   }
 
+  var accountId = inputs.account_id.stringInputs.value[0] || null;
+
   var payload = {
     amount: amount,
     currency: inputs.currency.stringInputs.value[0],
@@ -119,7 +154,7 @@ function submitExpense(e) {
     type: inputs.type.stringInputs.value[0],
     notes: inputs.notes.stringInputs.value[0] || null,
     category_id: null,
-    account_id: null
+    account_id: accountId
   };
 
   var response = UrlFetchApp.fetch(apiUrl + "/api/gmail-addon", {

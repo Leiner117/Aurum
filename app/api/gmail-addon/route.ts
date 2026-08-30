@@ -4,20 +4,36 @@ import { hashToken } from "@/lib/api-tokens";
 import { expenseSchema } from "@/lib/validators";
 import { SUPABASE_TABLES } from "@/constants/supabase.constants";
 
-export async function POST(request: Request) {
+async function resolveToken(request: Request) {
   const authHeader = request.headers.get("authorization");
   const raw = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
-  if (!raw) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+  if (!raw) return null;
   const hashed = await hashToken(raw);
-
-  const { data: tokenRow } = await supabaseAdmin
+  const { data } = await supabaseAdmin
     .from(SUPABASE_TABLES.API_TOKENS)
     .select("id, user_id")
     .eq("token", hashed)
     .eq("is_active", true)
     .single();
+  return data;
+}
 
+export async function GET(request: Request) {
+  const tokenRow = await resolveToken(request);
+  if (!tokenRow) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { data: accounts } = await supabaseAdmin
+    .from(SUPABASE_TABLES.ACCOUNTS)
+    .select("id, name, currency")
+    .eq("user_id", tokenRow.user_id)
+    .order("is_default", { ascending: false })
+    .order("name");
+
+  return NextResponse.json(accounts ?? []);
+}
+
+export async function POST(request: Request) {
+  const tokenRow = await resolveToken(request);
   if (!tokenRow) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   supabaseAdmin
