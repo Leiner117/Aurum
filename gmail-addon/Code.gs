@@ -1,3 +1,7 @@
+function onGmailHomepage(e) {
+  return buildSettingsCard();
+}
+
 function onGmailMessage(e) {
   var msg = getCurrentMessage(e);
   var from = msg.getFrom();

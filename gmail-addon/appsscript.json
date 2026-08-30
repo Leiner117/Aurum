@@ -8,7 +8,7 @@
       "name": "Aurum Expense Tracker",
       "logoUrl": "https://www.gstatic.com/images/icons/material/system/1x/label_googblue_48dp.png",
       "homepageTrigger": {
-        "runFunction": "onGmailMessage"
+        "runFunction": "onGmailHomepage"
       }
     },
     "gmail": {
