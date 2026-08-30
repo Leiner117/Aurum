@@ -92,7 +92,7 @@ function buildCard(parsed, fallbackSubject, accounts) {
     .setType(CardService.SelectionInputType.DROPDOWN)
     .setFieldName("account_id")
     .setTitle("Account")
-    .addItem("— None —", "", true);
+    .addItem("No account", "none", true);
   if (accounts && accounts.length > 0) {
     accounts.forEach(function(acc) {
       accountInput.addItem(acc.name + " (" + acc.currency + ")", acc.id, false);
@@ -144,7 +144,8 @@ function submitExpense(e) {
       .build();
   }
 
-  var accountId = inputs.account_id.stringInputs.value[0] || null;
+  var accountId = inputs.account_id.stringInputs.value[0];
+  accountId = (accountId && accountId !== "none") ? accountId : null;
 
   var payload = {
     amount: amount,
