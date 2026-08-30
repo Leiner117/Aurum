@@ -22,14 +22,21 @@ export async function GET(request: Request) {
   const tokenRow = await resolveToken(request);
   if (!tokenRow) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: accounts } = await supabaseAdmin
-    .from(SUPABASE_TABLES.ACCOUNTS)
-    .select("id, name, currency")
-    .eq("user_id", tokenRow.user_id)
-    .order("is_default", { ascending: false })
-    .order("name");
+  const [{ data: accounts }, { data: categories }] = await Promise.all([
+    supabaseAdmin
+      .from(SUPABASE_TABLES.ACCOUNTS)
+      .select("id, name, currency")
+      .eq("user_id", tokenRow.user_id)
+      .order("is_default", { ascending: false })
+      .order("name"),
+    supabaseAdmin
+      .from(SUPABASE_TABLES.CATEGORIES)
+      .select("id, name, icon, type")
+      .eq("user_id", tokenRow.user_id)
+      .order("name"),
+  ]);
 
-  return NextResponse.json(accounts ?? []);
+  return NextResponse.json({ accounts: accounts ?? [], categories: categories ?? [] });
 }
 
 export async function POST(request: Request) {
