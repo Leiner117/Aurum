@@ -3,6 +3,9 @@ function onGmailHomepage(e) {
 }
 
 function onGmailMessage(e) {
+  if (!e || !e.gmail || !e.gmail.messageId) {
+    return buildSettingsCard();
+  }
   var msg = getCurrentMessage(e);
   var from = msg.getFrom();
   var subject = msg.getSubject();
