@@ -370,6 +370,32 @@ export interface Database {
         };
         Relationships: [];
       };
+      api_tokens: {
+        Row: {
+          id: string;
+          user_id: string;
+          token: string;
+          name: string;
+          created_at: string;
+          last_used_at: string | null;
+          is_active: boolean;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          token: string;
+          name: string;
+          created_at?: string;
+          last_used_at?: string | null;
+          is_active?: boolean;
+        };
+        Update: {
+          name?: string;
+          last_used_at?: string | null;
+          is_active?: boolean;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<never, never>;
     Functions: {
