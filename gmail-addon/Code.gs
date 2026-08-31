@@ -109,7 +109,7 @@ function buildCard(parsed, fallbackSubject, accounts, categories) {
     var txType = parsed ? parsed.type : "expense";
     categories.forEach(function(cat) {
       if (cat.type === txType) {
-        categoryInput.addItem(cat.icon + " " + cat.name, cat.id, false);
+        categoryInput.addItem(cat.name, cat.id, false);
       }
     });
   }
