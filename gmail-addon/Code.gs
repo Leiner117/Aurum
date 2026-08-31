@@ -169,16 +169,17 @@ function submitExpense(e) {
     return inputs[key] && inputs[key].stringInputs ? inputs[key].stringInputs.value[0] : "";
   }
 
+  var notesVal = readInput("notes");
   var payload = {
     amount: amount,
     currency: readInput("currency"),
     description: readInput("description").substring(0, 100),
     date: readInput("date"),
     type: readInput("type") || "expense",
-    notes: readInput("notes") || null,
     category_id: categoryId,
     account_id: accountId
   };
+  if (notesVal) payload.notes = notesVal;
 
   var response = UrlFetchApp.fetch(apiUrl + "/api/gmail-addon", {
     method: "post",
