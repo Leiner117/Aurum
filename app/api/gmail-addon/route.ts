@@ -31,7 +31,7 @@ export async function GET(request: Request) {
       .order("name"),
     supabaseAdmin
       .from(SUPABASE_TABLES.CATEGORIES)
-      .select("id, name, icon, type")
+      .select("id, name, type")
       .eq("user_id", tokenRow.user_id)
       .order("name"),
   ]);
