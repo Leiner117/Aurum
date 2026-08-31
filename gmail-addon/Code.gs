@@ -159,11 +159,11 @@ function submitExpense(e) {
       .build();
   }
 
-  var accountId = inputs.account_id.stringInputs.value[0];
-  accountId = (accountId && accountId !== "none") ? accountId : null;
+  var accountRaw = inputs.account_id && inputs.account_id.stringInputs ? inputs.account_id.stringInputs.value[0] : null;
+  var accountId = (accountRaw && accountRaw !== "none") ? accountRaw : null;
 
-  var categoryId = inputs.category_id.stringInputs.value[0];
-  categoryId = (categoryId && categoryId !== "none") ? categoryId : null;
+  var categoryRaw = inputs.category_id && inputs.category_id.stringInputs ? inputs.category_id.stringInputs.value[0] : null;
+  var categoryId = (categoryRaw && categoryRaw !== "none") ? categoryRaw : null;
 
   var payload = {
     amount: amount,
