@@ -109,7 +109,7 @@ function buildCard(parsed, fallbackSubject, accounts, categories) {
     var txType = parsed ? parsed.type : "expense";
     categories.forEach(function(cat) {
       if (cat.type === txType) {
-        categoryInput.addItem(cat.icon + " " + cat.name, cat.id, false);
+        categoryInput.addItem(cat.name, cat.id, false);
       }
     });
   }
@@ -165,16 +165,21 @@ function submitExpense(e) {
   var categoryRaw = inputs.category_id && inputs.category_id.stringInputs ? inputs.category_id.stringInputs.value[0] : null;
   var categoryId = (categoryRaw && categoryRaw !== "none") ? categoryRaw : null;
 
+  function readInput(key) {
+    return inputs[key] && inputs[key].stringInputs ? inputs[key].stringInputs.value[0] : "";
+  }
+
+  var notesVal = readInput("notes");
   var payload = {
     amount: amount,
-    currency: inputs.currency.stringInputs.value[0],
-    description: inputs.description.stringInputs.value[0].substring(0, 100),
-    date: inputs.date.stringInputs.value[0],
-    type: inputs.type.stringInputs.value[0],
-    notes: inputs.notes.stringInputs.value[0] || null,
+    currency: readInput("currency"),
+    description: readInput("description").substring(0, 100),
+    date: readInput("date"),
+    type: readInput("type") || "expense",
     category_id: categoryId,
     account_id: accountId
   };
+  if (notesVal) payload.notes = notesVal;
 
   var response = UrlFetchApp.fetch(apiUrl + "/api/gmail-addon", {
     method: "post",
