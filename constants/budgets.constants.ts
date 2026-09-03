@@ -11,3 +11,8 @@ export const BUDGET_STATUS_COLORS = {
   warning: "#f59e0b",
   exceeded: "#ef4444",
 } as const;
+
+export const BUDGET_PERIOD_TYPES = {
+  MONTHLY: "monthly",
+  WEEKLY: "weekly",
+} as const;

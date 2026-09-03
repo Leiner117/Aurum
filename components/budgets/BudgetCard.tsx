@@ -70,9 +70,16 @@ export const BudgetCard = ({ summary, categories, onUpdate, onDelete }: BudgetCa
                 />
               </div>
               <div>
-                <p className="font-medium text-[var(--color-foreground)]">
-                  {summary.category_name}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <p className="font-medium text-[var(--color-foreground)]">
+                    {summary.category_name}
+                  </p>
+                  {summary.period_type === "weekly" && (
+                    <span className="rounded bg-[var(--color-primary)]/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-primary)]">
+                      Weekly
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-[var(--color-muted-foreground)]">
                   {formatCurrency(summary.spent, summary.budget_currency)} /{" "}
                   {formatCurrency(summary.budget_amount, summary.budget_currency)}

@@ -1,13 +1,17 @@
 import type { BudgetStatus } from "./budget.types";
 
+export type BudgetPeriodType = "monthly" | "weekly";
+
 export interface Budget {
   id: string;
   user_id: string;
   category_id: string;
   amount: number;
   currency: string;
-  month: number;
+  month: number | null;
   year: number;
+  week_number: number | null;
+  period_type: BudgetPeriodType;
   alert_threshold: number;
   is_recurring: boolean;
   notifications_enabled: boolean;
@@ -29,8 +33,10 @@ export interface BudgetSummary {
   remaining: number;
   percentage: number;
   status: BudgetStatus;
-  month: number;
+  month: number | null;
   year: number;
+  week_number: number | null;
+  period_type: BudgetPeriodType;
   is_recurring: boolean;
   notifications_enabled: boolean;
 }
@@ -39,8 +45,10 @@ export interface CreateBudgetInput {
   category_id: string;
   amount: number;
   currency: string;
-  month: number;
   year: number;
+  period_type: BudgetPeriodType;
+  month?: number | null;
+  week_number?: number | null;
   alert_threshold?: number;
   is_recurring?: boolean;
   notifications_enabled?: boolean;

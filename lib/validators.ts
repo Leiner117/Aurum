@@ -50,19 +50,30 @@ export const expenseSchema = z.object({
 });
 
 // ── Budgets ───────────────────────────────────────────────
-export const budgetSchema = z.object({
-  category_id: z.string().uuid("Select a category"),
-  amount: z
-    .number()
-    .positive("Amount must be greater than 0")
-    .multipleOf(0.01, "Max 2 decimal places"),
-  currency: z.string().length(3, "Must be a valid currency code"),
-  month: z.number().int().min(1).max(12),
-  year: z.number().int().min(2000),
-  alert_threshold: z.number().int().min(1).max(100).optional(),
-  is_recurring: z.boolean(),
-  notifications_enabled: z.boolean(),
-});
+export const budgetSchema = z
+  .object({
+    category_id: z.string().uuid("Select a category"),
+    amount: z
+      .number()
+      .positive("Amount must be greater than 0")
+      .multipleOf(0.01, "Max 2 decimal places"),
+    currency: z.string().length(3, "Must be a valid currency code"),
+    period_type: z.enum(["monthly", "weekly"]),
+    month: z.number().int().min(1).max(12).optional(),
+    week_number: z.number().int().min(1).max(53).optional(),
+    year: z.number().int().min(2000),
+    alert_threshold: z.number().int().min(1).max(100).optional(),
+    is_recurring: z.boolean(),
+    notifications_enabled: z.boolean(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.period_type === "monthly" && !data.month) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Month is required", path: ["month"] });
+    }
+    if (data.period_type === "weekly" && !data.week_number) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Week is required", path: ["week_number"] });
+    }
+  });
 
 // ── Recurring Expenses ────────────────────────────────────
 export const recurringExpenseSchema = z.object({

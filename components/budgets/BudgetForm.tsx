@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, Controller, type SubmitHandler, type ControllerRenderProps } from "react-hook-form";
+import { useForm, Controller, type SubmitHandler, type ControllerRenderProps, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { budgetSchema, type BudgetInput } from "@/lib/validators";
 import { Input } from "@/components/ui/Input";
@@ -9,6 +9,7 @@ import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { SUPPORTED_CURRENCIES } from "@/constants/currency.constants";
 import { BUDGET_ALERT_THRESHOLD_DEFAULT } from "@/constants/budgets.constants";
+import { getISOWeeksInYear } from "@/lib/week-utils";
 import type { BudgetSummary } from "@/types/budget.types";
 import type { Category } from "@/types/category.types";
 
@@ -27,14 +28,6 @@ const YEAR_OPTIONS = [0, 1, 2].map((offset) => ({
   value: String(currentYear + offset),
 }));
 
-// Defined at module level (outside BudgetForm) so React sees a stable component
-// type and never remounts it during parent re-renders.
-//
-// Root cause of the "digits come back" bug:
-// react-hook-form falls back to defaultValues when field.onChange(undefined) is called,
-// making field.value revert to the original budget amount (e.g. 85000).
-// By keeping a local `raw` string state for display, we decouple the visible input
-// from react-hook-form's internal value — the user can freely clear the field.
 const AmountInput = ({
   field,
   initialValue,
@@ -76,6 +69,8 @@ interface BudgetFormProps {
   categories: Category[];
   defaultMonth?: number;
   defaultYear?: number;
+  defaultWeek?: number;
+  defaultPeriodType?: "monthly" | "weekly";
   defaultCurrency?: string;
   isLoading: boolean;
   onSubmit: (data: BudgetInput) => void;
@@ -87,6 +82,8 @@ export const BudgetForm = ({
   categories,
   defaultMonth = new Date().getMonth() + 1,
   defaultYear = new Date().getFullYear(),
+  defaultWeek = 1,
+  defaultPeriodType = "monthly",
   defaultCurrency = "USD",
   isLoading,
   onSubmit,
@@ -103,13 +100,24 @@ export const BudgetForm = ({
       category_id: budget?.category_id ?? "",
       amount: budget?.budget_amount ?? undefined,
       currency: budget?.budget_currency ?? defaultCurrency,
+      period_type: budget?.period_type ?? defaultPeriodType,
       month: budget?.month ?? defaultMonth,
+      week_number: budget?.week_number ?? defaultWeek,
       year: budget?.year ?? defaultYear,
       alert_threshold: budget?.alert_threshold ?? BUDGET_ALERT_THRESHOLD_DEFAULT,
       is_recurring: budget?.is_recurring ?? false,
       notifications_enabled: budget?.notifications_enabled ?? true,
     },
   });
+
+  const periodType = useWatch({ control, name: "period_type" });
+  const selectedYear = useWatch({ control, name: "year" });
+
+  const weekCount = getISOWeeksInYear(selectedYear ?? currentYear);
+  const weekOptions = Array.from({ length: weekCount }, (_, i) => ({
+    label: `Week ${i + 1}`,
+    value: String(i + 1),
+  }));
 
   const handleFormSubmit: SubmitHandler<BudgetInput> = (data) => onSubmit(data);
 
@@ -125,6 +133,30 @@ export const BudgetForm = ({
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+      {/* Period type toggle */}
+      <Controller
+        name="period_type"
+        control={control}
+        render={({ field }) => (
+          <div className="flex rounded-lg border border-[var(--color-border)] p-1 gap-1">
+            {(["monthly", "weekly"] as const).map((type) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => field.onChange(type)}
+                className={`flex-1 rounded-md py-1.5 text-sm font-medium capitalize transition-colors ${
+                  field.value === type
+                    ? "bg-[var(--color-primary)] text-white"
+                    : "text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        )}
+      />
+
       <Select
         label="Category"
         options={categoryOptions}
@@ -152,34 +184,66 @@ export const BudgetForm = ({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Controller
-          name="month"
-          control={control}
-          render={({ field }) => (
-            <Select
-              label="Month"
-              options={MONTH_OPTIONS}
-              value={String(field.value)}
-              onChange={(e) => field.onChange(parseInt(e.target.value))}
-              error={errors.month?.message}
-            />
-          )}
-        />
-        <Controller
-          name="year"
-          control={control}
-          render={({ field }) => (
-            <Select
-              label="Year"
-              options={YEAR_OPTIONS}
-              value={String(field.value)}
-              onChange={(e) => field.onChange(parseInt(e.target.value))}
-              error={errors.year?.message}
-            />
-          )}
-        />
-      </div>
+      {/* Period selectors */}
+      {periodType === "monthly" ? (
+        <div className="grid grid-cols-2 gap-3">
+          <Controller
+            name="month"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Month"
+                options={MONTH_OPTIONS}
+                value={String(field.value ?? defaultMonth)}
+                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                error={errors.month?.message}
+              />
+            )}
+          />
+          <Controller
+            name="year"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Year"
+                options={YEAR_OPTIONS}
+                value={String(field.value)}
+                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                error={errors.year?.message}
+              />
+            )}
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3">
+          <Controller
+            name="week_number"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Week"
+                options={weekOptions}
+                value={String(field.value ?? defaultWeek)}
+                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                error={errors.week_number?.message}
+              />
+            )}
+          />
+          <Controller
+            name="year"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Year"
+                options={YEAR_OPTIONS}
+                value={String(field.value)}
+                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                error={errors.year?.message}
+              />
+            )}
+          />
+        </div>
+      )}
 
       <Controller
         name="alert_threshold"
@@ -204,7 +268,9 @@ export const BudgetForm = ({
       <div className="flex items-center justify-between rounded-lg border border-[var(--color-border)] px-4 py-3">
         <div>
           <p className="text-sm font-medium text-[var(--color-foreground)]">Recurring budget</p>
-          <p className="text-xs text-[var(--color-muted-foreground)]">Auto-renew this budget every month</p>
+          <p className="text-xs text-[var(--color-muted-foreground)]">
+            {periodType === "weekly" ? "Auto-renew this budget every week" : "Auto-renew this budget every month"}
+          </p>
         </div>
         <Controller
           name="is_recurring"
