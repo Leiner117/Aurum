@@ -11,6 +11,7 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import { getISOWeek } from "@/lib/week-utils";
 import accountsReducer from "./slices/accountsSlice";
 import categoriesReducer from "./slices/categoriesSlice";
 import expensesReducer from "./slices/expensesSlice";
@@ -28,6 +29,9 @@ const _currentYear = _now.getFullYear();
 // Reset transient loading/error state on rehydration so spinners never get stuck.
 // Also reset selectedMonth/Year to the current month so the budgets page always
 // opens on the correct month after a new session (fixes stale persisted month).
+// selectedWeek/selectedPeriodType are backfilled the same way for sessions
+// persisted before weekly budgets existed (fixes "Week undefined" on rehydrate).
+const _currentWeek = getISOWeek(_now);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const resetLoadingState = createTransform<any, any>(
   (state) => state,
@@ -42,6 +46,11 @@ const resetLoadingState = createTransform<any, any>(
       selectedMonth: _currentMonth,
       selectedYear: _currentYear,
     }),
+    ...(state.selectedMonth !== undefined &&
+      (state.selectedWeek === undefined || state.selectedPeriodType === undefined) && {
+        selectedWeek: _currentWeek,
+        selectedPeriodType: state.selectedPeriodType ?? "monthly",
+      }),
   })
 );
 

@@ -17,6 +17,7 @@ import {
   setPeriodType as setPeriodTypeAction,
 } from "@/store/slices/budgetsSlice";
 import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
+import { getCurrentISOWeek } from "@/lib/week-utils";
 import type {
   BudgetOverview,
   BudgetComplianceMonth,
@@ -60,8 +61,8 @@ export const useBudgetsViewModel = () => {
     summaries,
     selectedMonth,
     selectedYear,
-    selectedPeriodType,
-    selectedWeek,
+    selectedPeriodType: rawSelectedPeriodType,
+    selectedWeek: rawSelectedWeek,
     isLoading,
     isSummaryLoading,
     error,
@@ -71,6 +72,10 @@ export const useBudgetsViewModel = () => {
     compliance,
     isComplianceLoading,
   } = useAppSelector((s) => s.budgets);
+
+  // Defensive fallback for state persisted before weekly budgets existed.
+  const selectedPeriodType = rawSelectedPeriodType ?? "monthly";
+  const selectedWeek = rawSelectedWeek ?? getCurrentISOWeek().week;
 
   const { defaultCurrency } = useCurrencyViewModel();
 
