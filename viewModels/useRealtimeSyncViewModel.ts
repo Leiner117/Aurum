@@ -12,11 +12,15 @@ import { fetchReportsThunk } from "@/store/slices/reportsSlice";
 import { processRecurringThunk } from "@/store/slices/recurringSlice";
 import type { ExpenseFilters } from "@/types/expense.types";
 
+import type { BudgetPeriodType } from "@/types/budget.types";
+
 interface SyncState {
   expenseFilters: ExpenseFilters;
   expensePage: number;
   budgetMonth: number;
   budgetYear: number;
+  budgetPeriodType: BudgetPeriodType;
+  budgetWeek: number;
   monthsBack: number;
 }
 
@@ -27,6 +31,8 @@ export const useRealtimeSyncViewModel = () => {
   const expensePage = useAppSelector((s) => s.expenses.currentPage);
   const budgetMonth = useAppSelector((s) => s.budgets.selectedMonth);
   const budgetYear = useAppSelector((s) => s.budgets.selectedYear);
+  const budgetPeriodType = useAppSelector((s) => s.budgets.selectedPeriodType);
+  const budgetWeek = useAppSelector((s) => s.budgets.selectedWeek);
   const monthsBack = useAppSelector((s) => s.reports.monthsBack);
 
   const stateRef = useRef<SyncState>({
@@ -34,12 +40,22 @@ export const useRealtimeSyncViewModel = () => {
     expensePage,
     budgetMonth,
     budgetYear,
+    budgetPeriodType,
+    budgetWeek,
     monthsBack,
   });
 
   useEffect(() => {
-    stateRef.current = { expenseFilters, expensePage, budgetMonth, budgetYear, monthsBack };
-  }, [expenseFilters, expensePage, budgetMonth, budgetYear, monthsBack]);
+    stateRef.current = {
+      expenseFilters,
+      expensePage,
+      budgetMonth,
+      budgetYear,
+      budgetPeriodType,
+      budgetWeek,
+      monthsBack,
+    };
+  }, [expenseFilters, expensePage, budgetMonth, budgetYear, budgetPeriodType, budgetWeek, monthsBack]);
 
   useEffect(() => {
     dispatch(processRecurringThunk()).then((result) => {
@@ -69,9 +85,23 @@ export const useRealtimeSyncViewModel = () => {
         dispatch(fetchAccountsThunk());
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "budgets" }, () => {
-        const { budgetMonth, budgetYear } = stateRef.current;
-        dispatch(fetchBudgetsThunk({ month: budgetMonth, year: budgetYear }));
-        dispatch(fetchSummariesThunk({ month: budgetMonth, year: budgetYear }));
+        const { budgetMonth, budgetYear, budgetPeriodType, budgetWeek } = stateRef.current;
+        dispatch(
+          fetchBudgetsThunk({
+            month: budgetMonth,
+            year: budgetYear,
+            periodType: budgetPeriodType,
+            weekNumber: budgetWeek,
+          })
+        );
+        dispatch(
+          fetchSummariesThunk({
+            month: budgetMonth,
+            year: budgetYear,
+            periodType: budgetPeriodType,
+            weekNumber: budgetWeek,
+          })
+        );
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "goals" }, () => {
         dispatch(fetchGoalsThunk());

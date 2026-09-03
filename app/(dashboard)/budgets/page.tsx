@@ -10,6 +10,7 @@ import { PageSpinner } from "@/components/ui/Spinner";
 import { BudgetCard } from "@/components/budgets/BudgetCard";
 import { BudgetForm } from "@/components/budgets/BudgetForm";
 import { MonthSelector } from "@/components/budgets/MonthSelector";
+import { WeekSelector } from "@/components/budgets/WeekSelector";
 import { BudgetOverviewCard } from "@/components/budgets/BudgetOverviewCard";
 import { BudgetComplianceGrid } from "@/components/budgets/BudgetComplianceGrid";
 import { MonthlyIncomeModal } from "@/components/budgets/MonthlyIncomeModal";
@@ -30,7 +31,11 @@ const BudgetsPage = () => {
     isLoading,
     selectedMonth,
     selectedYear,
+    selectedPeriodType,
+    selectedWeek,
     setMonth,
+    setWeek,
+    setPeriodType,
     createBudget,
     updateBudget,
     deleteBudget,
@@ -50,7 +55,11 @@ const BudgetsPage = () => {
 
   const handleCreate = async (data: BudgetInput) => {
     setCreateLoading(true);
-    const ok = await createBudget(data);
+    const ok = await createBudget({
+      ...data,
+      month: data.period_type === "monthly" ? (data.month ?? null) : null,
+      week_number: data.period_type === "weekly" ? (data.week_number ?? null) : null,
+    });
     setCreateLoading(false);
     if (ok) {
       setIsCreateOpen(false);
@@ -70,6 +79,11 @@ const BudgetsPage = () => {
     }
   };
 
+  const emptyLabel =
+    selectedPeriodType === "weekly"
+      ? `No budgets for week ${selectedWeek}`
+      : "No budgets for this month";
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -83,32 +97,55 @@ const BudgetsPage = () => {
         }
       />
 
-      {/* Month navigator */}
-      <div className="flex items-center justify-between">
-        <MonthSelector
-          month={selectedMonth}
-          year={selectedYear}
-          onChange={setMonth}
-        />
+      {/* Period type toggle + navigator */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          {/* Period toggle */}
+          <div className="flex rounded-lg border border-[var(--color-border)] p-1 gap-1">
+            {(["monthly", "weekly"] as const).map((type) => (
+              <button
+                key={type}
+                onClick={() => setPeriodType(type)}
+                className={`rounded-md px-3 py-1 text-sm font-medium capitalize transition-colors ${
+                  selectedPeriodType === type
+                    ? "bg-[var(--color-primary)] text-white"
+                    : "text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+
+          {/* Time navigator */}
+          {selectedPeriodType === "monthly" ? (
+            <MonthSelector month={selectedMonth} year={selectedYear} onChange={setMonth} />
+          ) : (
+            <WeekSelector week={selectedWeek} year={selectedYear} onChange={setWeek} />
+          )}
+        </div>
+
         <p className="text-sm text-[var(--color-muted-foreground)]">
           {summaries.length} budget{summaries.length !== 1 ? "s" : ""}
         </p>
       </div>
 
-      {/* Monthly overview */}
-      <BudgetOverviewCard
-        overview={overview}
-        onEditIncome={() => setIsIncomeOpen(true)}
-        isLoading={isIncomeLoading}
-      />
-
-      {/* Year compliance grid */}
-      <BudgetComplianceGrid
-        compliance={compliance ?? []}
-        year={selectedYear}
-        currency={overview.currency}
-        isLoading={isComplianceLoading}
-      />
+      {/* Monthly-only sections */}
+      {selectedPeriodType === "monthly" && (
+        <>
+          <BudgetOverviewCard
+            overview={overview}
+            onEditIncome={() => setIsIncomeOpen(true)}
+            isLoading={isIncomeLoading}
+          />
+          <BudgetComplianceGrid
+            compliance={compliance ?? []}
+            year={selectedYear}
+            currency={overview.currency}
+            isLoading={isComplianceLoading}
+          />
+        </>
+      )}
 
       {/* Budget cards grid */}
       {isLoading ? (
@@ -116,7 +153,7 @@ const BudgetsPage = () => {
       ) : summaries.length === 0 ? (
         <EmptyState
           icon={<Target className="h-6 w-6" />}
-          title="No budgets for this month"
+          title={emptyLabel}
           description="Create a budget to track spending limits by category."
           actionLabel="New budget"
           onAction={() => setIsCreateOpen(true)}
@@ -155,6 +192,8 @@ const BudgetsPage = () => {
           categories={categories}
           defaultMonth={selectedMonth}
           defaultYear={selectedYear}
+          defaultWeek={selectedWeek}
+          defaultPeriodType={selectedPeriodType}
           defaultCurrency={defaultCurrency}
           isLoading={createLoading}
           onSubmit={handleCreate}

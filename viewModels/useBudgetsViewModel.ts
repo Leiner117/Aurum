@@ -13,9 +13,17 @@ import {
   updateMonthlyIncomeThunk,
   fetchComplianceThunk,
   setMonth as setMonthAction,
+  setWeek as setWeekAction,
+  setPeriodType as setPeriodTypeAction,
 } from "@/store/slices/budgetsSlice";
 import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
-import type { BudgetOverview, BudgetComplianceMonth, CreateBudgetInput, UpdateBudgetInput } from "@/types/budget.types";
+import type {
+  BudgetOverview,
+  BudgetComplianceMonth,
+  BudgetPeriodType,
+  CreateBudgetInput,
+  UpdateBudgetInput,
+} from "@/types/budget.types";
 import type { BudgetSummary } from "@/types/budget.types";
 
 export interface BudgetsViewModelReturn {
@@ -26,6 +34,8 @@ export interface BudgetsViewModelReturn {
   error: string | null;
   selectedMonth: number;
   selectedYear: number;
+  selectedPeriodType: BudgetPeriodType;
+  selectedWeek: number;
   monthlyIncome: number | null;
   monthlyIncomeCurrency: string;
   isIncomeLoading: boolean;
@@ -34,6 +44,8 @@ export interface BudgetsViewModelReturn {
   overview: BudgetOverview;
   defaultCurrency: string;
   setMonth: (month: number, year: number) => void;
+  setWeek: (week: number, year: number) => void;
+  setPeriodType: (type: BudgetPeriodType) => void;
   setMonthlyIncome: (amount: number | null, currency: string) => Promise<boolean>;
   createBudget: (data: CreateBudgetInput) => Promise<boolean>;
   updateBudget: (data: UpdateBudgetInput) => Promise<boolean>;
@@ -48,6 +60,8 @@ export const useBudgetsViewModel = () => {
     summaries,
     selectedMonth,
     selectedYear,
+    selectedPeriodType,
+    selectedWeek,
     isLoading,
     isSummaryLoading,
     error,
@@ -63,10 +77,24 @@ export const useBudgetsViewModel = () => {
   const incomeFetched = useRef(false);
 
   useEffect(() => {
-    dispatch(fetchBudgetsThunk({ month: selectedMonth, year: selectedYear }));
-    dispatch(fetchSummariesThunk({ month: selectedMonth, year: selectedYear }));
+    dispatch(
+      fetchBudgetsThunk({
+        month: selectedMonth,
+        year: selectedYear,
+        periodType: selectedPeriodType,
+        weekNumber: selectedWeek,
+      })
+    );
+    dispatch(
+      fetchSummariesThunk({
+        month: selectedMonth,
+        year: selectedYear,
+        periodType: selectedPeriodType,
+        weekNumber: selectedWeek,
+      })
+    );
     dispatch(processRecurringBudgetsThunk());
-  }, [dispatch, selectedMonth, selectedYear]);
+  }, [dispatch, selectedMonth, selectedYear, selectedPeriodType, selectedWeek]);
 
   useEffect(() => {
     if (!incomeFetched.current) {
@@ -76,9 +104,10 @@ export const useBudgetsViewModel = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    if (selectedPeriodType !== "monthly") return;
     const refCurrency = defaultCurrency ?? "USD";
     dispatch(fetchComplianceThunk({ year: selectedYear, currency: refCurrency }));
-  }, [dispatch, selectedYear, defaultCurrency]);
+  }, [dispatch, selectedYear, defaultCurrency, selectedPeriodType]);
 
   const overview = useMemo<BudgetOverview>(() => {
     const refCurrency = defaultCurrency ?? "USD";
@@ -90,12 +119,20 @@ export const useBudgetsViewModel = () => {
       monthlyIncome,
       monthlyIncomeCurrency,
       totalBudgeted,
-      impliedSavings: monthlyIncome !== null && canCompare ? monthlyIncome - totalBudgeted : null,
+      impliedSavings:
+        monthlyIncome !== null && canCompare ? monthlyIncome - totalBudgeted : null,
       currency: refCurrency,
     };
   }, [summaries, monthlyIncome, monthlyIncomeCurrency, defaultCurrency]);
 
-  const setMonth = (month: number, year: number) => dispatch(setMonthAction({ month, year }));
+  const setMonth = (month: number, year: number) =>
+    dispatch(setMonthAction({ month, year }));
+
+  const setWeek = (week: number, year: number) =>
+    dispatch(setWeekAction({ week, year }));
+
+  const setPeriodType = (type: BudgetPeriodType) =>
+    dispatch(setPeriodTypeAction(type));
 
   const setMonthlyIncome = async (amount: number | null, currency: string): Promise<boolean> => {
     const result = await dispatch(updateMonthlyIncomeThunk({ amount, currency }));
@@ -118,8 +155,22 @@ export const useBudgetsViewModel = () => {
   };
 
   const refetch = () => {
-    dispatch(fetchBudgetsThunk({ month: selectedMonth, year: selectedYear }));
-    dispatch(fetchSummariesThunk({ month: selectedMonth, year: selectedYear }));
+    dispatch(
+      fetchBudgetsThunk({
+        month: selectedMonth,
+        year: selectedYear,
+        periodType: selectedPeriodType,
+        weekNumber: selectedWeek,
+      })
+    );
+    dispatch(
+      fetchSummariesThunk({
+        month: selectedMonth,
+        year: selectedYear,
+        periodType: selectedPeriodType,
+        weekNumber: selectedWeek,
+      })
+    );
   };
 
   return {
@@ -130,6 +181,8 @@ export const useBudgetsViewModel = () => {
     error,
     selectedMonth,
     selectedYear,
+    selectedPeriodType,
+    selectedWeek,
     monthlyIncome,
     monthlyIncomeCurrency,
     isIncomeLoading,
@@ -138,6 +191,8 @@ export const useBudgetsViewModel = () => {
     overview,
     defaultCurrency: defaultCurrency ?? "USD",
     setMonth,
+    setWeek,
+    setPeriodType,
     setMonthlyIncome,
     createBudget,
     updateBudget,
