@@ -113,6 +113,9 @@ export const createBudgetThunk = createAsyncThunk(
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return rejectWithValue("Not authenticated");
+    // Cast needed: Supabase generated types predate the weekly-budget migration
+    // (period_type, week_number columns and nullable month).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await supabase.from(SUPABASE_TABLES.BUDGETS).insert({
       ...input,
       user_id: user.id,
@@ -120,7 +123,7 @@ export const createBudgetThunk = createAsyncThunk(
       notifications_enabled: input.notifications_enabled ?? true,
       month: input.period_type === "monthly" ? (input.month ?? null) : null,
       week_number: input.period_type === "weekly" ? (input.week_number ?? null) : null,
-    });
+    } as any);
     if (error) return rejectWithValue(error.message);
     const s = (getState() as { budgets: BudgetsState }).budgets;
     dispatch(
@@ -146,9 +149,10 @@ export const updateBudgetThunk = createAsyncThunk(
   "budgets/update",
   async ({ id, ...input }: UpdateBudgetInput, { rejectWithValue, dispatch, getState }) => {
     const supabase = createClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await supabase
       .from(SUPABASE_TABLES.BUDGETS)
-      .update({ ...input, updated_at: new Date().toISOString() })
+      .update({ ...input, updated_at: new Date().toISOString() } as any)
       .eq("id", id);
     if (error) return rejectWithValue(error.message);
     const s = (getState() as { budgets: BudgetsState }).budgets;
@@ -234,6 +238,7 @@ export const processRecurringBudgetsThunk = createAsyncThunk(
         .single();
 
       if (!existing) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await supabase.from(SUPABASE_TABLES.BUDGETS).insert({
           user_id: user.id,
           category_id: budget.category_id,
@@ -244,7 +249,7 @@ export const processRecurringBudgetsThunk = createAsyncThunk(
           year: currentYear,
           alert_threshold: budget.alert_threshold,
           is_recurring: true,
-        });
+        } as any);
       }
     }
   }
