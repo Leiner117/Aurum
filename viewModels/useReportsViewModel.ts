@@ -23,6 +23,7 @@ import {
   eachDayOfInterval,
   parseISO,
 } from "date-fns";
+import { useCurrencyViewModel } from "./useCurrencyViewModel";
 
 export type { ReportExpenseRow, CategorySpending, MonthlyTrend, DailySpending, ExpenseSortKey };
 
@@ -60,6 +61,7 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
   const dispatch = useAppDispatch();
   const { rawRows, monthsBack, selectedCategoryIds, expenseSortBy, isLoading, error } =
     useAppSelector((s) => s.reports);
+  const { convert } = useCurrencyViewModel();
 
   useEffect(() => {
     dispatch(fetchReportsThunk(monthsBack));
@@ -95,20 +97,21 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
     const catMap = new Map<string, CategorySpending>();
     filteredRows.forEach((r) => {
       const key = r.category_id ?? "uncategorized";
+      const converted = convert(r.amount, r.currency);
       const existing = catMap.get(key);
       if (existing) {
-        existing.total += r.amount;
+        existing.total += converted;
       } else {
         catMap.set(key, {
           category_id: r.category_id,
           category_name: r.category_name,
           category_color: r.category_color,
-          total: r.amount,
+          total: converted,
         });
       }
     });
     return Array.from(catMap.values()).sort((a, b) => b.total - a.total);
-  }, [filteredRows]);
+  }, [filteredRows, convert]);
 
   const monthlyTrend = useMemo<MonthlyTrend[]>(() => {
     const now = new Date();
@@ -118,10 +121,10 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
     }
     filteredRows.forEach((r) => {
       const label = format(parseISO(r.date), "MMM yy");
-      if (monthMap.has(label)) monthMap.set(label, (monthMap.get(label) ?? 0) + r.amount);
+      if (monthMap.has(label)) monthMap.set(label, (monthMap.get(label) ?? 0) + convert(r.amount, r.currency));
     });
     return Array.from(monthMap.entries()).map(([month, total]) => ({ month, total }));
-  }, [filteredRows, monthsBack]);
+  }, [filteredRows, monthsBack, convert]);
 
   const dailySpending = useMemo<DailySpending[]>(() => {
     const now = new Date();
@@ -132,10 +135,10 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
       .filter((r) => r.date >= thisMonthStart)
       .forEach((r) => {
         const day = format(parseISO(r.date), "dd");
-        if (dayMap.has(day)) dayMap.set(day, (dayMap.get(day) ?? 0) + r.amount);
+        if (dayMap.has(day)) dayMap.set(day, (dayMap.get(day) ?? 0) + convert(r.amount, r.currency));
       });
     return Array.from(dayMap.entries()).map(([day, total]) => ({ day, total }));
-  }, [filteredRows]);
+  }, [filteredRows, convert]);
 
   const now = new Date();
   const thisMonthStart = format(startOfMonth(now), "yyyy-MM-dd");
@@ -148,8 +151,8 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
   );
 
   const totalThisMonth = useMemo(
-    () => thisMonthRows.reduce((s, r) => s + r.amount, 0),
-    [thisMonthRows]
+    () => thisMonthRows.reduce((s, r) => s + convert(r.amount, r.currency), 0),
+    [thisMonthRows, convert]
   );
 
   const totalThisMonthCount = useMemo(() => thisMonthRows.length, [thisMonthRows]);
@@ -163,32 +166,33 @@ export const useReportsViewModel = (): ReportsViewModelReturn => {
           );
     return rows
       .filter((r) => r.date >= lastMonthStart && r.date <= lastMonthEnd)
-      .reduce((s, r) => s + r.amount, 0);
-  }, [rawRows, selectedCategoryIds, lastMonthStart, lastMonthEnd]);
+      .reduce((s, r) => s + convert(r.amount, r.currency), 0);
+  }, [rawRows, selectedCategoryIds, lastMonthStart, lastMonthEnd, convert]);
 
   const totalPeriod = useMemo(
-    () => filteredRows.reduce((s, r) => s + r.amount, 0),
-    [filteredRows]
+    () => filteredRows.reduce((s, r) => s + convert(r.amount, r.currency), 0),
+    [filteredRows, convert]
   );
 
   const categorySpendingThisMonth = useMemo<CategorySpending[]>(() => {
     const catMap = new Map<string, CategorySpending>();
     thisMonthRows.forEach((r) => {
         const key = r.category_id ?? "uncategorized";
+        const converted = convert(r.amount, r.currency);
         const existing = catMap.get(key);
         if (existing) {
-          existing.total += r.amount;
+          existing.total += converted;
         } else {
           catMap.set(key, {
             category_id: r.category_id,
             category_name: r.category_name,
             category_color: r.category_color,
-            total: r.amount,
+            total: converted,
           });
         }
       });
     return Array.from(catMap.values()).sort((a, b) => b.total - a.total);
-  }, [thisMonthRows]);
+  }, [thisMonthRows, convert]);
 
   const sortedExpenses = useMemo<ReportExpenseRow[]>(() => {
     return [...filteredRows].sort((a, b) => {
