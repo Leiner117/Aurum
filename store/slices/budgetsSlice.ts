@@ -146,10 +146,15 @@ export const updateBudgetThunk = createAsyncThunk(
   "budgets/update",
   async ({ id, ...input }: UpdateBudgetInput, { rejectWithValue, dispatch, getState }) => {
     const supabase = createClient();
-    const { error } = await supabase
-      .from(SUPABASE_TABLES.BUDGETS)
-      .update({ ...input, updated_at: new Date().toISOString() })
-      .eq("id", id);
+    const payload = { ...input, updated_at: new Date().toISOString() };
+    if (input.period_type === "monthly") {
+      payload.month = input.month ?? null;
+      payload.week_number = null;
+    } else if (input.period_type === "weekly") {
+      payload.week_number = input.week_number ?? null;
+      payload.month = null;
+    }
+    const { error } = await supabase.from(SUPABASE_TABLES.BUDGETS).update(payload).eq("id", id);
     if (error) return rejectWithValue(error.message);
     const s = (getState() as { budgets: BudgetsState }).budgets;
     dispatch(
