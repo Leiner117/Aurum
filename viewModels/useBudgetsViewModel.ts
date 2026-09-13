@@ -72,7 +72,7 @@ export const useBudgetsViewModel = () => {
     isComplianceLoading,
   } = useAppSelector((s) => s.budgets);
 
-  const { defaultCurrency } = useCurrencyViewModel();
+  const { defaultCurrency, convert } = useCurrencyViewModel();
 
   const incomeFetched = useRef(false);
 
@@ -111,9 +111,10 @@ export const useBudgetsViewModel = () => {
 
   const overview = useMemo<BudgetOverview>(() => {
     const refCurrency = defaultCurrency ?? "USD";
-    const totalBudgeted = summaries
-      .filter((r) => r.budget_currency === refCurrency)
-      .reduce((s, r) => s + r.budget_amount, 0);
+    const totalBudgeted = summaries.reduce(
+      (s, r) => s + convert(r.budget_amount, r.budget_currency, refCurrency),
+      0
+    );
     const canCompare = monthlyIncomeCurrency === refCurrency;
     return {
       monthlyIncome,
@@ -123,7 +124,7 @@ export const useBudgetsViewModel = () => {
         monthlyIncome !== null && canCompare ? monthlyIncome - totalBudgeted : null,
       currency: refCurrency,
     };
-  }, [summaries, monthlyIncome, monthlyIncomeCurrency, defaultCurrency]);
+  }, [summaries, monthlyIncome, monthlyIncomeCurrency, defaultCurrency, convert]);
 
   const setMonth = (month: number, year: number) =>
     dispatch(setMonthAction({ month, year }));

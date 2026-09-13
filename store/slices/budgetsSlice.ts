@@ -180,8 +180,28 @@ export const deleteBudgetThunk = createAsyncThunk(
   "budgets/delete",
   async (id: string, { rejectWithValue, dispatch, getState }) => {
     const supabase = createClient();
+
+    const { data: budget } = await supabase
+      .from(SUPABASE_TABLES.BUDGETS)
+      .select("category_id, period_type, is_recurring")
+      .eq("id", id)
+      .single();
+
     const { error } = await supabase.from(SUPABASE_TABLES.BUDGETS).delete().eq("id", id);
     if (error) return rejectWithValue(error.message);
+
+    // Deleting a recurring budget must stop it from being auto-recreated next
+    // month by processRecurringBudgetsThunk, which otherwise re-inserts it based
+    // on any earlier row for the same category still flagged is_recurring.
+    if (budget?.is_recurring && budget.period_type === "monthly") {
+      await supabase
+        .from(SUPABASE_TABLES.BUDGETS)
+        .update({ is_recurring: false })
+        .eq("category_id", budget.category_id)
+        .eq("period_type", "monthly")
+        .eq("is_recurring", true);
+    }
+
     const s = (getState() as { budgets: BudgetsState }).budgets;
     dispatch(
       fetchBudgetsThunk({
