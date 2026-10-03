@@ -8,9 +8,17 @@ interface AccountListProps {
   accounts: Account[];
   onEdit: (account: Account) => void;
   onDelete: (id: string) => void;
+  isSelected: (id: string) => boolean;
+  onToggleSelect: (id: string) => void;
 }
 
-export const AccountList = ({ accounts, onEdit, onDelete }: AccountListProps) => {
+export const AccountList = ({
+  accounts,
+  onEdit,
+  onDelete,
+  isSelected,
+  onToggleSelect,
+}: AccountListProps) => {
   if (!accounts.length) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -28,7 +36,14 @@ export const AccountList = ({ accounts, onEdit, onDelete }: AccountListProps) =>
   return (
     <div className="divide-y divide-[var(--color-border)]">
       {accounts.map((account) => (
-        <AccountCard key={account.id} account={account} onEdit={onEdit} onDelete={onDelete} />
+        <AccountCard
+          key={account.id}
+          account={account}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          isSelected={isSelected(account.id)}
+          onToggleSelect={onToggleSelect}
+        />
       ))}
     </div>
   );

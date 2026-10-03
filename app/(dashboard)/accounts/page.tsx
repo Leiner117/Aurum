@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Landmark } from "lucide-react";
+import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
@@ -9,10 +9,11 @@ import { Modal } from "@/components/ui/Modal";
 import { Spinner } from "@/components/ui/Spinner";
 import { AccountList } from "@/components/accounts/AccountList";
 import { AccountForm } from "@/components/accounts/AccountForm";
+import { AccountsTotalCard } from "@/components/accounts/AccountsTotalCard";
 import { useAccountsViewModel } from "@/viewModels/useAccountsViewModel";
+import { useAccountSelectionViewModel } from "@/viewModels/useAccountSelectionViewModel";
 import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
 import { useToast } from "@/providers/ToastProvider";
-import { formatCurrency } from "@/lib/currency/format";
 import type { AccountInput } from "@/lib/validators";
 import type { Account } from "@/types/account.types";
 
@@ -27,7 +28,9 @@ export default function AccountsPage() {
     useAccountsViewModel();
   const { convert, defaultCurrency, isLoadingRates, rates } = useCurrencyViewModel();
 
-  const totalBalance = accounts.reduce(
+  const selection = useAccountSelectionViewModel(accounts);
+
+  const totalBalance = selection.selectedAccounts.reduce(
     (sum, a) => sum + convert(a.balance, a.currency),
     0
   );
@@ -80,19 +83,16 @@ export default function AccountsPage() {
 
       {/* Total balance card */}
       {!isLoading && accounts.length > 0 && (
-        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-primary)]/10 px-5 py-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
-            Total balance
-          </p>
-          <p className="mt-1 text-2xl font-bold text-[var(--color-foreground)]">
-            {isLoadingRates || !Object.keys(rates).length
-              ? "—"
-              : formatCurrency(totalBalance, defaultCurrency)}
-          </p>
-          <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
-            Across {accounts.length} account{accounts.length !== 1 ? "s" : ""}
-          </p>
-        </div>
+        <AccountsTotalCard
+          total={totalBalance}
+          currency={defaultCurrency}
+          isLoadingRates={isLoadingRates || !Object.keys(rates).length}
+          selectedCount={selection.selectedAccounts.length}
+          totalCount={accounts.length}
+          isAllSelected={selection.isAllSelected}
+          onSelectAll={selection.selectAll}
+          onClearSelection={selection.clearSelection}
+        />
       )}
 
       <Card>
@@ -106,6 +106,8 @@ export default function AccountsPage() {
               accounts={accounts}
               onEdit={setEditAccount}
               onDelete={handleDelete}
+              isSelected={selection.isSelected}
+              onToggleSelect={selection.toggleAccount}
             />
           )}
         </CardBody>

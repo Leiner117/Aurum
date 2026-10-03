@@ -12,3 +12,5 @@ export const ACCOUNT_COLORS = [
 
 export const ACCOUNT_ICON_DEFAULT = "wallet";
 export const ACCOUNT_COLOR_DEFAULT = "#f59e0b";
+
+export const ACCOUNTS_EXCLUDED_STORAGE_KEY = "aurum:accounts:excluded-from-total";
