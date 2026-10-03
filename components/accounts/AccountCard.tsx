@@ -9,6 +9,8 @@ interface AccountCardProps {
   account: Account;
   onEdit: (account: Account) => void;
   onDelete: (id: string) => void;
+  isSelected: boolean;
+  onToggleSelect: (id: string) => void;
 }
 
 const ACCOUNT_TYPE_ICONS: Record<string, React.ReactNode> = {
@@ -25,11 +27,26 @@ const ACCOUNT_TYPE_LABELS: Record<string, string> = {
   credit: "Credit",
 };
 
-export const AccountCard = ({ account, onEdit, onDelete }: AccountCardProps) => {
+export const AccountCard = ({
+  account,
+  onEdit,
+  onDelete,
+  isSelected,
+  onToggleSelect,
+}: AccountCardProps) => {
   const isNegative = account.balance < 0;
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3">
+    <div className={cn("flex items-center gap-3 px-4 py-3 transition-opacity", !isSelected && "opacity-60")}>
+      {/* Include in total */}
+      <input
+        type="checkbox"
+        checked={isSelected}
+        onChange={() => onToggleSelect(account.id)}
+        className="h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-primary)]"
+        aria-label={`Include ${account.name} in total`}
+      />
+
       {/* Icon */}
       <div
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white"
