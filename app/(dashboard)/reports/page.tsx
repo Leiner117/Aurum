@@ -13,11 +13,14 @@ import { ExpenseListTable } from "@/components/reports/ExpenseListTable";
 import { useReportsViewModel } from "@/viewModels/useReportsViewModel";
 import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
 import { exportExpensesToCsv } from "@/lib/export";
+import { useIsNative } from "@/lib/native/use-is-native";
 import type { ExpenseWithCategory } from "@/types/expense.types";
 import { formatCurrency } from "@/lib/currency/format";
 import { format } from "date-fns";
 
 const ReportsPage = () => {
+  // CSV download doesn't work inside the Android WebView yet (native share pending)
+  const isNative = useIsNative();
   const {
     categorySpending,
     monthlyTrend,
@@ -68,11 +71,13 @@ const ReportsPage = () => {
               selected={selectedCategoryIds}
               onChange={setSelectedCategoryIds}
             />
-            <Button variant="secondary" size="sm" onClick={handleExport}>
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">Export CSV</span>
-              <span className="sm:hidden">CSV</span>
-            </Button>
+            {!isNative && (
+              <Button variant="secondary" size="sm" onClick={handleExport}>
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Export CSV</span>
+                <span className="sm:hidden">CSV</span>
+              </Button>
+            )}
           </div>
         }
       />
