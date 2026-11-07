@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { createClient } from "@/lib/supabase/client";
-import { SUPABASE_TABLES } from "@/constants/supabase.constants";
-import { isDue, getNextDate } from "@/lib/recurrence";
+import { SUPABASE_FUNCTIONS, SUPABASE_TABLES } from "@/constants/supabase.constants";
 import type {
   RecurringExpenseWithCategory,
   CreateRecurringExpenseInput,
@@ -37,47 +36,17 @@ export const fetchRecurringThunk = createAsyncThunk(
   }
 );
 
+// Due items are generated in the database (process_my_recurring), the same code the
+// daily pg_cron job runs — rows are locked so the app and the job never duplicate.
 export const processRecurringThunk = createAsyncThunk(
   "recurring/process",
   async (_, { rejectWithValue, dispatch }) => {
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return rejectWithValue("Not authenticated");
+    const { data: count, error } = await supabase.rpc(SUPABASE_FUNCTIONS.PROCESS_MY_RECURRING);
+    if (error) return rejectWithValue(error.message);
 
-    const { data: activeItems } = await supabase
-      .from(SUPABASE_TABLES.RECURRING_EXPENSES)
-      .select("*")
-      .eq("is_active", true);
-
-    if (!activeItems?.length) return 0;
-
-    const dueItems = activeItems.filter((item) => isDue(item.next_date));
-    if (!dueItems.length) return 0;
-
-    let count = 0;
-    for (const item of dueItems) {
-      await supabase.from(SUPABASE_TABLES.EXPENSES).insert({
-        user_id: user.id,
-        category_id: item.category_id,
-        account_id: item.account_id ?? null,
-        amount: item.amount,
-        currency: item.currency,
-        description: item.description,
-        date: item.next_date,
-        type: item.type ?? "expense",
-        is_recurring: true,
-        recurring_expense_id: item.id,
-      });
-      const nextDate = getNextDate(item.next_date, item.frequency, item.specific_day);
-      await supabase
-        .from(SUPABASE_TABLES.RECURRING_EXPENSES)
-        .update({ next_date: nextDate, updated_at: new Date().toISOString() })
-        .eq("id", item.id);
-      count++;
-    }
-
-    if (count > 0) dispatch(fetchRecurringThunk());
-    return count;
+    if (count && count > 0) dispatch(fetchRecurringThunk());
+    return count ?? 0;
   }
 );
 
