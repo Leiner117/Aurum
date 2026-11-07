@@ -1,6 +1,8 @@
 # Aurum Android — Plan de app nativa (APK)
 
-> Estado: **Propuesta** · Fecha: 2026-11-07 · Alcance: Android (APK / AAB). iOS queda preparado pero fuera de alcance.
+> Estado: **Fase 1 completada** (shell Capacitor) · ver [`android-setup.md`](./android-setup.md)
+>
+> Estado original: **Propuesta** · Fecha: 2026-11-07 · Alcance: Android (APK / AAB). iOS queda preparado pero fuera de alcance.
 
 ## 1. Objetivo
 
@@ -211,7 +213,7 @@ create table public.notification_preferences (
 | Fase | Entregable | Estimación |
 |---|---|---|
 | **0. Preparación** | Proyecto Firebase, `google-services.json`, keystore de firma, decidir `appId`, dominio prod fijo | 0.5 día |
-| **1. Shell Capacitor** | `capacitor.config.ts`, `android/`, `native-shell/` offline, iconos/splash, status bar, APK debug que carga la web y permite login | 1–2 días |
+| **1. Shell Capacitor** ✅ | `capacitor.config.ts`, `android/`, `native-shell/` offline, iconos/splash, status bar, APK debug que carga la web y permite login | 1–2 días |
 | **2. Experiencia nativa** | Safe areas, botón atrás + modales, teclado, háptica, banner offline, enlaces externos, export CSV nativo | 2–3 días |
 | **3. Backend de notificaciones** | Migraciones 021–024, Edge Function `send-push`, recurrentes en servidor (pg_cron), anti-duplicados | 3–4 días |
 | **4. Push en cliente** | `usePushNotificationsViewModel`, canales, deep link al tocar, preferencias en Ajustes, recordatorio local | 2 días |

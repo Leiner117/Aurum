@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { ToastProvider } from "@/providers/ToastProvider";
 import { ReduxProvider } from "@/providers/ReduxProvider";
+import { NativeProvider } from "@/providers/NativeProvider";
 
 export const metadata: Metadata = {
   title: "Aurum",
@@ -25,6 +26,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  // Draw under the system bars; layout pads with env(safe-area-inset-*)
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -37,7 +40,9 @@ export default function RootLayout({
       <body className="min-h-full bg-[var(--color-background)] text-[var(--color-foreground)]">
         <ReduxProvider>
           <ThemeProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <ToastProvider>
+              <NativeProvider>{children}</NativeProvider>
+            </ToastProvider>
           </ThemeProvider>
         </ReduxProvider>
       </body>

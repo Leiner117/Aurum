@@ -50,3 +50,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 *.example !.env.local.example
+
+# android signing
+*.jks
+*.keystore
+android/app/google-services.json

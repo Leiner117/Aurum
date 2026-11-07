@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 import { useEffect } from "react";
+import { useBackHandler } from "@/lib/native/back-button";
 
 interface ModalProps {
   isOpen: boolean;
@@ -25,6 +26,8 @@ export const Modal = ({
   children,
   size = "md",
 }: ModalProps) => {
+  useBackHandler(isOpen, onClose);
+
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e: KeyboardEvent) => {

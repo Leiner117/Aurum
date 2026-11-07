@@ -21,7 +21,7 @@ export const Header = () => {
     theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4 lg:px-6">
+    <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4 lg:px-6">
       {/* Mobile nav trigger */}
       <MobileNav />
 
