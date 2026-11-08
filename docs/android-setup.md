@@ -31,7 +31,7 @@ Para probar contra el dev server en la red local: `CAP_SERVER_URL=http://192.168
 Instalar en un teléfono con depuración USB: `adb install -r android/app/build/outputs/apk/debug/app-debug.apk`.
 
 ## CI (GitHub Actions — `.github/workflows/android.yml`)
-Se ejecuta manualmente (*Run workflow*) o al cambiar archivos nativos en `main`. El APK queda como artefacto.
+Se ejecuta manualmente (*Run workflow*) o al cambiar archivos nativos en `master`. El APK queda como artefacto.
 
 Configurar en *Settings → Secrets and variables → Actions*:
 
