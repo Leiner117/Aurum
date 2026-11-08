@@ -16,7 +16,9 @@ Reglas:
 - Los fallos del trigger nunca bloquean el guardado de un gasto o una meta.
 
 ## Migraciones
-`021_device_tokens` · `022_notifications` · `023_server_recurring_processing` · `024_push_triggers`
+`021_device_tokens` · `022_notifications` · `023_server_recurring_processing` · `024_push_triggers` · `025_harden_push_functions`
+
+> ✅ Aplicadas en producción (`majazwbtqgrdhlfelftq`) el 2026-11-08. Respaldo previo en el schema `backup_20261108`.
 
 > ⚠️ Desde la `023`, la app ya **no** genera los recurrentes en el navegador: llama a `process_my_recurring()`.
 > Hay que aplicar las migraciones **antes** de desplegar el frontend de esta rama.
