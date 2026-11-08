@@ -3,5 +3,9 @@
     <string name="app_name">Aurum</string>
     <string name="title_activity_main">Aurum</string>
     <string name="package_name">com.aurum.finance</string>
-    <string name="custom_url_scheme">com.aurum.finance</string>
+    <string name="custom_url_scheme">aurum</string>
+    <string name="shortcut_add_expense_short">Add expense</string>
+    <string name="shortcut_add_expense_long">Add a new expense</string>
+    <string name="shortcut_add_income_short">Add income</string>
+    <string name="shortcut_add_income_long">Add a new income</string>
 </resources>

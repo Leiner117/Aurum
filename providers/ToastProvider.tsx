@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useState } from "react";
 import { Toast } from "@/components/ui/Toast";
+import { hapticFeedback } from "@/lib/native/haptics";
 
 type ToastVariant = "success" | "error" | "warning" | "info";
 
@@ -24,6 +25,8 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
   const showToast = useCallback(
     (message: string, variant: ToastVariant = "info") => {
+      // Every save/delete/error already reports through a toast — one place for haptics
+      hapticFeedback(variant);
       const id = crypto.randomUUID();
       setToasts((prev) => [...prev, { id, message, variant }]);
       setTimeout(() => {

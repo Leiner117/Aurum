@@ -9,10 +9,11 @@ Plan completo: [`android-app-plan.md`](./android-app-plan.md).
 - Android Studio (o Android SDK con `platforms;android-36` y `build-tools;36.0.0`)
 
 ## URL que carga la app
-`capacitor.config.ts` lee `CAP_SERVER_URL` al hacer `cap sync`:
+Por defecto la app carga **https://aurum.leineralvarado.dev** (producción).
+Para otra URL, `capacitor.config.ts` lee `CAP_SERVER_URL` al hacer `cap sync`:
 
 ```bash
-CAP_SERVER_URL=https://<tu-dominio>.vercel.app npm run cap:sync
+CAP_SERVER_URL=https://<preview>.vercel.app npm run cap:sync
 ```
 
 Para probar contra el dev server en la red local: `CAP_SERVER_URL=http://192.168.x.x:3000 npm run cap:sync`
@@ -36,7 +37,7 @@ Configurar en *Settings → Secrets and variables → Actions*:
 
 | Tipo | Nombre | Valor |
 |---|---|---|
-| Variable | `CAP_SERVER_URL` | URL de producción |
+| Variable (opcional) | `CAP_SERVER_URL` | Otra URL; por defecto producción |
 | Secret | `ANDROID_KEYSTORE_BASE64` | `base64 -w0 aurum.jks` |
 | Secret | `ANDROID_KEYSTORE_PASSWORD` | contraseña del keystore |
 | Secret | `ANDROID_KEY_ALIAS` | alias de la llave |
@@ -50,7 +51,7 @@ keytool -genkeypair -v -keystore aurum.jks -alias aurum -keyalg RSA -keysize 204
 ```
 
 ## Qué hace la capa nativa (Fase 1)
-- `providers/NativeProvider.tsx` → `useNativeShellViewModel`: oculta el splash al montar, ajusta el estilo de las barras del sistema al tema, y maneja el botón atrás (cierra modal/menú → navega atrás → sale en `/`, `/login`, `/register`).
+- `providers/NativeProvider.tsx` → `useNativeShellViewModel`: oculta el splash al montar (con auto-ocultado de respaldo a los 2.5 s), ajusta el estilo de las barras del sistema al tema, y maneja el botón atrás (cierra modal/menú → navega atrás → sale en `/`, `/login`, `/register`).
 - `lib/native/back-button.ts`: pila de overlays; `Modal`, `MobileNav` y `FloatingMenu` se registran con `useBackHandler`.
 - Pantalla de borde a borde: el layout usa `env(safe-area-inset-*)` (vale `0` en navegadores de escritorio, así que la web no cambia).
 - `OfflineBanner`: aviso cuando no hay conexión (también en la web). Sin red al abrir, se muestra `native-shell/offline.html`.
@@ -76,3 +77,15 @@ Probar un push manualmente (SQL editor), con la app instalada y la sesión inici
 ```sql
 select public.enqueue_notification('<user-uuid>', 'goal_reached', 'Test', 'Hello from Aurum', '/goals');
 ```
+
+## Experiencia nativa (Fases 2 y 5)
+- **Vibración** (`lib/native/haptics.ts`): cada toast vibra según su tipo (éxito, advertencia o error), y también al abrir el menú flotante.
+- **Teclado**: `Keyboard.resizeOnFullScreen` ajusta la vista y el campo enfocado se desplaza para quedar visible.
+- **Exportar CSV**: en la app guarda el archivo y abre la hoja de compartir de Android; en la web se descarga como antes.
+- **Bloqueo de la app** (*Settings → Security*, solo en la app): huella, rostro o PIN del teléfono. Pide desbloqueo al abrir
+  la app en frío y al volver después de 30 s en segundo plano. No lo pide justo después de iniciar sesión con contraseña.
+  Activarlo o desactivarlo exige verificar primero.
+- **Accesos directos** (mantener presionado el icono): *Add expense* / *Add income* → `aurum://expenses?new=expense|income`,
+  que abre el formulario. El esquema `aurum://` solo acepta rutas conocidas de la app.
+- **Pendiente: App Links** (que `https://aurum.leineralvarado.dev/...` abra la app): requiere el keystore de release
+  para publicar `/.well-known/assetlinks.json` con su huella SHA-256.

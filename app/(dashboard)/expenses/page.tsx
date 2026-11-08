@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useCallback, useState } from "react";
 import { Plus, Receipt, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
@@ -12,6 +12,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { ExpenseFiltersBar } from "@/components/expenses/ExpenseFilters";
 import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { ExpenseRowActions } from "@/components/expenses/ExpenseRowActions";
+import { NewTransactionParam } from "@/components/expenses/NewTransactionParam";
 import { CategoryIcon } from "@/components/categories/CategoryIcon";
 import { useExpensesViewModel } from "@/viewModels/useExpensesViewModel";
 import { useCategoriesViewModel } from "@/viewModels/useCategoriesViewModel";
@@ -58,6 +59,13 @@ export default function ExpensesPage() {
     setActiveType(tab);
     setFilters({ ...filters, type: tab });
   };
+
+  // App shortcut / deep link: /expenses?new=expense|income
+  const openCreateFor = useCallback((type: TransactionType) => {
+    setActiveType(type);
+    setFilters({ ...filters, type });
+    setIsCreateOpen(true);
+  }, [filters, setFilters]);
 
   const handleCreate = async (data: ExpenseInput) => {
     setCreateLoading(true);
@@ -173,6 +181,9 @@ export default function ExpensesPage() {
 
   return (
     <div className="space-y-6">
+      <Suspense fallback={null}>
+        <NewTransactionParam onOpen={openCreateFor} />
+      </Suspense>
       <PageHeader
         title="Transactions"
         description={`${totalCount} ${isIncome ? "income" : "expense"}${totalCount !== 1 ? "s" : ""} total`}

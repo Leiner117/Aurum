@@ -112,7 +112,7 @@ La copia queda en tu gestor de contraseñas y en los secretos de Supabase.
 
 1. Compila e instala la app:
    ```bash
-   CAP_SERVER_URL=https://<tu-dominio> npm run android:build
+   npm run android:build
    adb install -r android/app/build/outputs/apk/debug/app-debug.apk
    ```
 2. Abre la app, inicia sesión y **acepta** el permiso de notificaciones.

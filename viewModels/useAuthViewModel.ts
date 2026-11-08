@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ROUTES } from "@/constants/routes.constants";
 import { removeDeviceToken } from "@/lib/native/push";
+import { markUnlocked } from "@/lib/native/biometric";
 import type { LoginInput, RegisterInput } from "@/lib/validators";
 
 export interface AuthViewModelReturn {
@@ -28,6 +29,8 @@ export const useAuthViewModel = (): AuthViewModelReturn => {
       setError(null);
       const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) throw authError;
+      // The password was just entered — don't ask for the app lock right after
+      markUnlocked();
       router.push(ROUTES.DASHBOARD);
       router.refresh();
     } catch (err) {
@@ -47,6 +50,8 @@ export const useAuthViewModel = (): AuthViewModelReturn => {
         options: { data: { full_name: fullName } },
       });
       if (authError) throw authError;
+      // The password was just entered — don't ask for the app lock right after
+      markUnlocked();
       router.push(ROUTES.DASHBOARD);
       router.refresh();
     } catch (err) {

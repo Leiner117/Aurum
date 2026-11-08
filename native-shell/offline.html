@@ -27,7 +27,7 @@
     <p>Aurum needs an internet connection. Check your network and try again.</p>
     <button type="button" onclick="location.reload()">Retry</button>
     <script>
-      // The splash waits for the web app to hide it; hide it here when the app can't load
+      // Hide the splash right away when the app can't load
       var plugins = window.Capacitor && window.Capacitor.Plugins;
       if (plugins && plugins.SplashScreen) plugins.SplashScreen.hide();
       window.addEventListener("online", function () { location.reload(); });

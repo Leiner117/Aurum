@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { SystemBars, SystemBarsStyle } from "@capacitor/core";
 import { App } from "@capacitor/app";
+import { Keyboard } from "@capacitor/keyboard";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { useTheme } from "@/providers/ThemeProvider";
 import { isNativePlatform } from "@/lib/native/platform";
@@ -25,7 +26,7 @@ export const useNativeShellViewModel = (): NativeShellViewModelReturn => {
     pathnameRef.current = pathname;
   }, [pathname]);
 
-  // The splash stays up (launchAutoHide: false) until the web app has mounted
+  // Hide the splash as soon as the web app has mounted (auto-hide is only a fallback)
   useEffect(() => {
     if (!isNative) return;
     SplashScreen.hide({ fadeOutDuration: SPLASH_FADE_OUT_MS });
@@ -54,6 +55,18 @@ export const useNativeShellViewModel = (): NativeShellViewModelReturn => {
       listener.then((handle) => handle.remove());
     };
   }, [isNative, router]);
+
+  // Keep the focused field visible above the keyboard (forms inside modals)
+  useEffect(() => {
+    if (!isNative) return;
+    const listener = Keyboard.addListener("keyboardDidShow", () => {
+      const active = document.activeElement;
+      if (active instanceof HTMLElement) active.scrollIntoView({ block: "center", behavior: "smooth" });
+    });
+    return () => {
+      listener.then((handle) => handle.remove());
+    };
+  }, [isNative]);
 
   return { isNative };
 };

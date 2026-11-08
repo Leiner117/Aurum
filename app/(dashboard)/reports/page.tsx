@@ -13,14 +13,13 @@ import { ExpenseListTable } from "@/components/reports/ExpenseListTable";
 import { useReportsViewModel } from "@/viewModels/useReportsViewModel";
 import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
 import { exportExpensesToCsv } from "@/lib/export";
-import { useIsNative } from "@/lib/native/use-is-native";
+import { useToast } from "@/providers/ToastProvider";
 import type { ExpenseWithCategory } from "@/types/expense.types";
 import { formatCurrency } from "@/lib/currency/format";
 import { format } from "date-fns";
 
 const ReportsPage = () => {
-  // CSV download doesn't work inside the Android WebView yet (native share pending)
-  const isNative = useIsNative();
+  const { showToast } = useToast();
   const {
     categorySpending,
     monthlyTrend,
@@ -45,7 +44,7 @@ const ReportsPage = () => {
   const diff = totalThisMonth - totalLastMonth;
   const diffSign = diff >= 0 ? "+" : "";
 
-  const handleExport = () => {
+  const handleExport = async () => {
     const filename = `expenses-${format(new Date(), "yyyy-MM")}.csv`;
     const rows = sortedExpenses.map((r) => ({
       date: r.date,
@@ -55,7 +54,11 @@ const ReportsPage = () => {
       notes: null,
       category: { name: r.category_name },
     })) as unknown as ExpenseWithCategory[];
-    exportExpensesToCsv(rows, filename);
+    try {
+      await exportExpensesToCsv(rows, filename);
+    } catch {
+      showToast("Failed to export CSV", "error");
+    }
   };
 
   return (
@@ -71,13 +74,11 @@ const ReportsPage = () => {
               selected={selectedCategoryIds}
               onChange={setSelectedCategoryIds}
             />
-            {!isNative && (
-              <Button variant="secondary" size="sm" onClick={handleExport}>
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Export CSV</span>
-                <span className="sm:hidden">CSV</span>
-              </Button>
-            )}
+            <Button variant="secondary" size="sm" onClick={handleExport}>
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Export CSV</span>
+              <span className="sm:hidden">CSV</span>
+            </Button>
           </div>
         }
       />
