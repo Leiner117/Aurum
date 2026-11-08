@@ -56,6 +56,8 @@ keytool -genkeypair -v -keystore aurum.jks -alias aurum -keyalg RSA -keysize 204
 - `OfflineBanner`: aviso cuando no hay conexión (también en la web). Sin red al abrir, se muestra `native-shell/offline.html`.
 
 ## Notificaciones en la app (Fase 4)
+Guía de Firebase paso a paso: [`firebase-setup.md`](./firebase-setup.md).
+
 Requisitos: backend de la Fase 3 desplegado ([`push-notifications-setup.md`](./push-notifications-setup.md)) y
 `android/app/google-services.json` (de Firebase; está en `.gitignore`, en CI se restaura desde el secreto `GOOGLE_SERVICES_JSON`).
 Sin ese archivo la app compila y funciona, pero no recibe push.
