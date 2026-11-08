@@ -28,6 +28,10 @@ const config: CapacitorConfig = {
       showSpinner: false,
       androidScaleType: "CENTER_CROP",
     },
+    LocalNotifications: {
+      smallIcon: "ic_stat_notification",
+      iconColor: "#f59e0b",
+    },
     SystemBars: {
       // Edge-to-edge webview; the layout pads itself with env(safe-area-inset-*)
       insetsHandling: "css",

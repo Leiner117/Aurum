@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ROUTES } from "@/constants/routes.constants";
+import { removeDeviceToken } from "@/lib/native/push";
 import type { LoginInput, RegisterInput } from "@/lib/validators";
 
 export interface AuthViewModelReturn {
@@ -58,6 +59,8 @@ export const useAuthViewModel = (): AuthViewModelReturn => {
   const logout = async (): Promise<void> => {
     try {
       setIsLoading(true);
+      // Must run while still authenticated (RLS); failure must not block sign-out
+      await removeDeviceToken().catch(() => undefined);
       await supabase.auth.signOut();
       router.push(ROUTES.LOGIN);
       router.refresh();

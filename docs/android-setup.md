@@ -54,3 +54,23 @@ keytool -genkeypair -v -keystore aurum.jks -alias aurum -keyalg RSA -keysize 204
 - `lib/native/back-button.ts`: pila de overlays; `Modal`, `MobileNav` y `FloatingMenu` se registran con `useBackHandler`.
 - Pantalla de borde a borde: el layout usa `env(safe-area-inset-*)` (vale `0` en navegadores de escritorio, así que la web no cambia).
 - `OfflineBanner`: aviso cuando no hay conexión (también en la web). Sin red al abrir, se muestra `native-shell/offline.html`.
+
+## Notificaciones en la app (Fase 4)
+Requisitos: backend de la Fase 3 desplegado ([`push-notifications-setup.md`](./push-notifications-setup.md)) y
+`android/app/google-services.json` (de Firebase; está en `.gitignore`, en CI se restaura desde el secreto `GOOGLE_SERVICES_JSON`).
+Sin ese archivo la app compila y funciona, pero no recibe push.
+
+- **Registro**: al entrar al dashboard se crean los canales de Android (`budgets`, `recurring`, `goals`, `reminders`),
+  se pide permiso **una sola vez** (Android 13+) y el token FCM se guarda con `register_device_token()`.
+  Si el usuario lo rechazó, puede activarlo desde *Settings → Notifications*.
+- **Al tocar una notificación** se abre su pantalla (`data.route`: `/budgets`, `/recurring`, `/goals`).
+- **Con la app abierta** Android no muestra el banner; se muestra un toast.
+- **Cerrar sesión** borra el token de este dispositivo (`unregister_device_token()`).
+- **Settings → Notifications**: preferencias por tipo (se guardan en `notification_preferences`, aplican a todos
+  los dispositivos y también se ven en la web) y un recordatorio diario local configurable (solo en este dispositivo).
+- Icono de la barra de estado: `res/drawable/ic_stat_notification.xml` (silueta blanca; color `#F59E0B`).
+
+Probar un push manualmente (SQL editor), con la app instalada y la sesión iniciada:
+```sql
+select public.enqueue_notification('<user-uuid>', 'goal_reached', 'Test', 'Hello from Aurum', '/goals');
+```

@@ -2,6 +2,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { RealtimeSyncProvider } from "@/components/layout/RealtimeSyncProvider";
 import { FloatingMenu } from "@/components/layout/FloatingMenu";
+import { PushNotificationsBridge } from "@/components/layout/PushNotificationsBridge";
 
 export default function DashboardLayout({
   children,
@@ -20,6 +21,7 @@ export default function DashboardLayout({
         </div>
       </div>
       <FloatingMenu />
+      <PushNotificationsBridge />
     </RealtimeSyncProvider>
   );
 }

@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
       token,
       title: notification.title,
       body: notification.body,
-      channelId: CHANNEL_BY_TYPE[notification.type] ?? "default",
+      channelId: CHANNEL_BY_TYPE[notification.type] ?? "budgets",
       data,
     }).catch((err: Error) => ({ ok: false as const, unregistered: false, error: err.message }));
 
