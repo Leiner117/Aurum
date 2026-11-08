@@ -13,11 +13,13 @@ import { ExpenseListTable } from "@/components/reports/ExpenseListTable";
 import { useReportsViewModel } from "@/viewModels/useReportsViewModel";
 import { useCurrencyViewModel } from "@/viewModels/useCurrencyViewModel";
 import { exportExpensesToCsv } from "@/lib/export";
+import { useToast } from "@/providers/ToastProvider";
 import type { ExpenseWithCategory } from "@/types/expense.types";
 import { formatCurrency } from "@/lib/currency/format";
 import { format } from "date-fns";
 
 const ReportsPage = () => {
+  const { showToast } = useToast();
   const {
     categorySpending,
     monthlyTrend,
@@ -42,7 +44,7 @@ const ReportsPage = () => {
   const diff = totalThisMonth - totalLastMonth;
   const diffSign = diff >= 0 ? "+" : "";
 
-  const handleExport = () => {
+  const handleExport = async () => {
     const filename = `expenses-${format(new Date(), "yyyy-MM")}.csv`;
     const rows = sortedExpenses.map((r) => ({
       date: r.date,
@@ -52,7 +54,11 @@ const ReportsPage = () => {
       notes: null,
       category: { name: r.category_name },
     })) as unknown as ExpenseWithCategory[];
-    exportExpensesToCsv(rows, filename);
+    try {
+      await exportExpensesToCsv(rows, filename);
+    } catch {
+      showToast("Failed to export CSV", "error");
+    }
   };
 
   return (

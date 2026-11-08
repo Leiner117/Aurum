@@ -1,5 +1,6 @@
 "use client";
 
+import { hapticTap } from "@/lib/native/haptics";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { ROUTES } from "@/constants/routes.constants";
@@ -38,7 +39,10 @@ export const useFloatingMenuViewModel = (): FloatingMenuViewModelReturn => {
     setIsOpen(false);
   }, [pathname]);
 
-  const toggle = () => setIsOpen((prev) => !prev);
+  const toggle = () => {
+    hapticTap();
+    setIsOpen((prev) => !prev);
+  };
   const close = () => setIsOpen(false);
 
   const isActive = (href: string) =>

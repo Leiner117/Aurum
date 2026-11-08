@@ -2,6 +2,8 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { RealtimeSyncProvider } from "@/components/layout/RealtimeSyncProvider";
 import { FloatingMenu } from "@/components/layout/FloatingMenu";
+import { PushNotificationsBridge } from "@/components/layout/PushNotificationsBridge";
+import { BiometricLockScreen } from "@/components/layout/BiometricLockScreen";
 
 export default function DashboardLayout({
   children,
@@ -14,12 +16,14 @@ export default function DashboardLayout({
         <Sidebar />
         <div className="flex flex-1 flex-col overflow-hidden">
           <Header />
-          <main className="flex-1 overflow-y-auto px-4 py-6 lg:px-6">
+          <main className="flex-1 overflow-y-auto px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] lg:px-6">
             {children}
           </main>
         </div>
       </div>
       <FloatingMenu />
+      <PushNotificationsBridge />
+      <BiometricLockScreen />
     </RealtimeSyncProvider>
   );
 }

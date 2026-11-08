@@ -6,6 +6,7 @@ import { Receipt, Landmark, Target, ArrowLeftRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { ROUTES } from "@/constants/routes.constants";
 import type { LucideIcon } from "lucide-react";
+import { useBackHandler } from "@/lib/native/back-button";
 
 interface MenuItem {
   label: string;
@@ -24,13 +25,15 @@ export const FloatingMenu = () => {
   const { isOpen, pos, isDragging, close, isActive, handlePointerDown, handlePointerMove, handlePointerUp } =
     useFloatingMenuViewModel();
 
+  useBackHandler(isOpen, close);
+
   return (
     <>
       {isOpen && (
         <div className="fixed inset-0 z-30" onClick={close} aria-hidden="true" />
       )}
 
-      <div className="fixed z-40" style={{ bottom: pos.bottom, right: pos.right }}>
+      <div className="fixed z-40" style={{ bottom: `calc(${pos.bottom}px + env(safe-area-inset-bottom))`, right: pos.right }}>
         {isOpen && (
           <div className="absolute bottom-full mb-3 right-0 flex flex-col items-end gap-3">
             {MENU_ITEMS.map((item, index) => {

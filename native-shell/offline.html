@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Aurum — Offline</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 16px; padding: 24px; box-sizing: border-box; text-align: center;
+        background: #0a0a0a; color: #fafafa;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      .logo { width: 72px; height: 72px; border-radius: 18px; background: #f59e0b;
+        display: grid; place-items: center; font-size: 36px; font-weight: 700; color: #0a0a0a; }
+      h1 { margin: 0; font-size: 20px; }
+      p { margin: 0; max-width: 320px; color: #a1a1aa; font-size: 14px; line-height: 1.5; }
+      button { margin-top: 8px; padding: 12px 24px; border: 0; border-radius: 12px;
+        background: #f59e0b; color: #0a0a0a; font-size: 15px; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <div class="logo">A</div>
+    <h1>No connection</h1>
+    <p>Aurum needs an internet connection. Check your network and try again.</p>
+    <button type="button" onclick="location.reload()">Retry</button>
+    <script>
+      // Hide the splash right away when the app can't load
+      var plugins = window.Capacitor && window.Capacitor.Plugins;
+      if (plugins && plugins.SplashScreen) plugins.SplashScreen.hide();
+      window.addEventListener("online", function () { location.reload(); });
+    </script>
+  </body>
+</html>

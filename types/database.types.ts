@@ -1,3 +1,10 @@
+import type {
+  AppNotification,
+  DevicePlatform,
+  DeviceToken,
+  NotificationPreferences,
+} from "@/types/notification.types";
+
 export type Json =
   | string
   | number
@@ -129,6 +136,7 @@ export interface Database {
           alert_threshold: number;
           is_recurring: boolean;
           notifications_enabled: boolean;
+          last_alert_status: "ok" | "warning" | "exceeded" | null;
           period_type: "monthly" | "weekly";
           week_number: number | null;
           created_at: string;
@@ -406,9 +414,39 @@ export interface Database {
         };
         Relationships: [];
       };
+      device_tokens: {
+        Row: DeviceToken;
+        Insert: Partial<DeviceToken>;
+        Update: Partial<DeviceToken>;
+        Relationships: [];
+      };
+      notifications: {
+        Row: AppNotification;
+        Insert: Partial<AppNotification>;
+        Update: { read_at?: string | null };
+        Relationships: [];
+      };
+      notification_preferences: {
+        Row: NotificationPreferences;
+        Insert: { user_id: string } & Partial<Omit<NotificationPreferences, "user_id">>;
+        Update: Partial<Omit<NotificationPreferences, "user_id">>;
+        Relationships: [];
+      };
     };
     Views: Record<never, never>;
     Functions: {
+      process_my_recurring: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      register_device_token: {
+        Args: { p_token: string; p_platform: DevicePlatform; p_app_version?: string | null };
+        Returns: undefined;
+      };
+      unregister_device_token: {
+        Args: { p_token: string };
+        Returns: undefined;
+      };
       get_budget_summary: {
         Args: {
           p_user_id: string;

@@ -20,6 +20,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useBackHandler } from "@/lib/native/back-button";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: ROUTES.DASHBOARD, icon: <LayoutDashboard className="h-4 w-4" /> },
@@ -37,6 +38,8 @@ const NAV_ITEMS = [
 export const MobileNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+
+  useBackHandler(isOpen, () => setIsOpen(false));
 
   useEffect(() => {
     setIsOpen(false);
@@ -61,7 +64,7 @@ export const MobileNav = () => {
           />
 
           {/* Drawer */}
-          <div className="absolute left-0 top-0 bottom-0 w-64 bg-[var(--color-surface)] flex flex-col shadow-xl">
+          <div className="absolute left-0 top-0 bottom-0 w-64 bg-[var(--color-surface)] flex flex-col shadow-xl pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
             <div className="flex h-14 items-center justify-between px-4 border-b border-[var(--color-border)]">
               <div className="flex items-center gap-2.5">
                 <Image src="/logo.png" alt="Aurum" width={28} height={28} className="shrink-0" />
